@@ -1,4 +1,6 @@
+import { fileSyntax } from 'esbuild-sass-plugin/lib/utils';
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+const { dialog } = require('electron');
 
 // Remember to rename these classes and interfaces!
 
@@ -33,14 +35,17 @@ export default class MyPlugin extends Plugin {
 		const statusBarItemEl = this.addStatusBarItem();
 		statusBarItemEl.setText('Status Bar Text');
 
-		// This adds a simple command that can be triggered anywhere
+
+		
 		this.addCommand({
-			id: 'open-sample-modal-simple',
-			name: 'Open sample modal (simple)',
+			id: 'ublik-om_import-google-keep-jsons',
+			name: 'Import backup from Google Keep',
 			callback: () => {
-				new SampleModal(this.app).open();
+				new OpenImportDialog(this.app).open();
 			}
 		});
+
+
 		// This adds an editor command that can perform some operation on the current editor instance
 		this.addCommand({
 			id: 'sample-editor-command',
@@ -48,25 +53,6 @@ export default class MyPlugin extends Plugin {
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				console.log(editor.getSelection());
 				editor.replaceSelection('Sample Editor Command');
-			}
-		});
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
-		this.addCommand({
-			id: 'open-sample-modal-complex',
-			name: 'Open sample modal (complex)',
-			checkCallback: (checking: boolean) => {
-				// Conditions to check
-				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (markdownView) {
-					// If checking is true, we're simply "checking" if the command can be run.
-					// If checking is false, then we want to actually perform the operation.
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
-
-					// This command will only show up in Command Palette when the check function returns true
-					return true;
-				}
 			}
 		});
 
@@ -96,14 +82,90 @@ export default class MyPlugin extends Plugin {
 	}
 }
 
-class SampleModal extends Modal {
+class OpenImportDialog extends Modal {
+	result: string;
+
 	constructor(app: App) {
 		super(app);
 	}
 
 	onOpen() {
 		const {contentEl} = this;
-		contentEl.setText('Woah!');
+		contentEl.setText('Upload a set of jsons output from a Google Keep backup');
+
+		// new Setting(contentEl)
+		// 	.setName("Name")
+		// 	.addText((text) =>
+		// 		text.onChange((value) => {
+		// 		this.result = value
+		// 		}));
+
+		// new Setting(contentEl)
+		// 	.addColorPicker(color => {});
+
+		// new Setting(contentEl)
+		// 	.addExtraButton(btn => {});
+
+		// new Setting(contentEl)
+		// 	.addMomentFormat(test => {})
+
+		// new Setting(contentEl)
+		// 	.addSearch(test => {});
+
+		// new Setting(contentEl)
+		// 	.addSlider(test => {});
+
+		// new Setting(contentEl)
+		// 	.addTextArea(test => {});
+
+		const dropFrame = contentEl.createEl('div', {cls: 'uo_drop-frame'});
+		const dropFrameText = dropFrame.createEl('p', { text: 'Drag your files here or ' });
+		// const linkText = dropFrameText.createEl('a', {text: 'browse local files'})
+		dropFrameText.createEl('label', { 
+			text: 'browse local files',
+			attr: {
+				'class': 'uo_file-label',
+				'for': 'uo_file',
+			}
+		})
+		const uploadBtn = dropFrameText.createEl('input', { 
+			type: 'file',
+			attr: {
+				'multiple': true,
+				'id': 'uo_file',
+				'accept': '.json',
+			}
+		})
+
+
+		uploadBtn.addEventListener('change', () => {
+			console.log('uploadBtn.files', uploadBtn.files);
+			this.close();
+		});
+		
+// 		<label for="file-upload" class="custom-file-upload">
+//     Custom Upload
+// </label>
+// <input id="file-upload" type="file"/>
+
+		// new Setting(contentEl)
+		// 	.addButton((btn) =>
+		// 		btn
+		// 		.setButtonText("Upload")
+		// 		.setCta()
+		// 		.onClick(() => {
+		// 			// console.log(dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] }))
+		// 			dialog.showOpenDialog({properties: ['openFile'] }).then(function (response) {
+		// 				if (!response.canceled) {
+		// 					// handle fully qualified file name
+		// 				  console.log(response.filePaths[0]);
+		// 				} else {
+		// 				  console.log("no file selected");
+		// 				}
+		// 			});
+		// 			// this.close();
+		// 		}));
+
 	}
 
 	onClose() {

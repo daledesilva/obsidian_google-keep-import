@@ -7,3 +7,22 @@ If your plugin does not need CSS, delete this file.
 
 */
 
+
+
+.uo_drop-frame {
+    width: 100%;
+    padding: 1.5em;
+    border-radius: 10px;
+    border: 1px white dashed;
+    margin: 1em 0;
+    text-align: center;
+}
+
+#uo_file {
+    display: none;
+}
+
+.uo_file-label {
+    color: pink;
+    text-decoration: underline;
+}
