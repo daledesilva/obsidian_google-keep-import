@@ -1,0 +1,11 @@
+{
+	"id": "Plugin Template",
+	"name": "Plugin Template",
+	"version": "0.0.1",
+	"minAppVersion": "1.00.0",
+	"description": "A template to help kick off your plugin.",
+	"author": "Dale de Silva",
+	"authorUrl": "https://ublik-om.net",
+	"fundingUrl": "https://twitter.com/daledesilva",
+	"isDesktopOnly": false
+}

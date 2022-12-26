@@ -1,0 +1,5 @@
+// The existence of this file indiciates the plugin should be reloaded automatically on change provided you have Hot Relead plguin installed in Obsidian.
+// The Hot Reload plugin can be installed from here: https://github.com/pjeby/hot-reload
+
+// This file isn't copied into dist automatically, you should copy it manually.
+// This prevents it from being included in releases by default.
