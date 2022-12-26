@@ -1,9 +1,9 @@
 {
-	"id": "Plugin Template",
-	"name": "Plugin Template",
+	"id": "ublik-om_keep-import",
+	"name": "Keep Import",
 	"version": "0.0.1",
 	"minAppVersion": "1.00.0",
-	"description": "A template to help kick off your plugin.",
+	"description": "Allows import of Google Keep backup json files",
 	"author": "Dale de Silva",
 	"authorUrl": "https://ublik-om.net",
 	"fundingUrl": "https://twitter.com/daledesilva",
