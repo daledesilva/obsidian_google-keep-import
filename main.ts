@@ -1,8 +1,29 @@
 import { fileSyntax } from 'esbuild-sass-plugin/lib/utils';
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
-const { dialog } = require('electron');
+import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, TFile, TFolder, Vault } from 'obsidian';
 
-// Remember to rename these classes and interfaces!
+
+
+const IMPORT_FOLDER = 'Keep Imports';
+
+var plugin: MyPlugin;
+
+
+interface KeepListItem {
+	text: string;
+	isChecked: boolean;
+}
+interface KeepJson {
+	color: string;
+	createdTimestampUsec: number;
+	isArchived: boolean;
+	isPinned: boolean;
+	isTrashed: boolean;
+	textContent?: string;
+	listContent?: Array<KeepListItem>;
+	title: string;
+	userEditedTimestampUsec: number;
+}
+
 
 interface MyPluginSettings {
 	hideOpenVaultButton: boolean;
@@ -16,11 +37,14 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 	vaultLinks: ['utl'],
 }
 
+
+
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
 
 	async onload() {
 		await this.loadSettings();
+		plugin = this;	// TODO: Not sure if this is a good idea or not
 
 		// This creates an icon in the left ribbon.
 		const ribbonIconEl = this.addRibbonIcon('dice', 'Open Philsophy Vault', (evt: MouseEvent) => {
@@ -45,7 +69,7 @@ export default class MyPlugin extends Plugin {
 			}
 		});
 
-
+		
 		// This adds an editor command that can perform some operation on the current editor instance
 		this.addCommand({
 			id: 'sample-editor-command',
@@ -133,38 +157,16 @@ class OpenImportDialog extends Modal {
 			attr: {
 				'multiple': true,
 				'id': 'uo_file',
-				'accept': '.json',
+				'accept': '.json, .jpg, .png, .3gp',
 			}
 		})
 
 
 		uploadBtn.addEventListener('change', () => {
-			console.log('uploadBtn.files', uploadBtn.files);
+			importFiles( Object.values(uploadBtn.files as Object) );	// TODO: Need to respond to this finishing as it's calliung an async function
 			this.close();
 		});
 		
-// 		<label for="file-upload" class="custom-file-upload">
-//     Custom Upload
-// </label>
-// <input id="file-upload" type="file"/>
-
-		// new Setting(contentEl)
-		// 	.addButton((btn) =>
-		// 		btn
-		// 		.setButtonText("Upload")
-		// 		.setCta()
-		// 		.onClick(() => {
-		// 			// console.log(dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] }))
-		// 			dialog.showOpenDialog({properties: ['openFile'] }).then(function (response) {
-		// 				if (!response.canceled) {
-		// 					// handle fully qualified file name
-		// 				  console.log(response.filePaths[0]);
-		// 				} else {
-		// 				  console.log("no file selected");
-		// 				}
-		// 			});
-		// 			// this.close();
-		// 		}));
 
 	}
 
@@ -199,4 +201,142 @@ class SampleSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				}));
 	}
+}
+
+
+
+async function importFiles(files: Array<Object>) {
+	const folder = await getFolder();	
+
+	files.forEach( (file: File) => {
+		switch(file.type) {
+			case 'application/json':	importJson(file, folder);			break;
+			case 'application/jpg':		importAttachment(file, folder);		break;
+			case 'application/png':		importAttachment(file, folder);			break;
+			case 'application/3gp':		importAttachment(file, folder);			break;
+		}
+	})
+
+}
+
+
+async function getFolder(): Promise<TFolder> {
+
+	const root = plugin.app.vault.getRoot();
+	let importFolder: TFolder | undefined;
+
+	// Find the folder if it exists
+	for(let i=0; i<root.children.length; i++) {
+		if(root.children[i].path == IMPORT_FOLDER) {
+			importFolder = root.children[i] as TFolder;
+			break;
+		}
+	}
+	
+	// Create the folder if it doesn't exist
+	if(importFolder === undefined) {
+		await plugin.app.vault.createFolder(IMPORT_FOLDER);		
+		importFolder = await getFolder()
+	}
+	
+	return importFolder;
+}
+
+
+
+function importJson(file: File, folder: TFolder) {
+
+	// setting up the reader
+	var reader = new FileReader();
+	reader.readAsText(file as Blob,'UTF-8');
+
+	reader.onload = async (readerEvent) => {
+
+		// Bail if the file hasn't been interpreted properly
+		if(!readerEvent || !readerEvent.target) {
+			console.error(`Something went wrong reading json: ${file.name}`)
+			return;
+		}
+		
+		const content: KeepJson = JSON.parse(readerEvent.target.result as string);
+		const path: string = `${folder.path}/${content.title || file.name}`;
+		const fileRef: TFile = await plugin.app.vault.create(path+'.md', '');
+		await plugin.app.vault.append(fileRef, `#Keep/Colour/${content.color} `);
+		content.isPinned ?		await plugin.app.vault.append(fileRef, `#Keep/Pinned `) : null;
+		content.isArchived ?	await plugin.app.vault.append(fileRef, `#Keep/Archived `) : null;
+		content.isTrashed ? 	await plugin.app.vault.append(fileRef, `#Keep/Trashed `) : null;
+		await plugin.app.vault.append(fileRef, `\n\n`);
+
+		if(content.textContent) {
+			await plugin.app.vault.append(fileRef, `${content.textContent}\n`);
+		}
+		if(content.listContent) {
+			for(let i=0; i<content.listContent.length; i++) {
+				const listItem = content.listContent[i];
+				
+				// Skip to next line if this one is blank
+				if(!listItem.text) continue;
+				
+				let listItemContent = `- [${listItem.isChecked ? 'X' : ' '}] ${listItem.text}\n`;
+				await plugin.app.vault.append(fileRef, listItemContent);
+			}
+		}
+
+
+	 }
+
+	/*
+	JSON
+	//////////
+	{
+		"color": "DEFAULT",
+		"isTrashed": false,
+		"isPinned": false,
+		"isArchived": true,
+		"title": "",
+		"userEditedTimestampUsec": 1462811176816000,
+		"createdTimestampUsec": 1462763160359000
+
+		"textContent": "",
+		OR
+		"listContent": [
+			{
+				"text": "",
+				"isChecked": false
+			},
+			{
+				"text": "",
+				"isChecked": false
+			},
+			{
+				"text": "175.32.124.133\n",
+				"isChecked": false
+			}
+		],
+
+		OPTIONAL:
+		"attachments": [
+			{
+				"filePath": "16271b560b6.ba20e87f973dd142.png",
+				"mimetype": "image/png"
+			}
+		],
+		
+	}
+	*/
+}
+
+
+function importAttachment(file: Object, folder: TFolder) {
+		/*
+		Potential formats:
+		- jpg
+		- jpeg
+		- png
+		- 3gp (Audio recording)
+		- mp4??
+		- mov??
+		*/
+
+
 }
