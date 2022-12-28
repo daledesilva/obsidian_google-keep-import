@@ -4,6 +4,7 @@ import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Set
 
 
 const IMPORT_FOLDER = 'Keep Imports';
+const ASSET_FOLDER = 'Attachments'
 
 var plugin: MyPlugin;
 
@@ -11,6 +12,10 @@ var plugin: MyPlugin;
 interface KeepListItem {
 	text: string;
 	isChecked: boolean;
+}
+interface KeepAttachment {
+	filePath: string;
+	mimetype: string;
 }
 interface KeepJson {
 	color: string;
@@ -20,6 +25,7 @@ interface KeepJson {
 	isTrashed: boolean;
 	textContent?: string;
 	listContent?: Array<KeepListItem>;
+	attachments?: Array<KeepAttachment>;
 	title: string;
 	userEditedTimestampUsec: number;
 }
@@ -206,21 +212,23 @@ class SampleSettingTab extends PluginSettingTab {
 
 
 async function importFiles(files: Array<Object>) {
-	const folder = await getFolder();	
+	const importFolder = await getImportFolder();
+	const assetFolder = await getAssetFolder();
 
 	files.forEach( (file: File) => {
+		console.log('file.type', file.type);
 		switch(file.type) {
-			case 'application/json':	importJson(file, folder);			break;
-			case 'application/jpg':		importAttachment(file, folder);		break;
-			case 'application/png':		importAttachment(file, folder);			break;
-			case 'application/3gp':		importAttachment(file, folder);			break;
+			case 'application/json':	importJson(file, importFolder);					break;
+			case 'image/jpeg':			importBinaryFile(file, assetFolder);			break;
+			case 'image/png':			importBinaryFile(file, assetFolder);			break;
+			case 'video/3gpp':			importBinaryFile(file, assetFolder);			break;
 		}
 	})
 
 }
 
 
-async function getFolder(): Promise<TFolder> {
+async function getImportFolder(): Promise<TFolder> {
 
 	const root = plugin.app.vault.getRoot();
 	let importFolder: TFolder | undefined;
@@ -236,10 +244,33 @@ async function getFolder(): Promise<TFolder> {
 	// Create the folder if it doesn't exist
 	if(importFolder === undefined) {
 		await plugin.app.vault.createFolder(IMPORT_FOLDER);		
-		importFolder = await getFolder()
+		importFolder = await getImportFolder()
 	}
 	
 	return importFolder;
+}
+
+
+async function getAssetFolder(): Promise<TFolder> {
+
+	const importFolder = await getImportFolder()
+	let assetFolder: TFolder | undefined;
+
+	// Find the folder if it exists
+	for(let i=0; i<importFolder.children.length; i++) {
+		if(importFolder.children[i].name == ASSET_FOLDER) {
+			assetFolder = importFolder.children[i] as TFolder;
+			break;
+		}
+	}
+	
+	// Create the folder if it doesn't exist
+	if(assetFolder === undefined) {
+		await plugin.app.vault.createFolder(`${importFolder.path}/${ASSET_FOLDER}`);		
+		assetFolder = await getAssetFolder()
+	}
+	
+	return assetFolder;
 }
 
 
@@ -261,26 +292,43 @@ function importJson(file: File, folder: TFolder) {
 		const content: KeepJson = JSON.parse(readerEvent.target.result as string);
 		const path: string = `${folder.path}/${content.title || file.name}`;
 		const fileRef: TFile = await plugin.app.vault.create(path+'.md', '');
+
+		// Add in tags to represent Keep properties
 		await plugin.app.vault.append(fileRef, `#Keep/Colour/${content.color} `);
 		content.isPinned ?		await plugin.app.vault.append(fileRef, `#Keep/Pinned `) : null;
+		content.attachments ?	await plugin.app.vault.append(fileRef, `#Keep/Attachments `) : null;
 		content.isArchived ?	await plugin.app.vault.append(fileRef, `#Keep/Archived `) : null;
 		content.isTrashed ? 	await plugin.app.vault.append(fileRef, `#Keep/Trashed `) : null;
 		await plugin.app.vault.append(fileRef, `\n\n`);
 
+		// Add in text content
 		if(content.textContent) {
 			await plugin.app.vault.append(fileRef, `${content.textContent}\n`);
 		}
+
+		// Add in text content if check box
 		if(content.listContent) {
 			for(let i=0; i<content.listContent.length; i++) {
 				const listItem = content.listContent[i];
 				
 				// Skip to next line if this one is blank
 				if(!listItem.text) continue;
-				
+
 				let listItemContent = `- [${listItem.isChecked ? 'X' : ' '}] ${listItem.text}\n`;
 				await plugin.app.vault.append(fileRef, listItemContent);
 			}
 		}
+
+		// Embed attachments
+		// NOTE: The files for these may not have been created yet, but since it's just markdown text, they can be created after.
+		if(content.attachments) {
+			for(let i=0; i<content.attachments.length; i++) {
+				const attachment = content.attachments[i];
+				
+				await plugin.app.vault.append(fileRef, `\n\n![[${attachment.filePath}]]`);
+			}
+		}
+
 
 
 	 }
@@ -327,16 +375,18 @@ function importJson(file: File, folder: TFolder) {
 }
 
 
-function importAttachment(file: Object, folder: TFolder) {
-		/*
-		Potential formats:
-		- jpg
-		- jpeg
-		- png
-		- 3gp (Audio recording)
-		- mp4??
-		- mov??
-		*/
+async function importBinaryFile(file: File, folder: TFolder) {
+
+	const path: string = `${folder.path}/${file.name}`;
+	const fileRef: TFile = await plugin.app.vault.createBinary(path, await file.arrayBuffer());
+	
+	/*
+	Potential formats:
+	- jpg
+	- jpeg
+	- png
+	- 3gp (Audio/video recording)
+	*/
 
 
 }
