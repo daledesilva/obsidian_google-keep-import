@@ -291,15 +291,7 @@ function updateProgressBar(options: {total: number, barEl: HTMLDivElement}) {
 	const perc = (successCount + failCount)/total * 100;
 	barEl.setAttr('style', `width: ${perc}%`);
 
-	console.log('successCount', successCount)
-	console.log('failCount', failCount)
-	console.log('(Added))', successCount + failCount)
-	console.log('total', total)
-	console.log('perc', perc)
-
-	// Bail if right near end
-	// TODO: Why doesn't it ever get to exactly 100? Is it a floating point issue?
-	if(perc == 100) return;
+	if(perc == 100) return;	// TODO: Close the modal here
 
 	requestAnimationFrame( function() {
 		updateProgressBar(options);
