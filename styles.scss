@@ -26,3 +26,36 @@ If your plugin does not need CSS, delete this file.
     color: pink;
     text-decoration: underline;
 }
+
+
+
+
+
+
+.uo_progress-bar {
+    width: 100%;
+    height: 0.5em;
+    border-radius: 10px;
+    background-color: #333;
+    margin: 1em 0;
+    
+    .uo_bar {
+        width: 50%;
+        height: 100%;
+        background-color: white;
+        border-radius: 10px;
+    }
+}
+
+
+button.uo_button[disabled] {
+    opacity: 0.3;
+    background-color: unset !important;
+    color: unset !important;
+    box-shadow: var(--input-shadow);
+    &:hover {
+        background-color: unset !important;
+        color: unset !important;
+        box-shadow: var(--input-shadow);
+    }
+}

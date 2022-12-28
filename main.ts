@@ -7,7 +7,8 @@ const IMPORT_FOLDER = 'Keep Imports';
 const ASSET_FOLDER = 'Attachments'
 
 var plugin: MyPlugin;
-
+var successCount = 0;
+var failCount = 0;
 
 interface KeepListItem {
 	text: string;
@@ -71,7 +72,7 @@ export default class MyPlugin extends Plugin {
 			id: 'ublik-om_import-google-keep-jsons',
 			name: 'Import backup from Google Keep',
 			callback: () => {
-				new OpenImportDialog(this.app).open();
+				new StartImportModal(this.app).open();
 			}
 		});
 
@@ -112,7 +113,7 @@ export default class MyPlugin extends Plugin {
 	}
 }
 
-class OpenImportDialog extends Modal {
+class StartImportModal extends Modal {
 	result: string;
 
 	constructor(app: App) {
@@ -120,8 +121,13 @@ class OpenImportDialog extends Modal {
 	}
 
 	onOpen() {
-		const {contentEl} = this;
-		contentEl.setText('Upload a set of jsons output from a Google Keep backup');
+		const {titleEl, contentEl} = this;
+
+		titleEl.setText('Import Google Keep backup');
+
+		contentEl.createEl('p', {text: 'Here you can upload a set of jsons output from a Google Keep backup.'});
+		contentEl.createEl('p', {text: 'Upload each json one at a time or all together. You should also upload any attachments in the backup as well such as png\'s jpgs, etc.'});
+		contentEl.createEl('p', {text: 'If you import attachments or jsons separately and close this dialog, they will will automatically link together once their counterparts are imported later provided you haven\'t changed the names of attachments or modified the markdown embeds in the notes.'});
 
 		// new Setting(contentEl)
 		// 	.setName("Name")
@@ -167,17 +173,55 @@ class OpenImportDialog extends Modal {
 			}
 		})
 
+		const modalActions = new Setting(contentEl).addButton(btn => {
+			btn.setClass('uo_button');
+			btn.setCta();
+			btn.setButtonText('Start Import');
+			btn.setDisabled(true);
+			btn.onClick( (e) => {
+				this.close();
+				importFiles( Object.values(uploadBtn.files as Object) );
+			})
+		})
 
 		uploadBtn.addEventListener('change', () => {
-			importFiles( Object.values(uploadBtn.files as Object) );	// TODO: Need to respond to this finishing as it's calliung an async function
-			this.close();
+			const importBtn = modalActions.components[0];
+			importBtn.setDisabled(false);
 		});
 		
 
 	}
 
 	onClose() {
-		const {contentEl} = this;
+		const {titleEl, contentEl} = this;
+		titleEl.empty();
+		contentEl.empty();
+	}
+}
+
+
+class ImportProgressModal extends Modal {
+	result: string;
+	bar: HTMLDivElement;
+
+	constructor(app: App) {
+		super(app);
+	}
+
+	onOpen() {
+		const {titleEl, contentEl} = this;
+
+		titleEl.setText('Import in progress');
+
+		const progressBarEl = contentEl.createEl('div', {cls: 'uo_progress-bar'});
+		this.bar = progressBarEl.createEl('div', {cls: 'uo_bar'});	
+		
+
+	}
+
+	onClose() {
+		const {titleEl, contentEl} = this;
+		titleEl.empty();
 		contentEl.empty();
 	}
 }
@@ -212,19 +256,54 @@ class SampleSettingTab extends PluginSettingTab {
 
 
 async function importFiles(files: Array<Object>) {
+
+	const importProgressModal = new ImportProgressModal(plugin.app)
+	importProgressModal.open();
+
 	const importFolder = await getImportFolder();
 	const assetFolder = await getAssetFolder();
 
-	files.forEach( (file: File) => {
-		console.log('file.type', file.type);
-		switch(file.type) {
-			case 'application/json':	importJson(file, importFolder);					break;
-			case 'image/jpeg':			importBinaryFile(file, assetFolder);			break;
-			case 'image/png':			importBinaryFile(file, assetFolder);			break;
-			case 'video/3gpp':			importBinaryFile(file, assetFolder);			break;
-		}
+	successCount = 0;
+	failCount = 0;
+
+	updateProgressBar({
+		total: files.length,
+		barEl: importProgressModal.bar,
 	})
 
+	for(let i=0; i<files.length; i++) {
+		const file = files[i] as File;
+
+		switch(file.type) {
+			case 'application/json':	await importJson(file, importFolder);				break;
+			case 'image/png':			await importBinaryFile(file, assetFolder);			break;
+			case 'video/3gpp':			await importBinaryFile(file, assetFolder);			break;
+			case 'image/jpeg':			await importBinaryFile(file, assetFolder);			break;
+		}
+	}
+
+}
+
+
+function updateProgressBar(options: {total: number, barEl: HTMLDivElement}) {
+	const {total, barEl} = options;
+
+	const perc = (successCount + failCount)/total * 100;
+	barEl.setAttr('style', `width: ${perc}%`);
+
+	console.log('successCount', successCount)
+	console.log('failCount', failCount)
+	console.log('(Added))', successCount + failCount)
+	console.log('total', total)
+	console.log('perc', perc)
+
+	// Bail if right near end
+	// TODO: Why doesn't it ever get to exactly 100? Is it a floating point issue?
+	if(perc == 100) return;
+
+	requestAnimationFrame( function() {
+		updateProgressBar(options);
+	});
 }
 
 
@@ -290,46 +369,61 @@ function importJson(file: File, folder: TFolder) {
 		}
 		
 		const content: KeepJson = JSON.parse(readerEvent.target.result as string);
-		const path: string = `${folder.path}/${content.title || file.name}`;
-		const fileRef: TFile = await plugin.app.vault.create(path+'.md', '');
+		let path: string = `${folder.path}/${filenameSanitize(content.title || file.name)}`;	// TODO: Strip file extension from filename
+		let fileRef: TFile;
+		try {
 
-		// Add in tags to represent Keep properties
-		await plugin.app.vault.append(fileRef, `#Keep/Colour/${content.color} `);
-		content.isPinned ?		await plugin.app.vault.append(fileRef, `#Keep/Pinned `) : null;
-		content.attachments ?	await plugin.app.vault.append(fileRef, `#Keep/Attachments `) : null;
-		content.isArchived ?	await plugin.app.vault.append(fileRef, `#Keep/Archived `) : null;
-		content.isTrashed ? 	await plugin.app.vault.append(fileRef, `#Keep/Trashed `) : null;
-		await plugin.app.vault.append(fileRef, `\n\n`);
+			// Create file
+			fileRef = await plugin.app.vault.create(path+'.md', 'test');
 
-		// Add in text content
-		if(content.textContent) {
-			await plugin.app.vault.append(fileRef, `${content.textContent}\n`);
-		}
+			// Add in tags to represent Keep properties
+			await plugin.app.vault.append(fileRef, `#Keep/Colour/${content.color} `);
+			content.isPinned ?		await plugin.app.vault.append(fileRef, `#Keep/Pinned `) : null;
+			content.attachments ?	await plugin.app.vault.append(fileRef, `#Keep/Attachments `) : null;
+			content.isArchived ?	await plugin.app.vault.append(fileRef, `#Keep/Archived `) : null;
+			content.isTrashed ? 	await plugin.app.vault.append(fileRef, `#Keep/Trashed `) : null;
+			await plugin.app.vault.append(fileRef, `\n\n`);
 
-		// Add in text content if check box
-		if(content.listContent) {
-			for(let i=0; i<content.listContent.length; i++) {
-				const listItem = content.listContent[i];
-				
-				// Skip to next line if this one is blank
-				if(!listItem.text) continue;
-
-				let listItemContent = `- [${listItem.isChecked ? 'X' : ' '}] ${listItem.text}\n`;
-				await plugin.app.vault.append(fileRef, listItemContent);
+			// Add in text content
+			if(content.textContent) {
+				await plugin.app.vault.append(fileRef, `${content.textContent}\n`);
 			}
-		}
 
-		// Embed attachments
-		// NOTE: The files for these may not have been created yet, but since it's just markdown text, they can be created after.
-		if(content.attachments) {
-			for(let i=0; i<content.attachments.length; i++) {
-				const attachment = content.attachments[i];
-				
-				await plugin.app.vault.append(fileRef, `\n\n![[${attachment.filePath}]]`);
+			// Add in text content if check box
+			if(content.listContent) {
+				for(let i=0; i<content.listContent.length; i++) {
+					const listItem = content.listContent[i];
+					
+					// Skip to next line if this one is blank
+					if(!listItem.text) continue;
+
+					let listItemContent = `- [${listItem.isChecked ? 'X' : ' '}] ${listItem.text}\n`;
+					await plugin.app.vault.append(fileRef, listItemContent);
+				}
 			}
+
+			// Embed attachments
+			// NOTE: The files for these may not have been created yet, but since it's just markdown text, they can be created after.
+			if(content.attachments) {
+				for(let i=0; i<content.attachments.length; i++) {
+					const attachment = content.attachments[i];
+					
+					console.log('file.name', file.name);
+					console.log('attachment.filePath', attachment.filePath);
+					await plugin.app.vault.append(fileRef, `\n\n![[${attachment.filePath}]]`);
+				}
+			}
+
+			successCount++;
+
+
+		} catch (error) {
+
+			console.log(error)
+			failCount++;
 		}
-
-
+		
+		
 
 	 }
 
@@ -378,8 +472,16 @@ function importJson(file: File, folder: TFolder) {
 async function importBinaryFile(file: File, folder: TFolder) {
 
 	const path: string = `${folder.path}/${file.name}`;
-	const fileRef: TFile = await plugin.app.vault.createBinary(path, await file.arrayBuffer());
 	
+	try {
+		const fileRef: TFile = await plugin.app.vault.createBinary(path, await file.arrayBuffer());
+		successCount++;
+	} catch (error) {
+		console.log(error)
+		failCount++;
+		return;
+	}
+
 	/*
 	Potential formats:
 	- jpg
@@ -389,4 +491,23 @@ async function importBinaryFile(file: File, folder: TFolder) {
 	*/
 
 
+}
+
+
+
+function filenameSanitize(str: string) {
+
+	// Remove /
+	let newArr = str.split('/');
+	let newStr = newArr.join();
+
+	// Remove \
+	newArr = newStr.split('\\');
+	newStr = newArr.join();
+
+	// Remove :
+	newArr = newStr.split(':');
+	newStr = newArr.join();
+
+	return newStr;
 }
