@@ -203,6 +203,10 @@ class StartImportModal extends Modal {
 class ImportProgressModal extends Modal {
 	result: string;
 	bar: HTMLDivElement;
+	summaryEl: HTMLDivElement;
+	remainingSpan: HTMLSpanElement;
+	failedSpan: HTMLSpanElement;
+	importedSpan: HTMLSpanElement;
 
 	constructor(app: App) {
 		super(app);
@@ -215,8 +219,60 @@ class ImportProgressModal extends Modal {
 
 		const progressBarEl = contentEl.createEl('div', {cls: 'uo_progress-bar'});
 		this.bar = progressBarEl.createEl('div', {cls: 'uo_bar'});	
-		
 
+		
+		const summaryEl = contentEl.createDiv('uo_import-summary');
+		let bubbleEl;
+		let pBubbleEl
+
+		bubbleEl = summaryEl.createDiv('uo_import-remaining');
+		pBubbleEl = bubbleEl.createEl('p');
+		this.remainingSpan = pBubbleEl.createEl('span', {cls: 'uo_import-number', text: `-`});
+		pBubbleEl.createEl('br');
+		pBubbleEl.createEl('span', {cls: 'uo_import-label', text: `remaining`});
+
+		bubbleEl = summaryEl.createDiv('uo_import-failed');
+		pBubbleEl = bubbleEl.createEl('p');
+		this.failedSpan = pBubbleEl.createEl('span', {cls: 'uo_import-number', text: `${failCount}`});
+		pBubbleEl.createEl('br');
+		pBubbleEl.createEl('span', {cls: 'uo_import-label', text: `failed/skipped`});
+
+		bubbleEl = summaryEl.createDiv('uo_import-imported');
+		pBubbleEl = bubbleEl.createEl('p');
+		this.importedSpan = pBubbleEl.createEl('span', {cls: 'uo_import-number', text: `${successCount}`});
+		pBubbleEl.createEl('br');
+		pBubbleEl.createEl('span', {cls: 'uo_import-label', text: `imported`});
+
+	}
+
+	public updateProgress(options: {successCount: number, failCount: number, totalImports: number}) {
+		const {
+			successCount,
+			failCount,
+			totalImports
+		} = options;
+
+		// Update bar visual
+		const perc = (successCount + failCount)/totalImports * 100;
+		this.bar.setAttr('style', `width: ${perc}%`);
+
+		// Update text
+		this.remainingSpan.setText(`${totalImports-successCount-failCount}`);
+		this.failedSpan.setText(`${failCount}`);
+		this.importedSpan.setText(`${successCount}`);
+
+		// Update modal if finished
+		if(perc == 100) {
+
+			const modalActions = new Setting(this.contentEl).addButton(btn => {
+				btn.setClass('uo_button');
+				// btn.setCta();
+				btn.setButtonText('Close');
+				btn.onClick( (e) => {
+					this.close();
+				})
+			})
+		}
 	}
 
 	onClose() {
@@ -226,32 +282,6 @@ class ImportProgressModal extends Modal {
 	}
 }
 
-class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
-
-	constructor(app: App, plugin: MyPlugin) {
-		super(app, plugin);
-		this.plugin = plugin;
-	}
-
-	display(): void {
-		const {containerEl} = this;
-
-		containerEl.empty();
-
-		containerEl.createEl('h2', {text: 'Settings for my awesome plugin.'});
-
-		new Setting(containerEl)
-			.setName('Hide "Open Other Vault" button')
-			.setDesc('This will hide the button at the bottom left that returns you to the Vault Selector screen. This is mostly useful for mobile users that find this button disruptive to flow.')
-			.addToggle(value => value
-				.setValue(this.plugin.settings.hideOpenVaultButton)
-				.onChange(async (value) => {
-					this.plugin.settings.hideOpenVaultButton = !value;
-					await this.plugin.saveSettings();
-				}));
-	}
-}
 
 
 
@@ -267,8 +297,8 @@ async function importFiles(files: Array<Object>) {
 	failCount = 0;
 
 	updateProgressBar({
-		total: files.length,
-		barEl: importProgressModal.bar,
+		totalImports: files.length,
+		modal: importProgressModal,
 	})
 
 	for(let i=0; i<files.length; i++) {
@@ -285,13 +315,19 @@ async function importFiles(files: Array<Object>) {
 }
 
 
-function updateProgressBar(options: {total: number, barEl: HTMLDivElement}) {
-	const {total, barEl} = options;
+function updateProgressBar(options: {totalImports: number, modal: ImportProgressModal}) {
+	const {totalImports, modal} = options;
+	const barEl = modal.bar;
 
-	const perc = (successCount + failCount)/total * 100;
-	barEl.setAttr('style', `width: ${perc}%`);
+	modal.updateProgress({
+		successCount,
+		failCount,
+		totalImports
+	})
 
-	if(perc == 100) return;	// TODO: Close the modal here
+	if(successCount + failCount == totalImports) {
+		return
+	}
 
 	requestAnimationFrame( function() {
 		updateProgressBar(options);
@@ -502,4 +538,36 @@ function filenameSanitize(str: string) {
 	newStr = newArr.join();
 
 	return newStr;
+}
+
+
+
+
+
+
+class SampleSettingTab extends PluginSettingTab {
+	plugin: MyPlugin;
+
+	constructor(app: App, plugin: MyPlugin) {
+		super(app, plugin);
+		this.plugin = plugin;
+	}
+
+	display(): void {
+		const {containerEl} = this;
+
+		containerEl.empty();
+
+		containerEl.createEl('h2', {text: 'Settings for my awesome plugin.'});
+
+		new Setting(containerEl)
+			.setName('Hide "Open Other Vault" button')
+			.setDesc('This will hide the button at the bottom left that returns you to the Vault Selector screen. This is mostly useful for mobile users that find this button disruptive to flow.')
+			.addToggle(value => value
+				.setValue(this.plugin.settings.hideOpenVaultButton)
+				.onChange(async (value) => {
+					this.plugin.settings.hideOpenVaultButton = !value;
+					await this.plugin.saveSettings();
+				}));
+	}
 }

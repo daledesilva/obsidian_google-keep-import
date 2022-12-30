@@ -48,6 +48,27 @@ If your plugin does not need CSS, delete this file.
 }
 
 
+
+.uo_import-summary {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 40px;
+
+    p {
+        text-align: center;
+    }
+
+    .uo_import-number {
+        font-size: 2em;
+        font-weight: 600;
+    }
+}
+
+
+
+
+
 button.uo_button[disabled] {
     opacity: 0.3;
     background-color: unset !important;
