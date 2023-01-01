@@ -115,9 +115,10 @@ export default class MyPlugin extends Plugin {
 
 class StartImportModal extends Modal {
 	result: string;
+	duplicateNotes: number = 0;
 	noteSpan: HTMLSpanElement;
 	assetSpan: HTMLSpanElement;
-	fileBacklog: Array<Object> = [];
+	fileBacklog: Array<File> = [];
 
 	constructor(app: App) {
 		super(app);
@@ -174,7 +175,7 @@ class StartImportModal extends Modal {
 		uploadBtn.addEventListener('change', () => {
 
 			// Add imports to accumulative array
-			this.addToFilesBacklog( Object.values(uploadBtn.files as Object) );
+			this.addToFilesBacklog( Object.values(uploadBtn.files as FileList) );
 
 			// Erase references in upload component to prepare for new set
 			uploadBtn.files = null;
@@ -184,7 +185,6 @@ class StartImportModal extends Modal {
 			this.noteSpan.setText(`${breakdown.notes}`);
 			this.assetSpan.setText(`${breakdown.assets}`);
 
-
 			// Activate start button
 			const importBtn = modalActions.components[0];
 			importBtn.setDisabled(false);
@@ -193,13 +193,35 @@ class StartImportModal extends Modal {
 	}
 
 
-	addToFilesBacklog( files: Array<Object> ) {
+	addToFilesBacklog( files: Array<File> ) {
+		let newFiles = 0;
+		let duplicateFiles = 0;
 
-		// TODO: check for duplicates
+		// Add non-duplicates to backlog
+		files.forEach( (file) => {
+			if( this.backlogContains(file) ) {
+				duplicateFiles++;
+			} else {
+				this.fileBacklog.push(file);
+				newFiles++;
+			}
+		})
 
-		console.log('files', files);
-		// Add non-duplicates to array
-		this.fileBacklog.push(...files);
+		if(duplicateFiles>0) new Notice(`${duplicateFiles} ${singleOrPlural(duplicateFiles, 'file')} ignored because ${singleOrPlural(duplicateFiles, 'it\'s', 'they\'re')} already in the import list.`, 9000);
+		new Notice(`${newFiles} new ${singleOrPlural(newFiles, 'file')} queued for import.`, 10000);
+	}
+
+	backlogContains(file: File) {
+		for(let i=0; i<this.fileBacklog.length; i++) {
+			// NOTE: Path isn't necessarily guaranteed in all environments.
+			// Could do a name and content comparison for jsons, and a so too for binary if possible.
+			// Maybe even just a content comparison. For not this is fine.
+			if((file as any).path) {
+				if((file as any).path == (this.fileBacklog[i] as any).path) return true;
+			}
+		}
+		// If no duplicates found
+		return false;
 	}
 
 	getFilesBacklogBreakdown(): { notes : number, assets: number } {
@@ -627,5 +649,23 @@ class SampleSettingTab extends PluginSettingTab {
 		// 	.addTextArea(test => {});
 
 
+	}
+}
+
+
+
+
+
+const singleOrPlural = (count: number, singleVersion: string, pluralVersion?: string) => {
+	if(count == 1 || count == -1) {
+		return singleVersion;
+	} else {
+		if(pluralVersion) {
+			// custom plural version passed in
+			return pluralVersion;
+		} else {
+			// just add an s
+			return `${singleVersion}s`;
+		}
 	}
 }
