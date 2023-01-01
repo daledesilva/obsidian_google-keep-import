@@ -119,6 +119,8 @@ class StartImportModal extends Modal {
 	noteSpan: HTMLSpanElement;
 	assetSpan: HTMLSpanElement;
 	fileBacklog: Array<File> = [];
+	uploadInput: HTMLInputElement;
+	modalActions: Setting;
 
 	constructor(app: App) {
 		super(app);
@@ -135,6 +137,7 @@ class StartImportModal extends Modal {
 
 
 		const dropFrame = contentEl.createEl('div', {cls: 'uo_drop-frame'});
+
 		const dropFrameText = dropFrame.createEl('p', { text: 'Drag your files here or ' });
 		// const linkText = dropFrameText.createEl('a', {text: 'browse local files'})
 		dropFrameText.createEl('label', { 
@@ -144,7 +147,7 @@ class StartImportModal extends Modal {
 				'for': 'uo_file',
 			}
 		})
-		const uploadBtn = dropFrameText.createEl('input', { 
+		this.uploadInput = dropFrameText.createEl('input', { 
 			type: 'file',
 			attr: {
 				'multiple': true,
@@ -161,7 +164,7 @@ class StartImportModal extends Modal {
 		this.assetSpan = summaryP.createEl('span', {cls: 'uo_import-number', text: `0`});
 
 
-		const modalActions = new Setting(contentEl).addButton(btn => {
+		this.modalActions = new Setting(contentEl).addButton(btn => {
 			btn.setClass('uo_button');
 			btn.setCta();
 			btn.setButtonText('Start Import');
@@ -172,23 +175,50 @@ class StartImportModal extends Modal {
 			})
 		})
 
-		uploadBtn.addEventListener('change', () => {
-
+		this.uploadInput.addEventListener('change', () => {
 			// Add imports to accumulative array
-			this.addToFilesBacklog( Object.values(uploadBtn.files as FileList) );
-
-			// Erase references in upload component to prepare for new set
-			uploadBtn.files = null;
-			
-			// Update summary numbers
-			const breakdown = this.getFilesBacklogBreakdown();
-			this.noteSpan.setText(`${breakdown.notes}`);
-			this.assetSpan.setText(`${breakdown.assets}`);
-
-			// Activate start button
-			const importBtn = modalActions.components[0];
-			importBtn.setDisabled(false);
+			this.addToFilesBacklog( Object.values(this.uploadInput.files as FileList) );
 		});
+		
+		dropFrame.addEventListener('dragenter', (e) => {
+			dropFrame.addClass('uo_drag-over-active');
+		});
+		
+		dropFrame.addEventListener('dragover', (e) => {
+			// Prevent default to allow drop
+			e.preventDefault();
+		});
+		
+		dropFrame.addEventListener('dragleave', (e) => {
+			dropFrame.removeClass('uo_drag-over-active');
+		});
+		
+		dropFrame.addEventListener('drop', (e) => {
+			// Prevent default to stop browser opening file
+			e.preventDefault();
+
+			dropFrame.removeClass('uo_drag-over-active');
+			
+			const files: Array<File> = [];
+
+			if (e.dataTransfer.items) {
+				// DataTransferItems is supporter in this browser
+				const items = [...e.dataTransfer.items];
+
+				for(let i=0; i<items.length; i++) {
+					const item = items[i];
+					if (item.kind === 'file') {
+						const file = item.getAsFile();
+						files.push(file);
+					}
+				};
+			} else {
+				// Use DataTransfer interface to access the file(s)
+				files.push(...e.dataTransfer.files);
+			}
+			this.addToFilesBacklog(files);
+		});
+
 
 	}
 
@@ -209,6 +239,18 @@ class StartImportModal extends Modal {
 
 		if(duplicateFiles>0) new Notice(`${duplicateFiles} ${singleOrPlural(duplicateFiles, 'file')} ignored because ${singleOrPlural(duplicateFiles, 'it\'s', 'they\'re')} already in the import list.`, 9000);
 		new Notice(`${newFiles} new ${singleOrPlural(newFiles, 'file')} queued for import.`, 10000);
+
+		// Erase references in upload component to prepare for new set
+		this.uploadInput.files = null;
+			
+		// Update summary numbers
+		const breakdown = this.getFilesBacklogBreakdown();
+		this.noteSpan.setText(`${breakdown.notes}`);
+		this.assetSpan.setText(`${breakdown.assets}`);
+
+		// Activate start button
+		const importBtn = this.modalActions.components[0];
+		importBtn.setDisabled(false);
 	}
 
 	backlogContains(file: File) {

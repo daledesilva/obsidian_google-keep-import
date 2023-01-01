@@ -14,8 +14,18 @@ If your plugin does not need CSS, delete this file.
     padding: 1.5em;
     border-radius: 10px;
     border: 1px white dashed;
-    margin: 1em 0;
     text-align: center;
+
+    &.uo_drag-over-active {
+        // User outlines so that thickened border doesn't change layout
+        outline: 2px solid white;
+        outline-offset: -2px;
+        background-color: rgba(255,255,255,0.1);
+
+        // Prevent children components firing dragleave
+        // But only while dragging is active because otherwise it stops the link text working
+        * {pointer-events: none;}
+    }
 }
 
 #uo_file {
@@ -25,7 +35,10 @@ If your plugin does not need CSS, delete this file.
 .uo_file-label {
     color: pink;
     text-decoration: underline;
+    cursor: pointer;
 }
+
+
 
 
 
