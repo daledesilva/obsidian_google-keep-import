@@ -476,78 +476,101 @@ async function getAssetFolder(): Promise<TFolder> {
 
 
 
-function importJson(file: File, folder: TFolder) {
+async function importJson(file: File, folder: TFolder) {
 
 	// setting up the reader
 	var reader = new FileReader();
 	reader.readAsText(file as Blob,'UTF-8');
 
-	reader.onload = async (readerEvent) => {
+	return new Promise( (resolve, reject) => {
 
-		// Bail if the file hasn't been interpreted properly
-		if(!readerEvent || !readerEvent.target) {
-			console.error(`Something went wrong reading json: ${file.name}`)
-			return;
-		}
-		
-		const content: KeepJson = JSON.parse(readerEvent.target.result as string);
-		let path: string = `${folder.path}/${filenameSanitize(content.title || file.name)}`;	// TODO: Strip file extension from filename
-		let fileRef: TFile;
-		try {
+		reader.onerror = reject;
+		reader.onload = async (readerEvent) => {
 
-			// Create file
-			fileRef = await plugin.app.vault.create(path+'.md', 'test');
-
+			// Bail if the file hasn't been interpreted properly
+			if(!readerEvent || !readerEvent.target) {
+				return Promise.reject(new Error(`Something went wrong reading json: ${file.name}`));
+			}
+			
+			const content: KeepJson = JSON.parse(readerEvent.target.result as string);
+			let path: string = `${folder.path}/${filenameSanitize(content.title || file.name)}`;	// TODO: Strip file extension from filename
+			let fileRef: TFile;
+			
+			// Create new file
+			try {
+				// path = await getUnusedFilename(path);
+				// fileRef = await plugin.app.vault.create(`${path}.md`, '');
+				fileRef = await createNewEmptyMdFile(path);
+			} catch (error) {
+				failCount++;
+				return Promise.reject(new Error(`Error creating new file ${path} (from ${file.name}. Error: ${error})`));
+			}			
+	
 			// Add in tags to represent Keep properties
-			await plugin.app.vault.append(fileRef, `#Keep/Colour/${content.color} `);
-			content.isPinned ?		await plugin.app.vault.append(fileRef, `#Keep/Pinned `) : null;
-			content.attachments ?	await plugin.app.vault.append(fileRef, `#Keep/Attachments `) : null;
-			content.isArchived ?	await plugin.app.vault.append(fileRef, `#Keep/Archived `) : null;
-			content.isTrashed ? 	await plugin.app.vault.append(fileRef, `#Keep/Trashed `) : null;
-			await plugin.app.vault.append(fileRef, `\n\n`);
-
+			try {
+				await plugin.app.vault.append(fileRef, `#Keep/Colour/${content.color} `);
+				content.isPinned ?		await plugin.app.vault.append(fileRef, `#Keep/Pinned `) : null;
+				content.attachments ?	await plugin.app.vault.append(fileRef, `#Keep/Attachments `) : null;
+				content.isArchived ?	await plugin.app.vault.append(fileRef, `#Keep/Archived `) : null;
+				content.isTrashed ? 	await plugin.app.vault.append(fileRef, `#Keep/Trashed `) : null;
+			} catch (error) {
+				failCount++;
+				return Promise.reject(Error(`Error adding tags to new file ${path} (from ${file.name})`));
+			}
+			
 			// Add in text content
-			if(content.textContent) {
-				await plugin.app.vault.append(fileRef, `${content.textContent}\n`);
-			}
-
-			// Add in text content if check box
-			if(content.listContent) {
-				for(let i=0; i<content.listContent.length; i++) {
-					const listItem = content.listContent[i];
-					
-					// Skip to next line if this one is blank
-					if(!listItem.text) continue;
-
-					let listItemContent = `- [${listItem.isChecked ? 'X' : ' '}] ${listItem.text}\n`;
-					await plugin.app.vault.append(fileRef, listItemContent);
+			try {
+				if(content.textContent) {
+					await plugin.app.vault.append(fileRef, `\n\n`);
+					await plugin.app.vault.append(fileRef, `${content.textContent}\n`);
 				}
+			} catch (error) {
+				failCount++;
+				return Promise.reject(new Error(`Error adding paragraph content to new file ${path} (from ${file.name})`));
 			}
-
+			
+			// Add in text content if check box
+			try {
+				if(content.listContent) {
+					await plugin.app.vault.append(fileRef, `\n\n`);
+					for(let i=0; i<content.listContent.length; i++) {
+						const listItem = content.listContent[i];
+						
+						// Skip to next line if this one is blank
+						if(!listItem.text) continue;
+						
+						let listItemContent = `- [${listItem.isChecked ? 'X' : ' '}] ${listItem.text}\n`;
+						await plugin.app.vault.append(fileRef, listItemContent);
+					}
+				}
+			} catch (error) {
+				failCount++;
+				return Promise.reject(new Error(`Error adding list content to new file ${path} (from ${file.name})`));
+			}
+			
 			// Embed attachments
 			// NOTE: The files for these may not have been created yet, but since it's just markdown text, they can be created after.
 			if(content.attachments) {
 				for(let i=0; i<content.attachments.length; i++) {
 					const attachment = content.attachments[i];
-					
-					console.log('file.name', file.name);
-					console.log('attachment.filePath', attachment.filePath);
-					await plugin.app.vault.append(fileRef, `\n\n![[${attachment.filePath}]]`);
+					try {
+						await plugin.app.vault.append(fileRef, `\n\n![[${attachment.filePath}]]`);
+					} catch (error) {
+						failCount++;
+						return Promise.reject(new Error(`Error embedding attachment ${attachment.filePath} to new file ${path} (from ${file.name})`));
+					}
 				}
 			}
 
 			successCount++;
+			resolve(fileRef);
+			
+			
+	
+		 }
 
-
-		} catch (error) {
-
-			console.log(error)
-			failCount++;
-		}
-		
-		
-
-	 }
+	})
+	
 
 	/*
 	JSON
@@ -710,4 +733,49 @@ const singleOrPlural = (count: number, singleVersion: string, pluralVersion?: st
 			return `${singleVersion}s`;
 		}
 	}
+}
+
+
+
+
+// async function getUnusedFilename(path: string) : Promise<string> {
+// 	let newPath: string = path;
+// 	let fileRef = plugin.app.vault.getAbstractFileByPath(`${newPath}.md`);	// TODO: This is case sensitive. So I've replaced it with the function below.
+	
+// 	if(fileRef == null || fileRef == undefined) {
+// 		// File doesn't exist yet, so just return the same path
+// 		console.log('newPath', newPath);
+// 		console.log('doesn\'t exist', fileRef);
+		
+// 	} else {
+// 		let version = 2;
+// 		while(fileRef && fileRef instanceof TFile) {
+// 			newPath = `${path} v${version}`;
+// 			fileRef = plugin.app.vault.getAbstractFileByPath(`${newPath}.md`);
+// 			version++;
+// 		}
+// 	}
+
+// 	return newPath;
+// }
+
+
+
+async function createNewEmptyMdFile(path: string, version: number = 1) : Promise<TFile> {
+	let fileRef: TFile;
+
+	try {
+		if(version == 1) {
+			fileRef = await plugin.app.vault.create(`${path}.md`, '');
+		} else {
+			fileRef = await plugin.app.vault.create(`${path} (${version}).md`, '');
+		}
+
+	} catch {
+		fileRef = await createNewEmptyMdFile(path, version+1);
+
+	}
+	
+
+	return fileRef;
 }
