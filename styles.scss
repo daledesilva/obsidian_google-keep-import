@@ -49,7 +49,11 @@ If your plugin does not need CSS, delete this file.
 
 
 
-.uo_import-summary {
+.uo_before-import-summary {
+    text-align: right;
+}
+
+.uo_during-import-summary {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;

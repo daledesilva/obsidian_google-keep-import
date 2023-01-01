@@ -115,6 +115,9 @@ export default class MyPlugin extends Plugin {
 
 class StartImportModal extends Modal {
 	result: string;
+	noteSpan: HTMLSpanElement;
+	assetSpan: HTMLSpanElement;
+	fileBacklog: Array<Object> = [];
 
 	constructor(app: App) {
 		super(app);
@@ -129,30 +132,6 @@ class StartImportModal extends Modal {
 		contentEl.createEl('p', {text: 'Upload each json one at a time or all together. You should also upload any attachments in the backup as well such as png\'s jpgs, etc.'});
 		contentEl.createEl('p', {text: 'If you import attachments or jsons separately and close this dialog, they will will automatically link together once their counterparts are imported later provided you haven\'t changed the names of attachments or modified the markdown embeds in the notes.'});
 
-		// new Setting(contentEl)
-		// 	.setName("Name")
-		// 	.addText((text) =>
-		// 		text.onChange((value) => {
-		// 		this.result = value
-		// 		}));
-
-		// new Setting(contentEl)
-		// 	.addColorPicker(color => {});
-
-		// new Setting(contentEl)
-		// 	.addExtraButton(btn => {});
-
-		// new Setting(contentEl)
-		// 	.addMomentFormat(test => {})
-
-		// new Setting(contentEl)
-		// 	.addSearch(test => {});
-
-		// new Setting(contentEl)
-		// 	.addSlider(test => {});
-
-		// new Setting(contentEl)
-		// 	.addTextArea(test => {});
 
 		const dropFrame = contentEl.createEl('div', {cls: 'uo_drop-frame'});
 		const dropFrameText = dropFrame.createEl('p', { text: 'Drag your files here or ' });
@@ -173,6 +152,14 @@ class StartImportModal extends Modal {
 			}
 		})
 
+
+		const summaryP = contentEl.createEl('p', {cls: 'uo_before-import-summary'});
+		summaryP.createEl('span', {text: `notes: `});
+		this.noteSpan = summaryP.createEl('span', {cls: 'uo_import-number', text: `0`});
+		summaryP.createEl('span', {text: ` | attachments: `});
+		this.assetSpan = summaryP.createEl('span', {cls: 'uo_import-number', text: `0`});
+
+
 		const modalActions = new Setting(contentEl).addButton(btn => {
 			btn.setClass('uo_button');
 			btn.setCta();
@@ -180,17 +167,60 @@ class StartImportModal extends Modal {
 			btn.setDisabled(true);
 			btn.onClick( (e) => {
 				this.close();
-				importFiles( Object.values(uploadBtn.files as Object) );
+				importFiles( this.fileBacklog );
 			})
 		})
 
 		uploadBtn.addEventListener('change', () => {
+
+			// Add imports to accumulative array
+			this.addToFilesBacklog( Object.values(uploadBtn.files as Object) );
+
+			// Erase references in upload component to prepare for new set
+			uploadBtn.files = null;
+			
+			// Update summary numbers
+			const breakdown = this.getFilesBacklogBreakdown();
+			this.noteSpan.setText(`${breakdown.notes}`);
+			this.assetSpan.setText(`${breakdown.assets}`);
+
+
+			// Activate start button
 			const importBtn = modalActions.components[0];
 			importBtn.setDisabled(false);
 		});
-		
 
 	}
+
+
+	addToFilesBacklog( files: Array<Object> ) {
+
+		// TODO: check for duplicates
+
+		console.log('files', files);
+		// Add non-duplicates to array
+		this.fileBacklog.push(...files);
+	}
+
+	getFilesBacklogBreakdown(): { notes : number, assets: number } {
+		let notes = 0;
+		let assets = 0;
+
+		for(let i=0; i<this.fileBacklog.length; i++) {
+			const file = this.fileBacklog[i] as File;
+	
+			switch(file.type) {
+				case 'application/json':	notes++;				break;
+				default:					assets++;				break;
+			}
+		}
+
+		return {
+			notes,
+			assets
+		}
+	}
+
 
 	onClose() {
 		const {titleEl, contentEl} = this;
@@ -200,10 +230,10 @@ class StartImportModal extends Modal {
 }
 
 
+
 class ImportProgressModal extends Modal {
 	result: string;
 	bar: HTMLDivElement;
-	summaryEl: HTMLDivElement;
 	remainingSpan: HTMLSpanElement;
 	failedSpan: HTMLSpanElement;
 	importedSpan: HTMLSpanElement;
@@ -221,7 +251,7 @@ class ImportProgressModal extends Modal {
 		this.bar = progressBarEl.createEl('div', {cls: 'uo_bar'});	
 
 		
-		const summaryEl = contentEl.createDiv('uo_import-summary');
+		const summaryEl = contentEl.createDiv('uo_during-import-summary');
 		let bubbleEl;
 		let pBubbleEl
 
@@ -569,5 +599,33 @@ class SampleSettingTab extends PluginSettingTab {
 					this.plugin.settings.hideOpenVaultButton = !value;
 					await this.plugin.saveSettings();
 				}));
+
+
+		// new Setting(contentEl)
+		// 	.setName("Name")
+		// 	.addText((text) =>
+		// 		text.onChange((value) => {
+		// 		this.result = value
+		// 		}));
+
+		// new Setting(contentEl)
+		// 	.addColorPicker(color => {});
+
+		// new Setting(contentEl)
+		// 	.addExtraButton(btn => {});
+
+		// new Setting(contentEl)
+		// 	.addMomentFormat(test => {})
+
+		// new Setting(contentEl)
+		// 	.addSearch(test => {});
+
+		// new Setting(contentEl)
+		// 	.addSlider(test => {});
+
+		// new Setting(contentEl)
+		// 	.addTextArea(test => {});
+
+
 	}
 }
