@@ -1,5 +1,5 @@
 import { fileSyntax } from 'esbuild-sass-plugin/lib/utils';
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, TFile, TFolder, Vault } from 'obsidian';
+import { App, DataWriteOptions, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, TFile, TFolder, Vault } from 'obsidian';
 
 
 
@@ -495,12 +495,13 @@ async function importJson(file: File, folder: TFolder) {
 			const content: KeepJson = JSON.parse(readerEvent.target.result as string);
 			let path: string = `${folder.path}/${filenameSanitize(content.title || file.name)}`;	// TODO: Strip file extension from filename
 			let fileRef: TFile;
+
 			
 			// Create new file
 			try {
 				// path = await getUnusedFilename(path);
 				// fileRef = await plugin.app.vault.create(`${path}.md`, '');
-				fileRef = await createNewEmptyMdFile(path);
+				fileRef = await createNewEmptyMdFile(path, {});
 			} catch (error) {
 				failCount++;
 				return Promise.reject(new Error(`Error creating new file ${path} (from ${file.name}. Error: ${error})`));
@@ -561,6 +562,15 @@ async function importJson(file: File, folder: TFolder) {
 					}
 				}
 			}
+
+			// Update created and modified date to match Keep data
+			const options: DataWriteOptions = {
+				ctime: content.createdTimestampUsec/1000,
+				mtime: content.userEditedTimestampUsec/1000
+			}
+			await plugin.app.vault.append(fileRef, '', options);
+			// await plugin.app.vault.process(fileRef, (str) => str, options);	// In docs, but not in class
+
 
 			successCount++;
 			resolve(fileRef);
@@ -761,18 +771,18 @@ const singleOrPlural = (count: number, singleVersion: string, pluralVersion?: st
 
 
 
-async function createNewEmptyMdFile(path: string, version: number = 1) : Promise<TFile> {
+async function createNewEmptyMdFile(path: string, options: DataWriteOptions, version: number = 1) : Promise<TFile> {
 	let fileRef: TFile;
 
 	try {
 		if(version == 1) {
-			fileRef = await plugin.app.vault.create(`${path}.md`, '');
+			fileRef = await plugin.app.vault.create(`${path}.md`, '', options);
 		} else {
-			fileRef = await plugin.app.vault.create(`${path} (${version}).md`, '');
+			fileRef = await plugin.app.vault.create(`${path} (${version}).md`, '', options);
 		}
 
-	} catch {
-		fileRef = await createNewEmptyMdFile(path, version+1);
+	} catch(error) {
+;		fileRef = await createNewEmptyMdFile(path, options, version+1);
 
 	}
 	
