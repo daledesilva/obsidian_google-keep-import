@@ -17,7 +17,7 @@ esbuild.build({
 	banner: {
 		js: banner,
 	},
-	entryPoints: ['main.ts', 'styles.scss'],
+	entryPoints: ['./src/main.ts', './src/styles.scss'],
 	bundle: true,
 	external: [
 		'obsidian',
@@ -48,7 +48,7 @@ esbuild.build({
 		copy({
 		  resolveFrom: 'cwd',	// Returns name of current working directory
 		  assets: {
-			from: ['./static/**/*'],
+			from: ['./src/static/**/*'],
 			to: ['./dist'],
 		  },
 		}),
