@@ -1,7 +1,8 @@
-import { DataWriteOptions, TFile, TFolder, Vault } from "obsidian";
-import MyPlugin, { ASSET_FOLDER, IMPORT_FOLDER } from "src/main";
+import { DataWriteOptions, Plugin, TFile, TFolder, Vault } from "obsidian";
+import KeepPlugin from "src/main";
 import { ImportProgressModal, updateProgress } from "src/modals/import-progress-modal/import-progress-modal";
 import { filenameSanitize } from "./string-processes";
+import { PluginSettings } from "./types";
 
 
 
@@ -69,14 +70,14 @@ async function createNewEmptyMdFile(vault: Vault, path: string, options: DataWri
 
 
 
-async function getImportFolder(vault: Vault): Promise<TFolder> {
+async function getImportFolder(vault: Vault, settings: PluginSettings): Promise<TFolder> {
 
 	const root = vault.getRoot();
 	let importFolder: TFolder | undefined;
 
 	// Find the folder if it exists
 	for(let i=0; i<root.children.length; i++) {
-		if(root.children[i].path == IMPORT_FOLDER) {
+		if(root.children[i].path == settings.folderNames.imports) {
 			importFolder = root.children[i] as TFolder;
 			break;
 		}
@@ -84,8 +85,8 @@ async function getImportFolder(vault: Vault): Promise<TFolder> {
 	
 	// Create the folder if it doesn't exist
 	if(importFolder === undefined) {
-		await vault.createFolder(IMPORT_FOLDER);		
-		importFolder = await getImportFolder(vault)
+		await vault.createFolder(settings.folderNames.imports);		
+		importFolder = await getImportFolder(vault, settings)
 	}
 	
 	return importFolder;
@@ -95,14 +96,14 @@ async function getImportFolder(vault: Vault): Promise<TFolder> {
 
 
 
-async function getAssetFolder(vault: Vault): Promise<TFolder> {
+async function getAssetFolder(vault: Vault, settings: PluginSettings): Promise<TFolder> {
 
-	const importFolder = await getImportFolder(vault)
+	const importFolder = await getImportFolder(vault, settings);
 	let assetFolder: TFolder | undefined;
 
 	// Find the folder if it exists
 	for(let i=0; i<importFolder.children.length; i++) {
-		if(importFolder.children[i].name == ASSET_FOLDER) {
+		if(importFolder.children[i].name == settings.folderNames.attachments) {
 			assetFolder = importFolder.children[i] as TFolder;
 			break;
 		}
@@ -110,8 +111,8 @@ async function getAssetFolder(vault: Vault): Promise<TFolder> {
 	
 	// Create the folder if it doesn't exist
 	if(assetFolder === undefined) {
-		await vault.createFolder(`${importFolder.path}/${ASSET_FOLDER}`);		
-		assetFolder = await getAssetFolder(vault)
+		await vault.createFolder(`${importFolder.path}/${settings.folderNames.attachments}`);		
+		assetFolder = await getAssetFolder(vault, settings);
 	}
 	
 	return assetFolder;
@@ -122,13 +123,15 @@ async function getAssetFolder(vault: Vault): Promise<TFolder> {
 
 
 
-export async function importFiles(plugin: MyPlugin, files: Array<Object>) {
+export async function importFiles(plugin: KeepPlugin, files: Array<Object>) {
+	const vault = plugin.app.vault;
+	const settings = plugin.settings;
 
 	const importProgressModal = new ImportProgressModal(plugin)
 	importProgressModal.open();
 
-	const importFolder = await getImportFolder(plugin.app.vault);
-	const assetFolder = await getAssetFolder(plugin.app.vault);	// TODO: Only do this if there is an attachement to be imported
+	const importFolder = await getImportFolder(vault, settings);
+	const assetFolder = await getAssetFolder(vault, settings);	// TODO: Only do this if there is an attachement to be imported
 
 	let successCount = 0;
 	let failCount = 0;
@@ -145,16 +148,16 @@ export async function importFiles(plugin: MyPlugin, files: Array<Object>) {
         let fileRef: TFile | Error;
 
         if(file.type === 'image/png') {
-            fileRef = await importBinaryFile(plugin.app.vault, assetFolder, file);
+            fileRef = await importBinaryFile(vault, assetFolder, file);
             
         } else if(file.type === 'video/3gpp') {
-            fileRef = await importBinaryFile(plugin.app.vault, assetFolder, file);
+            fileRef = await importBinaryFile(vault, assetFolder, file);
             
         } else if(file.type === 'image/jpeg') {
-            fileRef = await importBinaryFile(plugin.app.vault, assetFolder, file);
+            fileRef = await importBinaryFile(vault, assetFolder, file);
             
         } else { // file.type === 'application/json'
-            fileRef = await importJson(plugin.app.vault, importFolder, file);
+            fileRef = await importJson(vault, importFolder, file, settings);
 
         }
 
@@ -180,7 +183,7 @@ export async function importFiles(plugin: MyPlugin, files: Array<Object>) {
 
 
 
-async function importJson(vault: Vault, folder: TFolder, file: File) : Promise<TFile> {
+async function importJson(vault: Vault, folder: TFolder, file: File, settings: PluginSettings) : Promise<TFile> {
 
 	// setting up the reader
 	var reader = new FileReader();
@@ -213,11 +216,11 @@ async function importJson(vault: Vault, folder: TFolder, file: File) : Promise<T
 	
 			// Add in tags to represent Keep properties
 			try {
-				await vault.append(fileRef, `#Keep/Colour/${content.color} `);
-				content.isPinned ?		await vault.append(fileRef, `#Keep/Pinned `) : null;
-				content.attachments ?	await vault.append(fileRef, `#Keep/Attachments `) : null;
-				content.isArchived ?	await vault.append(fileRef, `#Keep/Archived `) : null;
-				content.isTrashed ? 	await vault.append(fileRef, `#Keep/Trashed `) : null;
+				await vault.append(fileRef, `${settings.tagNames.colorPrepend}${content.color} `);
+				content.isPinned ?		await vault.append(fileRef, `${settings.tagNames.isPinned} `) : null;
+				content.attachments ?	await vault.append(fileRef, `${settings.tagNames.hasAttachment} `) : null;
+				content.isArchived ?	await vault.append(fileRef, `${settings.tagNames.isArchived} `) : null;
+				content.isTrashed ? 	await vault.append(fileRef, `${settings.tagNames.isTrashed} `) : null;
 			} catch (error) {
 				return reject(Error(`Error adding tags to new file ${path} (from ${file.name})`));
 			}

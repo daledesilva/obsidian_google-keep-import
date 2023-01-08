@@ -1,26 +1,33 @@
 import { fileSyntax } from 'esbuild-sass-plugin/lib/utils';
 import { App, DataWriteOptions, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, TFile, TFolder, Vault } from 'obsidian';
-import { MyPluginSettings } from './logic/types';
+import { PluginSettings } from './logic/types';
 import { StartImportModal } from './modals/import-modal/import-modal';
 import { SampleSettingTab } from './tabs/settings-tab/settings-tab';
 
 
 
 
-// TODO: Put these inside the plugin settings
-export const IMPORT_FOLDER = 'Keep Imports';
-export const ASSET_FOLDER = 'Attachments'
-
-const DEFAULT_SETTINGS: MyPluginSettings = {
-	hideOpenVaultButton: false,
-	vaultNames: ['name'],
-	vaultLinks: ['utl'],
+const DEFAULT_SETTINGS: PluginSettings = {
+	folderNames: {
+		imports: 'Keep Imports',
+		attachments: 'Attachments'
+	},
+	tagNames: {
+		colorPrepend: '#Keep/Colour/',
+		isPinned: '#Keep/Pinned',
+		hasAttachment: '#Keep/Attachments',
+		isArchived: '#Keep/Archived',
+		isTrashed: '#Keep/Trashed',
+	},
+	importArchived: true,
+	importTrashed: false,
 }
 
 
 
-export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+
+export default class KeepPlugin extends Plugin {
+	settings: PluginSettings;
 
 	async onload() {
 		await this.loadSettings();

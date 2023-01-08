@@ -66,7 +66,6 @@ export class StartImportModal extends Modal {
 			btn.setDisabled(true);
 			btn.onClick( (e) => {
 				this.close();
-				console.log("click to start import");
 				importFiles(this.plugin, this.fileBacklog );
 			})
 		})
