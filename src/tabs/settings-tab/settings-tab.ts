@@ -17,6 +17,11 @@ export class SampleSettingTab extends PluginSettingTab {
 
 		containerEl.empty();
 
+		containerEl.createEl('h1', {text: 'Keep Import Plugin'});
+		containerEl.createEl('p', {text: 'This plugin allows importing notes from Google keep as a one time operation.'});
+
+		
+		containerEl.createEl('hr');
 		containerEl.createEl('h2', {text: 'Basics'});
 	
 			

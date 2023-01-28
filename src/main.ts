@@ -37,8 +37,6 @@ export default class KeepPlugin extends Plugin {
 
 	async onload() {
 		await this.loadSettings();
-		console.log('this.settings', this.settings);
-
 		
 		this.addCommand({
 			id: 'ublik-om_import-google-keep-jsons',
