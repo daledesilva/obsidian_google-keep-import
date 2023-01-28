@@ -77,7 +77,7 @@ async function getImportFolder(vault: Vault, settings: PluginSettings): Promise<
 
 	// Find the folder if it exists
 	for(let i=0; i<root.children.length; i++) {
-		if(root.children[i].path == settings.folderNames.imports) {
+		if(root.children[i].path == settings.folderNames.notes) {
 			importFolder = root.children[i] as TFolder;
 			break;
 		}
@@ -85,7 +85,7 @@ async function getImportFolder(vault: Vault, settings: PluginSettings): Promise<
 	
 	// Create the folder if it doesn't exist
 	if(importFolder === undefined) {
-		await vault.createFolder(settings.folderNames.imports);		
+		await vault.createFolder(settings.folderNames.notes);		
 		importFolder = await getImportFolder(vault, settings)
 	}
 	

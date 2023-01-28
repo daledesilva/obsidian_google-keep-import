@@ -1,17 +1,25 @@
 import { fileSyntax } from 'esbuild-sass-plugin/lib/utils';
 import { App, DataWriteOptions, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, TFile, TFolder, Vault } from 'obsidian';
-import { PluginSettings } from './logic/types';
+import { createdDateTypes, PluginSettings } from './logic/types';
 import { StartImportModal } from './modals/import-modal/import-modal';
 import { SampleSettingTab } from './tabs/settings-tab/settings-tab';
 
 
 
 
-const DEFAULT_SETTINGS: PluginSettings = {
+export const DEFAULT_SETTINGS: PluginSettings = {
 	folderNames: {
-		imports: 'Keep Imports',
-		attachments: 'Attachments'
+		notes: 'Keep Imports',
+		attachments: 'Keep Imports/Attachments'
 	},
+	createdDate: createdDateTypes.googleKeep, 
+	importArchived: true,
+	importTrashed: false,
+	addColorTags: true,
+	addPinnedTags: true,
+	addAttachmentTags: true,
+	addArchivedTags: true,
+	addTrashedTags: true,
 	tagNames: {
 		colorPrepend: '#Keep/Colour/',
 		isPinned: '#Keep/Pinned',
@@ -19,8 +27,6 @@ const DEFAULT_SETTINGS: PluginSettings = {
 		isArchived: '#Keep/Archived',
 		isTrashed: '#Keep/Trashed',
 	},
-	importArchived: true,
-	importTrashed: false,
 }
 
 
@@ -31,6 +37,7 @@ export default class KeepPlugin extends Plugin {
 
 	async onload() {
 		await this.loadSettings();
+		console.log('this.settings', this.settings);
 
 		
 		this.addCommand({

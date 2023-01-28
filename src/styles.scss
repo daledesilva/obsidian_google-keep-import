@@ -43,6 +43,37 @@ If your plugin does not need CSS, delete this file.
 
 
 
+.uo_setting {
+    &.is-disabled {
+        display: none;
+    }
+}
+
+
+
+// Increase the width of text inputs and drop down to their own line on small windows.
+// But not toggles
+.uo_setting:not(.mod-toggle) {
+    flex-wrap: wrap;
+
+    .setting-item-info {
+        padding-bottom: 0.5em;
+    }
+
+    .setting-item-info {
+        flex: 1 0 30ch;
+    }
+    .setting-item-control {
+        flex: 1 30ch;
+        input, select {
+            width: 100%;
+        }
+    }
+
+}
+
+
+
 
 
 .uo_progress-bar {

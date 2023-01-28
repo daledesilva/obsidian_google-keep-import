@@ -1,8 +1,21 @@
+export enum createdDateTypes {
+	googleKeep = 'Google Keep creation date',
+	import = 'Obsidian import date',
+};
+
 export interface PluginSettings {
 	folderNames: {
-		imports: string,
+		notes: string,
 		attachments: string
 	},
+	createdDate: createdDateTypes,
+	importArchived: boolean,
+	importTrashed: boolean,
+	addColorTags: boolean,
+	addPinnedTags: boolean,
+	addAttachmentTags: boolean,
+	addArchivedTags: boolean,
+	addTrashedTags: boolean,
 	tagNames: {
 		colorPrepend: string,
 		isPinned: string,
@@ -10,6 +23,4 @@ export interface PluginSettings {
 		isArchived: string,
 		isTrashed: string,
 	},
-	importArchived: boolean,
-	importTrashed: boolean,
 }
