@@ -1,4 +1,4 @@
-import { DataWriteOptions, Plugin, TFile, TFolder, Vault } from "obsidian";
+import { DataWriteOptions, Plugin, TAbstractFile, TFile, TFolder, Vault } from "obsidian";
 import KeepPlugin from "src/main";
 import { ImportProgressModal, updateProgress } from "src/modals/import-progress-modal/import-progress-modal";
 import { filenameSanitize } from "./string-processes";
@@ -70,52 +70,27 @@ async function createNewEmptyMdFile(vault: Vault, path: string, options: DataWri
 
 
 
-async function getImportFolder(vault: Vault, settings: PluginSettings): Promise<TFolder> {
 
-	const root = vault.getRoot();
-	let importFolder: TFolder | undefined;
 
-	// Find the folder if it exists
-	for(let i=0; i<root.children.length; i++) {
-		if(root.children[i].path == settings.folderNames.notes) {
-			importFolder = root.children[i] as TFolder;
-			break;
-		}
-	}
+
+
+
+async function getOrCreateFolder(folderPath: string, vault: Vault): Promise<TFolder> {
+	let folder: TFolder | null = null;
+
+	Vault.recurseChildren(vault.getRoot(), (fileOrFolder) => {
+		if(fileOrFolder instanceof TFile) return;
+		if(fileOrFolder.path != folderPath) return;
+		folder = fileOrFolder as TFolder;
+	})
 	
 	// Create the folder if it doesn't exist
-	if(importFolder === undefined) {
-		await vault.createFolder(settings.folderNames.notes);		
-		importFolder = await getImportFolder(vault, settings)
+	if(folder === null) {
+		await vault.createFolder(folderPath);		
+		folder = await getOrCreateFolder(folderPath, vault);
 	}
 	
-	return importFolder;
-}
-
-
-
-
-
-async function getAssetFolder(vault: Vault, settings: PluginSettings): Promise<TFolder> {
-
-	const importFolder = await getImportFolder(vault, settings);
-	let assetFolder: TFolder | undefined;
-
-	// Find the folder if it exists
-	for(let i=0; i<importFolder.children.length; i++) {
-		if(importFolder.children[i].name == settings.folderNames.attachments) {
-			assetFolder = importFolder.children[i] as TFolder;
-			break;
-		}
-	}
-	
-	// Create the folder if it doesn't exist
-	if(assetFolder === undefined) {
-		await vault.createFolder(`${importFolder.path}/${settings.folderNames.attachments}`);		
-		assetFolder = await getAssetFolder(vault, settings);
-	}
-	
-	return assetFolder;
+	return folder;
 }
 
 
@@ -130,8 +105,8 @@ export async function importFiles(plugin: KeepPlugin, files: Array<Object>) {
 	const importProgressModal = new ImportProgressModal(plugin)
 	importProgressModal.open();
 
-	const importFolder = await getImportFolder(vault, settings);
-	const assetFolder = await getAssetFolder(vault, settings);	// TODO: Only do this if there is an attachement to be imported
+	const importFolder = await getOrCreateFolder(settings.folderNames.notes, vault);
+	const assetFolder = await getOrCreateFolder(settings.folderNames.attachments, vault);	// TODO: Only do this if there is an attachement to be imported
 
 	let successCount = 0;
 	let failCount = 0;
