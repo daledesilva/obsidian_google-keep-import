@@ -231,6 +231,7 @@ export class SampleSettingTab extends PluginSettingTab {
 				button.onClick(async () => {
 					this.plugin.settings = JSON.parse( JSON.stringify(DEFAULT_SETTINGS) );
 					await this.plugin.saveSettings();
+					this.display();
 				})
 			})
 		
