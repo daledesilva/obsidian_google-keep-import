@@ -1,4 +1,4 @@
-export enum createdDateTypes {
+export enum CreatedDateTypes {
 	googleKeep = 'Google Keep creation date',
 	import = 'Obsidian import date',
 };
@@ -8,7 +8,7 @@ export interface PluginSettings {
 		notes: string,
 		attachments: string
 	},
-	createdDate: createdDateTypes,
+	createdDate: CreatedDateTypes,
 	importArchived: boolean,
 	importTrashed: boolean,
 	addColorTags: boolean,

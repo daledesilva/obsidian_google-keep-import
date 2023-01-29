@@ -1,5 +1,5 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
-import { createdDateTypes } from "src/logic/types";
+import { CreatedDateTypes } from "src/logic/types";
 import MyPlugin, { DEFAULT_SETTINGS } from "src/main";
 
 
@@ -52,11 +52,11 @@ export class SampleSettingTab extends PluginSettingTab {
 			.setName('Note creation date')
 			.setDesc('Should the imported not have a creation date set to the same date it was created on in Google Keep, or should it change to the date it was imported into Obsidian on?')
 			.addDropdown((dropdown) => {
-				dropdown.addOption(createdDateTypes.googleKeep, createdDateTypes.googleKeep);
-				dropdown.addOption(createdDateTypes.import, createdDateTypes.import);
+				dropdown.addOption(CreatedDateTypes.googleKeep, CreatedDateTypes.googleKeep);
+				dropdown.addOption(CreatedDateTypes.import, CreatedDateTypes.import);
 				dropdown.setValue(this.plugin.settings.createdDate)
 				dropdown.onChange(async (value) => {
-					this.plugin.settings.createdDate = value as createdDateTypes;
+					this.plugin.settings.createdDate = value as CreatedDateTypes;
 					await this.plugin.saveSettings();
 				});
 			})

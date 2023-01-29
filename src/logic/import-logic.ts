@@ -2,7 +2,7 @@ import { DataWriteOptions, Plugin, TAbstractFile, TFile, TFolder, Vault } from "
 import KeepPlugin from "src/main";
 import { ImportProgressModal, updateProgress } from "src/modals/import-progress-modal/import-progress-modal";
 import { filenameSanitize } from "./string-processes";
-import { PluginSettings } from "./types";
+import { CreatedDateTypes, PluginSettings } from "./types";
 
 
 
@@ -120,7 +120,7 @@ export async function importFiles(plugin: KeepPlugin, files: Array<Object>) {
 
 	for(let i=0; i<files.length; i++) {
 		const file = files[i] as File;
-        let fileRef: TFile | Error;
+        let fileRef: TFile | null | Error;
 
         if(file.type === 'image/png') {
             fileRef = await importBinaryFile(vault, assetFolder, file);
@@ -136,7 +136,7 @@ export async function importFiles(plugin: KeepPlugin, files: Array<Object>) {
 
         }
 
-        if(fileRef instanceof Error) {
+        if(fileRef instanceof Error || fileRef ===  null) {
             failCount++;
         } else {
             successCount++;
@@ -158,7 +158,7 @@ export async function importFiles(plugin: KeepPlugin, files: Array<Object>) {
 
 
 
-async function importJson(vault: Vault, folder: TFolder, file: File, settings: PluginSettings) : Promise<TFile> {
+async function importJson(vault: Vault, folder: TFolder, file: File, settings: PluginSettings) : Promise<TFile | null> {
 
 	// setting up the reader
 	var reader = new FileReader();
@@ -179,11 +179,18 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 			let path: string = `${folder.path}/${filenameSanitize(content.title || file.name)}`;	// TODO: Strip file extension from filename
 			let fileRef: TFile;
 
+
+			// Abort if user doesn't want this type of file
+			if(content.isArchived && !settings.importArchived) {
+				return resolve(null);
+			}
+			if(content.isTrashed && !settings.importTrashed) {
+				return resolve(null);
+			}
+
 			
 			// Create new file
 			try {
-				// path = await getUnusedFilename(path);
-				// fileRef = await plugin.app.vault.create(`${path}.md`, '');
 				fileRef = await createNewEmptyMdFile(vault, path, {});
 			} catch (error) {
 				return reject(new Error(`Error creating new file ${path} (from ${file.name}. Error: ${error})`));
@@ -191,11 +198,11 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 	
 			// Add in tags to represent Keep properties
 			try {
-				await vault.append(fileRef, `${settings.tagNames.colorPrepend}${content.color} `);
-				content.isPinned ?		await vault.append(fileRef, `${settings.tagNames.isPinned} `) : null;
-				content.attachments ?	await vault.append(fileRef, `${settings.tagNames.hasAttachment} `) : null;
-				content.isArchived ?	await vault.append(fileRef, `${settings.tagNames.isArchived} `) : null;
-				content.isTrashed ? 	await vault.append(fileRef, `${settings.tagNames.isTrashed} `) : null;
+				settings.addColorTags ?								await vault.append(fileRef, `${settings.tagNames.colorPrepend}${content.color} `) : null;
+				content.isPinned && settings.addPinnedTags ?		await vault.append(fileRef, `${settings.tagNames.isPinned} `) :	null;
+				content.attachments && settings.addAttachmentTags ?	await vault.append(fileRef, `${settings.tagNames.hasAttachment} `) : null;
+				content.isArchived && settings.addArchivedTags ?	await vault.append(fileRef, `${settings.tagNames.isArchived} `) : null;
+				content.isTrashed && settings.addTrashedTags ? 		await vault.append(fileRef, `${settings.tagNames.isTrashed} `) : null;
 			} catch (error) {
 				return reject(Error(`Error adding tags to new file ${path} (from ${file.name})`));
 			}
@@ -241,13 +248,15 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 				}
 			}
 
-			// Update created and modified date to match Keep data
-			const options: DataWriteOptions = {
-				ctime: content.createdTimestampUsec/1000,
-				mtime: content.userEditedTimestampUsec/1000
+			// Update created and modified date to match Keep data if desired
+			if(settings.createdDate === CreatedDateTypes.googleKeep) {
+				const options: DataWriteOptions = {
+					ctime: content.createdTimestampUsec/1000,
+					mtime: content.userEditedTimestampUsec/1000
+				}
+				await vault.append(fileRef, '', options);
+				// await plugin.app.vault.process(fileRef, (str) => str, options);	// TODO: Error in docs. Exists in docs but not in class
 			}
-			await vault.append(fileRef, '', options);
-			// await plugin.app.vault.process(fileRef, (str) => str, options);	// In docs, but not in class
 
 
 			return resolve(fileRef);
