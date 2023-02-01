@@ -1,6 +1,6 @@
 import { fileSyntax } from 'esbuild-sass-plugin/lib/utils';
 import { App, DataWriteOptions, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, TFile, TFolder, Vault } from 'obsidian';
-import { CreatedDateTypes, PluginSettings } from './logic/types';
+import { CreatedDateTypes, PluginSettings } from 'src/types/PluginSettings';
 import { StartImportModal } from './modals/import-modal/import-modal';
 import { SampleSettingTab } from './tabs/settings-tab/settings-tab';
 

@@ -1,40 +1,17 @@
 import { DataWriteOptions, Plugin, TAbstractFile, TFile, TFolder, Vault } from "obsidian";
 import KeepPlugin from "src/main";
 import { ImportProgressModal, updateProgress } from "src/modals/import-progress-modal/import-progress-modal";
+import { KeepListItem } from "src/types/KeepData";
 import { filenameSanitize } from "./string-processes";
-import { CreatedDateTypes, PluginSettings } from "./types";
+import { CreatedDateTypes, PluginSettings } from "src/types/PluginSettings";
+import { KeepAttachment, KeepJson } from "src/types/KeepData";
 
 
 
 
 
 
-// Types definitions
-////////////////////
 
-
-interface KeepListItem {
-	text: string;
-	isChecked: boolean;
-}
-
-interface KeepAttachment {
-	filePath: string;
-	mimetype: string;
-}
-
-interface KeepJson {
-	color: string;
-	createdTimestampUsec: number;
-	isArchived: boolean;
-	isPinned: boolean;
-	isTrashed: boolean;
-	textContent?: string;
-	listContent?: Array<KeepListItem>;
-	attachments?: Array<KeepAttachment>;
-	title: string;
-	userEditedTimestampUsec: number;
-}
 
 
 

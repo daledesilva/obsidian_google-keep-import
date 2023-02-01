@@ -1,5 +1,5 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
-import { CreatedDateTypes } from "src/logic/types";
+import { CreatedDateTypes } from "src/types/PluginSettings";
 import MyPlugin, { DEFAULT_SETTINGS } from "src/main";
 
 
