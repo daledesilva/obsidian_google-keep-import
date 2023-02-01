@@ -1,10 +1,11 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
 import { CreatedDateTypes } from "src/types/PluginSettings";
 import MyPlugin, { DEFAULT_SETTINGS } from "src/main";
+import { ConfirmationModal } from "src/modals/confirmation-modal/confirmation-modal";
 
 
 
-export class SampleSettingTab extends PluginSettingTab {
+export class KeepImportSettingTab extends PluginSettingTab {
 	plugin: MyPlugin;
 
 	constructor(app: App, plugin: MyPlugin) {
@@ -17,7 +18,7 @@ export class SampleSettingTab extends PluginSettingTab {
 
 		containerEl.empty();
 
-		containerEl.createEl('h1', {text: 'Keep Import Plugin'});
+		containerEl.createEl('h1', {text: 'Google Keep Import Plugin'});
 		containerEl.createEl('p', {text: 'This plugin allows importing notes from Google keep as a one time operation.'});
 
 		
@@ -227,11 +228,19 @@ export class SampleSettingTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.addButton( (button) => {
 				button.setButtonText('Reset settings');
-				button.setWarning();
-				button.onClick(async () => {
-					this.plugin.settings = JSON.parse( JSON.stringify(DEFAULT_SETTINGS) );
-					await this.plugin.saveSettings();
-					this.display();
+				button.setClass('uo_button');
+				button.onClick(() => {
+					new ConfirmationModal({
+						plugin: this.plugin,
+						title: 'Please confirm',
+						message: 'Revert to default settings for Google Keep Import?',
+						confirmLabel: 'Reset settings',
+						confirmAction: async () => {
+							this.plugin.settings = JSON.parse( JSON.stringify(DEFAULT_SETTINGS) );
+							await this.plugin.saveSettings();
+							this.display();
+						}
+					}).open();
 				})
 			})
 		

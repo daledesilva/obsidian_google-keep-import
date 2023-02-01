@@ -1,6 +1,6 @@
 {
-	"id": "ublik-om_keep-import",
-	"name": "Keep Import",
+	"id": "ublik-om_google-keep-import",
+	"name": "Google Keep Import",
 	"version": "0.0.5",
 	"minAppVersion": "1.00.0",
 	"description": "Allows import of Google Keep backup json files",

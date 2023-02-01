@@ -115,6 +115,9 @@ If your plugin does not need CSS, delete this file.
 
 
 
+.uo_button {
+    cursor: pointer;
+}
 
 
 button.uo_button[disabled] {
