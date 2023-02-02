@@ -1,7 +1,8 @@
-import { App, PluginSettingTab, Setting } from "obsidian";
+import { App, Notice, PluginSettingTab, Setting } from "obsidian";
 import { CreatedDateTypes } from "src/types/PluginSettings";
 import MyPlugin, { DEFAULT_SETTINGS } from "src/main";
 import { ConfirmationModal } from "src/modals/confirmation-modal/confirmation-modal";
+import { resetSettings } from "src/logic/admin-logic";
 
 
 
@@ -236,8 +237,7 @@ export class KeepImportSettingTab extends PluginSettingTab {
 						message: 'Revert to default settings for Google Keep Import?',
 						confirmLabel: 'Reset settings',
 						confirmAction: async () => {
-							this.plugin.settings = JSON.parse( JSON.stringify(DEFAULT_SETTINGS) );
-							await this.plugin.saveSettings();
+							await this.plugin.resetSettings();
 							this.display();
 						}
 					}).open();

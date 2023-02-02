@@ -70,6 +70,12 @@ export default class KeepPlugin extends Plugin {
 	async saveSettings() {
 		await this.saveData(this.settings);
 	}
+
+	async resetSettings() {
+		this.settings = JSON.parse( JSON.stringify(DEFAULT_SETTINGS) );
+		this.saveSettings();
+		new Notice('Google Keep Import settings reset');
+	}
 }
 
 
