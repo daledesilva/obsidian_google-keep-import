@@ -5,6 +5,7 @@ import { KeepListItem } from "src/types/KeepData";
 import { filenameSanitize } from "./string-processes";
 import { CreatedDateTypes, PluginSettings } from "src/types/PluginSettings";
 import { KeepAttachment, KeepJson } from "src/types/KeepData";
+import { IgnoreImportType, ImportResult, ImportOutcomeType } from "src/types/Results";
 
 
 
@@ -97,23 +98,25 @@ export async function importFiles(plugin: KeepPlugin, files: Array<Object>) {
 
 	for(let i=0; i<files.length; i++) {
 		const file = files[i] as File;
-        let fileRef: TFile | null | Error;
+        let result: ImportResult;
 
         if(file.type === 'image/png') {
-            fileRef = await importBinaryFile(vault, assetFolder, file);
+            result = await importBinaryFile(vault, assetFolder, file);
             
         } else if(file.type === 'video/3gpp') {
-            fileRef = await importBinaryFile(vault, assetFolder, file);
+            result = await importBinaryFile(vault, assetFolder, file);
             
         } else if(file.type === 'image/jpeg') {
-            fileRef = await importBinaryFile(vault, assetFolder, file);
+            result = await importBinaryFile(vault, assetFolder, file);
             
         } else { // file.type === 'application/json'
-            fileRef = await importJson(vault, importFolder, file, settings);
+            result = await importJson(vault, importFolder, file, settings);
 
         }
 
-        if(fileRef instanceof Error || fileRef ===  null) {
+
+		// new Error(`Error creating new file '${path}' (from <${file.name}>). ${error}`)
+        if(result.outcome === ImportOutcomeType.CreationError || result.outcome === ImportOutcomeType.ContentError) {
             failCount++;
         } else {
             successCount++;
@@ -135,7 +138,11 @@ export async function importFiles(plugin: KeepPlugin, files: Array<Object>) {
 
 
 
-async function importJson(vault: Vault, folder: TFolder, file: File, settings: PluginSettings) : Promise<TFile | null> {
+async function importJson(vault: Vault, folder: TFolder, file: File, settings: PluginSettings) : Promise<ImportResult> {
+	const result: ImportResult = {
+		keepFilename: file.name,
+		outcome: ImportOutcomeType.Imported,
+	}
 
 	// setting up the reader
 	var reader = new FileReader();
@@ -159,18 +166,25 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 
 			// Abort if user doesn't want this type of file
 			if(content.isArchived && !settings.importArchived) {
-				return resolve(null);
+				result.outcome = ImportOutcomeType.UserIgnored;
+				result.ignoredReason = IgnoreImportType.Archived;
+				return resolve(result);
 			}
 			if(content.isTrashed && !settings.importTrashed) {
-				return resolve(null);
+				result.outcome = ImportOutcomeType.UserIgnored;
+				result.ignoredReason = IgnoreImportType.Trashed;
+				return resolve(result);
 			}
 
 			
 			// Create new file
+			result.obsidianFilepath = path;
 			try {
 				fileRef = await createNewEmptyMdFile(vault, path, {});
 			} catch (error) {
-				return reject(new Error(`Error creating new file ${path} (from ${file.name}. Error: ${error})`));
+				result.outcome = ImportOutcomeType.CreationError;
+				result.error = error;
+				return resolve(result);
 			}			
 	
 			// Add in tags to represent Keep properties
@@ -181,7 +195,10 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 				content.isArchived && settings.addArchivedTags ?	await vault.append(fileRef, `${settings.tagNames.isArchived} `) : null;
 				content.isTrashed && settings.addTrashedTags ? 		await vault.append(fileRef, `${settings.tagNames.isTrashed} `) : null;
 			} catch (error) {
-				return reject(Error(`Error adding tags to new file ${path} (from ${file.name})`));
+				result.outcome = ImportOutcomeType.ContentError;
+				result.error = error;
+				result.details = 'Error adding tags to new file.'
+				return resolve(result);
 			}
 			
 			// Add in text content
@@ -191,7 +208,10 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 					await vault.append(fileRef, `${content.textContent}\n`);
 				}
 			} catch (error) {
-				return reject(new Error(`Error adding paragraph content to new file ${path} (from ${file.name})`));
+				result.outcome = ImportOutcomeType.ContentError;
+				result.error = error;
+				result.details = 'Error adding paragraph content to new file.'
+				return resolve(result);
 			}
 			
 			// Add in text content if check box
@@ -209,7 +229,10 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 					}
 				}
 			} catch (error) {
-				return reject(new Error(`Error adding list content to new file ${path} (from ${file.name})`));
+				result.outcome = ImportOutcomeType.ContentError;
+				result.error = error;
+				result.details = 'Error adding list content to new file.'
+				return resolve(result);
 			}
 			
 			// Embed attachments
@@ -220,7 +243,10 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 					try {
 						await vault.append(fileRef, `\n\n![[${attachment.filePath}]]`);
 					} catch (error) {
-						return reject(new Error(`Error embedding attachment ${attachment.filePath} to new file ${path} (from ${file.name})`));
+						result.outcome = ImportOutcomeType.ContentError;
+						result.error = error;
+						result.details = `Error embedding attachment '${attachment.filePath}' to new file.`;
+						return resolve(result);
 					}
 				}
 			}
@@ -236,7 +262,7 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 			}
 
 
-			return resolve(fileRef);
+			return resolve(result);
 
 	
 		 }
@@ -248,17 +274,24 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 }
 
 
-async function importBinaryFile(vault: Vault, folder: TFolder, file: File) : Promise<TFile> {
+async function importBinaryFile(vault: Vault, folder: TFolder, file: File) : Promise<ImportResult> {
     let fileRef: TFile;
 	const path: string = `${folder.path}/${file.name}`;
+	const result: ImportResult = {
+		keepFilename: file.name,
+		outcome: ImportOutcomeType.Imported,
+	}
 	
 	try {
 		fileRef = await vault.createBinary(path, await file.arrayBuffer());
 	} catch (error) {
-		return Promise.reject(new Error(`Error creating attachment (Binary file) ${path} (from ${file.name})`));
+		result.outcome = ImportOutcomeType.CreationError;
+		result.error = error;
+		result.details = 'Error creating attachment (Binary file)';
+		return Promise.resolve(result);
 	}
     
-    return Promise.resolve(fileRef);
+    return Promise.resolve(result);
 
 
 }
