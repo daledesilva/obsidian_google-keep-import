@@ -81,7 +81,7 @@ If your plugin does not need CSS, delete this file.
     height: 0.5em;
     border-radius: 10px;
     background-color: #333;
-    margin: 1em 0;
+    margin-top: 1em;
     
     .uo_bar {
         width: 50%;
@@ -102,6 +102,7 @@ If your plugin does not need CSS, delete this file.
     flex-wrap: wrap;
     justify-content: center;
     gap: 40px;
+    margin-top: 1rem;
 
     p {
         text-align: center;
@@ -113,9 +114,62 @@ If your plugin does not need CSS, delete this file.
     }
 }
 
+.uo_import-log {
+    margin-top: 1rem;
+    background-color: rgba($color: #000000, $alpha: 0.3);
+    max-height: 0;
+    overflow-y: auto;
+    border-radius: 6px;
+    
+    &.uo_visible {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    
+    .uo_item {
+        font-size: 0.8rem;
+        padding: 1.2em 0.8em;
+        margin: 0;
+
+        &:nth-of-type(even) {
+            background-color: rgba($color: #FFF, $alpha: 0.01);
+        }
+        
+        .uo_item-header {
+            margin: 0;
+            
+            .uo_status {
+                font-size: 0.8em;
+                padding: 0.25em 0.6em;
+                background-color: rgba($color: #FF5555, $alpha: 0.3);
+                color: #FFF;
+                border-radius: 4px;
+                margin-right: 0.5em;
+            }
+            .uo_title {
+                font-size: 1.1em;
+                color: rgba($color: #FFF, $alpha: 0.6);
+            }
+        }
+        
+        .uo_item-body {
+            margin: 0.4em 0 0 0;
+            
+            .uo_desc {
+                margin: 0;
+                color: rgba($color: #FFF, $alpha: 0.3);
+            }
+        }
+
+    }    
+
+    
+}
+
 
 
 .uo_button {
+    margin-top: 1rem;
     cursor: pointer;
 }
 
@@ -135,4 +189,15 @@ button.uo_button[disabled] {
 
 .uo_hidden {
     display: none;
+}
+
+
+
+
+
+
+// Animation
+
+.uo_import-log {
+    transition: max-height 1s;
 }

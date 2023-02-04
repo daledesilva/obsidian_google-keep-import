@@ -12,6 +12,8 @@ export class ImportProgressModal extends Modal {
 	remainingSpan: HTMLSpanElement;
 	failedSpan: HTMLSpanElement;
 	importedSpan: HTMLSpanElement;
+	outputStr: string = '';
+	outputLogEl: HTMLParagraphElement;
 
 	constructor(plugin: MyPlugin) {
 		super(plugin.app);
@@ -48,6 +50,8 @@ export class ImportProgressModal extends Modal {
 		pBubbleEl.createEl('br');
 		pBubbleEl.createEl('span', {cls: 'uo_import-label', text: `imported`});
 
+		this.outputLogEl = contentEl.createDiv('uo_import-log');
+
 	}
 
 	public updateProgressVisuals(options: {successCount: number, failCount: number, totalImports: number}) {
@@ -66,6 +70,19 @@ export class ImportProgressModal extends Modal {
 		this.failedSpan.setText(`${failCount}`);
 		this.importedSpan.setText(`${successCount}`);
 
+	}
+
+	public addOutputLine(options: {status: string, title: string, desc: string}) {
+		const itemEl = this.outputLogEl.createDiv({cls: 'uo_item'});
+
+		const itemHeaderEl = itemEl.createEl('p', {cls: 'uo_item-header'});
+		itemHeaderEl.createEl('span', {cls: 'uo_status'}).setText(options.status);
+		itemHeaderEl.createEl('span', {cls: 'uo_title'}).setText(options.title);
+
+		const itemBodyEl = itemEl.createEl('p', {cls: 'uo_item-body'});
+		itemBodyEl.createEl('p', {cls: 'uo_desc'}).setText(options.desc);
+
+		this.outputLogEl.addClass('uo_visible');
 	}
 
 	public applyCompletedState() {
@@ -100,6 +117,15 @@ export function updateProgress(options: {successCount: number, failCount: number
 	if(successCount + failCount == totalImports) {
 		modal.applyCompletedState();
 	}
+}
+
+
+export function addOutputLine(options: {status: string, title: string, desc: string, modal: ImportProgressModal}) {
+	options.modal.addOutputLine({
+		status: options.status,
+		title: options.title,
+		desc: options.desc
+	});
 }
 
 

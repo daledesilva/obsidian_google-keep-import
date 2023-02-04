@@ -1,6 +1,6 @@
 import { DataWriteOptions, Plugin, TAbstractFile, TFile, TFolder, Vault } from "obsidian";
 import KeepPlugin from "src/main";
-import { ImportProgressModal, updateProgress } from "src/modals/import-progress-modal/import-progress-modal";
+import { addOutputLine, ImportProgressModal, updateProgress } from "src/modals/import-progress-modal/import-progress-modal";
 import { KeepListItem } from "src/types/KeepData";
 import { filenameSanitize } from "./string-processes";
 import { CreatedDateTypes, PluginSettings } from "src/types/PluginSettings";
@@ -117,7 +117,13 @@ export async function importFiles(plugin: KeepPlugin, files: Array<Object>) {
 
 		// new Error(`Error creating new file '${path}' (from <${file.name}>). ${error}`)
         if(result.outcome === ImportOutcomeType.CreationError || result.outcome === ImportOutcomeType.ContentError) {
-            failCount++;
+			failCount++;
+			addOutputLine({
+				status: 'Error',
+				title: `${result.keepFilename}`,
+				desc: `${result.details} ${result.obsidianFilepath || ''} (${result.error})`,
+				modal: importProgressModal,
+			})
         } else {
             successCount++;
         }
@@ -128,6 +134,8 @@ export async function importFiles(plugin: KeepPlugin, files: Array<Object>) {
 			totalImports: files.length,
 			modal: importProgressModal,
 		})
+
+		
 
 	}
 
@@ -156,7 +164,9 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 
 			// Bail if the file hasn't been interpreted properly
 			if(!readerEvent || !readerEvent.target) {
-				return reject(new Error(`Something went wrong reading json: ${file.name}`));
+				result.outcome = ImportOutcomeType.CreationError;
+				result.details = 'Something went wrong reading the file.'
+				return resolve(result);
 			}
 			
 			const content: KeepJson = JSON.parse(readerEvent.target.result as string);
@@ -184,6 +194,7 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 			} catch (error) {
 				result.outcome = ImportOutcomeType.CreationError;
 				result.error = error;
+				result.details = `Error creating equivalent file in obsidian as ${path}`;
 				return resolve(result);
 			}			
 	
@@ -197,7 +208,7 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 			} catch (error) {
 				result.outcome = ImportOutcomeType.ContentError;
 				result.error = error;
-				result.details = 'Error adding tags to new file.'
+				result.details = 'Error adding tags to the new file.'
 				return resolve(result);
 			}
 			
@@ -210,7 +221,7 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 			} catch (error) {
 				result.outcome = ImportOutcomeType.ContentError;
 				result.error = error;
-				result.details = 'Error adding paragraph content to new file.'
+				result.details = 'Error adding paragraph content to the new file.'
 				return resolve(result);
 			}
 			
@@ -231,7 +242,7 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 			} catch (error) {
 				result.outcome = ImportOutcomeType.ContentError;
 				result.error = error;
-				result.details = 'Error adding list content to new file.'
+				result.details = 'Error adding list content to the new file.'
 				return resolve(result);
 			}
 			
@@ -245,7 +256,7 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 					} catch (error) {
 						result.outcome = ImportOutcomeType.ContentError;
 						result.error = error;
-						result.details = `Error embedding attachment '${attachment.filePath}' to new file.`;
+						result.details = `Error embedding attachment '${attachment.filePath}' to the new file.`;
 						return resolve(result);
 					}
 				}
@@ -287,7 +298,7 @@ async function importBinaryFile(vault: Vault, folder: TFolder, file: File) : Pro
 	} catch (error) {
 		result.outcome = ImportOutcomeType.CreationError;
 		result.error = error;
-		result.details = 'Error creating attachment (Binary file)';
+		result.details = 'Error creating file in obsidian.';
 		return Promise.resolve(result);
 	}
     
