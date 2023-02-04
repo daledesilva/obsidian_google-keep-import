@@ -128,7 +128,14 @@ If your plugin does not need CSS, delete this file.
     
     .uo_item {
         font-size: 0.8rem;
-        padding: 1.2em 0.8em;
+        box-sizing: border-box;
+        padding: 0 0.8em;
+        // setting vertical padding with before and after so that max-height ignores them
+        &::before, &::after {
+            content: ' ';
+            display: block;
+            height: 1.2em;
+        }
         margin: 0;
 
         &:nth-of-type(even) {
@@ -201,3 +208,22 @@ button.uo_button[disabled] {
 .uo_import-log {
     transition: max-height 1s;
 }
+
+
+.uo_item {
+    animation-name: log-item-appear;
+    animation-duration: 1s;
+    animation-timing-function: cubic-bezier(0.77,0,0.18,1);
+    overflow: hidden;
+}
+
+@keyframes log-item-appear {
+    from {
+      max-height: 0;
+    }
+    
+    to {
+        // max-height: 4.5rem; // Approximately standard size from 3 lines of content // NOTE: This would cause issues if content wraps across lines
+        max-height: 7rem; // Approximately standard size from 3 lines of content // NOTE: This would cause issues if content wraps across lines
+    }
+  }
