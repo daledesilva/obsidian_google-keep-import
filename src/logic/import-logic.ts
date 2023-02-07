@@ -83,9 +83,7 @@ export async function importFiles(plugin: KeepPlugin, files: Array<Object>) {
 	const importProgressModal = new ImportProgressModal(plugin)
 	importProgressModal.open();
 
-	const importFolder = await getOrCreateFolder(settings.folderNames.notes, vault);
-	const assetFolder = await getOrCreateFolder(settings.folderNames.attachments, vault);	// TODO: Only do this if there is an attachement to be imported
-
+	let noteFolder,assetFolder;
 	let successCount = 0;
 	let failCount = 0;
 
@@ -100,17 +98,28 @@ export async function importFiles(plugin: KeepPlugin, files: Array<Object>) {
 		const file = files[i] as File;
         let result: ImportResult;
 
+		// REVIEW: This is more efficient than the below, but typescript won't accept it.
+		// if(noteFolder === undefined && file.type === 'application/json') {
+		// 	noteFolder = await getOrCreateFolder(settings.folderNames.notes, vault);
+		// } else {
+		// 	assetFolder = await getOrCreateFolder(settings.folderNames.attachments, vault);
+		// }
+
         if(file.type === 'image/png') {
+			if(!assetFolder) assetFolder = await getOrCreateFolder(settings.folderNames.attachments, vault);
             result = await importBinaryFile(vault, assetFolder, file);
             
         } else if(file.type === 'video/3gpp') {
+			if(!assetFolder) assetFolder = await getOrCreateFolder(settings.folderNames.attachments, vault);
             result = await importBinaryFile(vault, assetFolder, file);
             
         } else if(file.type === 'image/jpeg') {
+			if(!assetFolder) assetFolder = await getOrCreateFolder(settings.folderNames.attachments, vault);
             result = await importBinaryFile(vault, assetFolder, file);
             
         } else { // file.type === 'application/json'
-            result = await importJson(vault, importFolder, file, settings);
+			if(!noteFolder) noteFolder = await getOrCreateFolder(settings.folderNames.notes, vault);
+            result = await importJson(vault, noteFolder, file, settings);
 
         }
 
