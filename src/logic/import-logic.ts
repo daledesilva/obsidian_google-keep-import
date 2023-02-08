@@ -83,7 +83,7 @@ export async function importFiles(plugin: KeepPlugin, files: Array<Object>) {
 	const importProgressModal = new ImportProgressModal(plugin)
 	importProgressModal.open();
 
-	let noteFolder,assetFolder;
+	let noteFolder, assetFolder;
 	let successCount = 0;
 	let failCount = 0;
 
@@ -94,37 +94,45 @@ export async function importFiles(plugin: KeepPlugin, files: Array<Object>) {
 		modal: importProgressModal,
 	})
 
+	// try {
+	// 	for(let i=0; i<files.length; i++) {
+	// 		const file = files[i] as File;
+
+	// 		const isNote = file.type === 'application/json';
+	// 		if(isNote && noteFolder === undefined) {
+	// 			noteFolder = await getOrCreateFolder(settings.folderNames.notes, vault);
+			
+	// 		} else if (!isNote && assetFolder === undefined) {
+	// 			assetFolder = await getOrCreateFolder(settings.folderNames.attachments, vault);
+	// 		}
+	// 	}
+	// } catch(error) {
+	// 	addOutputLine({
+	// 		status: 'Error',
+	// 		title: `Error creating folders`,
+	// 		desc: `Couldn't create required Obsidian folders (${error})`,
+	// 		modal: importProgressModal,
+	// 	})
+	// 	return;
+	// }
+
 	for(let i=0; i<files.length; i++) {
 		const file = files[i] as File;
         let result: ImportResult;
 
-		// REVIEW: This is more efficient than the below, but typescript won't accept it.
-		// if(noteFolder === undefined && file.type === 'application/json') {
-		// 	noteFolder = await getOrCreateFolder(settings.folderNames.notes, vault);
-		// } else {
-		// 	assetFolder = await getOrCreateFolder(settings.folderNames.attachments, vault);
-		// }
-
-        if(file.type === 'image/png') {
-			if(!assetFolder) assetFolder = await getOrCreateFolder(settings.folderNames.attachments, vault);
-            result = await importBinaryFile(vault, assetFolder, file);
-            
-        } else if(file.type === 'video/3gpp') {
-			if(!assetFolder) assetFolder = await getOrCreateFolder(settings.folderNames.attachments, vault);
-            result = await importBinaryFile(vault, assetFolder, file);
-            
-        } else if(file.type === 'image/jpeg') {
-			if(!assetFolder) assetFolder = await getOrCreateFolder(settings.folderNames.attachments, vault);
-            result = await importBinaryFile(vault, assetFolder, file);
-            
-        } else { // file.type === 'application/json'
+		if(file.type === 'application/json') {
 			if(!noteFolder) noteFolder = await getOrCreateFolder(settings.folderNames.notes, vault);
             result = await importJson(vault, noteFolder, file, settings);
+        } else {
+			// image/png
+			// video/3gpp
+			// image/jpeg
+			// *
+			if(!assetFolder) assetFolder = await getOrCreateFolder(settings.folderNames.attachments, vault);
+            result = await importBinaryFile(vault, assetFolder, file);
+		}
 
-        }
-
-
-		// new Error(`Error creating new file '${path}' (from <${file.name}>). ${error}`)
+		// Populate output log on error
         if(result.outcome === ImportOutcomeType.CreationError || result.outcome === ImportOutcomeType.ContentError) {
 			failCount++;
 			addOutputLine({
@@ -143,8 +151,6 @@ export async function importFiles(plugin: KeepPlugin, files: Array<Object>) {
 			totalImports: files.length,
 			modal: importProgressModal,
 		})
-
-		
 
 	}
 
