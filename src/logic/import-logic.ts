@@ -123,13 +123,22 @@ export async function importFiles(plugin: KeepPlugin, files: Array<Object>) {
 		if(file.type === 'application/json') {
 			if(!noteFolder) noteFolder = await getOrCreateFolder(settings.folderNames.notes, vault);
             result = await importJson(vault, noteFolder, file, settings);
-        } else {
-			// image/png
-			// video/3gpp
-			// image/jpeg
-			// *
+        } else if(	file.type === 'video/3gpp'	||
+					file.type === 'audio/amr'	||
+					file.type === 'image/png'	||
+					file.type === 'image/jpeg'	||
+					file.type === 'image/jpg'	||
+					file.type === 'image/webp'	||
+					file.type === 'image/gif'
+		) {
 			if(!assetFolder) assetFolder = await getOrCreateFolder(settings.folderNames.attachments, vault);
             result = await importBinaryFile(vault, assetFolder, file);
+		} else {
+			result = {
+				keepFilename: file.name,
+				outcome: ImportOutcomeType.CreationError,
+				details: `This file wasn't imported because this plugin doesn\'t support importing ${file.type} files.`,
+			}
 		}
 
 		// Populate output log on error

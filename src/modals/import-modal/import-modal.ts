@@ -26,7 +26,7 @@ export class StartImportModal extends Modal {
 
 		titleEl.setText('Import Google Keep backup');
 
-		contentEl.createEl('p', {text: 'Here you can upload a set of jsons output from a Google Keep backup.'});
+		contentEl.createEl('p', {text: 'Here you can upload a set of jsons output from a Google Keep backup (<a href="https://takeout.google.com/">Google Takeout</a>).'});
 		contentEl.createEl('p', {text: 'Upload each json one at a time or all together. You should also upload any attachments in the backup as well such as png\'s jpgs, etc.'});
 		contentEl.createEl('p', {text: 'If you import attachments or jsons separately and close this dialog, they will will automatically link together once their counterparts are imported later provided you haven\'t changed the names of attachments or modified the markdown embeds in the notes.'});
 
