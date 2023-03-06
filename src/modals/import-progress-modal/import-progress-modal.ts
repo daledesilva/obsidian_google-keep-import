@@ -1,4 +1,5 @@
 import { App, Modal, Setting, TFile, TFolder } from "obsidian";
+import { FileImporter } from "src/logic/import-logic";
 import MyPlugin from "src/main";
 
 
@@ -7,6 +8,7 @@ import MyPlugin from "src/main";
 
 
 export class ImportProgressModal extends Modal {
+	fileImporter: FileImporter;
 	result: string;
 	bar: HTMLDivElement;
 	remainingSpan: HTMLSpanElement;
@@ -15,8 +17,20 @@ export class ImportProgressModal extends Modal {
 	outputStr: string = '';
 	outputLogEl: HTMLParagraphElement;
 
-	constructor(plugin: MyPlugin) {
+	resolveModal: (value: string) => void;
+	rejectModal: (value: string) => void;
+
+	constructor(plugin: MyPlugin, fileImporter: FileImporter) {
 		super(plugin.app);
+		this.fileImporter = fileImporter
+	}
+
+	showModal() {
+		return new Promise((resolve, reject) => {
+			this.open();
+			this.resolveModal = resolve;
+			this.rejectModal = reject;
+		})
 	}
 
 	onOpen() {
@@ -52,14 +66,17 @@ export class ImportProgressModal extends Modal {
 
 		this.outputLogEl = contentEl.createDiv('uo_import-log');
 
+		this.updateProgressVisuals()
 	}
 
-	public updateProgressVisuals(options: {successCount: number, failCount: number, totalImports: number}) {
+	public updateProgressVisuals() {
+
+		const totalImports = this.fileImporter.getTotalImports();
 		const {
 			successCount,
 			failCount,
-			totalImports
-		} = options;
+			newLogEntries,
+		} = this.fileImporter.getLatestProgress();
 
 		// Update bar visual
 		const perc = (successCount + failCount)/totalImports * 100;
@@ -70,6 +87,17 @@ export class ImportProgressModal extends Modal {
 		this.failedSpan.setText(`${failCount}`);
 		this.importedSpan.setText(`${successCount}`);
 
+		// Update output log
+		for(let i=0; i<newLogEntries.length; i++) {
+			this.addOutputLine(newLogEntries[i]);
+		}
+
+		// Finalise or continue on next frame
+		if(successCount + failCount == totalImports) {
+			this.applyCompletedState();
+		} else {
+			window.requestAnimationFrame(() => this.updateProgressVisuals());
+		}
 	}
 
 	public addOutputLine(options: {status: string, title: string, desc: string}) {
@@ -100,32 +128,9 @@ export class ImportProgressModal extends Modal {
 		const {titleEl, contentEl} = this;
 		titleEl.empty();
 		contentEl.empty();
+
+		this.fileImporter.stop();
 	}
-}
-
-
-
-export function updateProgress(options: {successCount: number, failCount: number, totalImports: number, modal: ImportProgressModal}) {
-	const {successCount, failCount, totalImports, modal} = options;
-
-	modal.updateProgressVisuals({
-		successCount,
-		failCount,
-		totalImports
-	})
-
-	if(successCount + failCount == totalImports) {
-		modal.applyCompletedState();
-	}
-}
-
-
-export function addOutputLine(options: {status: string, title: string, desc: string, modal: ImportProgressModal}) {
-	options.modal.addOutputLine({
-		status: options.status,
-		title: options.title,
-		desc: options.desc
-	});
 }
 
 

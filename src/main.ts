@@ -1,7 +1,7 @@
 import { fileSyntax } from 'esbuild-sass-plugin/lib/utils';
 import { App, DataWriteOptions, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, TFile, TFolder, Vault } from 'obsidian';
 import { CreatedDateTypes, PluginSettings } from 'src/types/PluginSettings';
-import { StartImportModal } from './modals/import-modal/import-modal';
+import { runImportSequence } from './logic/import-logic';
 import { KeepImportSettingTab } from './tabs/settings-tab/settings-tab';
 
 
@@ -32,7 +32,7 @@ export const DEFAULT_SETTINGS: PluginSettings = {
 
 
 
-export default class KeepPlugin extends Plugin {
+export default class MyPlugin extends Plugin {
 	settings: PluginSettings;
 
 	async onload() {
@@ -41,9 +41,7 @@ export default class KeepPlugin extends Plugin {
 		this.addCommand({
 			id: 'ublik-om_import-google-keep-jsons',
 			name: 'Import backup from Google Keep',
-			callback: () => {
-				new StartImportModal(this).open();
-			}
+			callback: () => runImportSequence(this)
 		});
 
 		

@@ -1,5 +1,4 @@
 import { App, Modal, Notice, Setting } from "obsidian";
-import { importFiles } from "src/logic/import-logic";
 import { singleOrPlural } from "src/logic/string-processes";
 import MyPlugin from "src/main";
 
@@ -15,10 +14,20 @@ export class StartImportModal extends Modal {
 	fileBacklog: Array<File> = [];
 	uploadInput: HTMLInputElement;
 	modalActions: Setting;
+	resolveModal: (value: Array<File>) => void;
+	rejectModal: (value: string) => void;
 
 	constructor(plugin: MyPlugin) {
 		super(plugin.app);
 		this.plugin = plugin;
+	}
+
+	showModal(): Promise<Array<File>> {
+		return new Promise((resolve, reject) => {
+			this.open();
+			this.resolveModal = resolve;
+			this.rejectModal = reject;
+		})
 	}
 
 	onOpen() {
@@ -65,8 +74,8 @@ export class StartImportModal extends Modal {
 			btn.setButtonText('Start Import');
 			btn.setDisabled(true);
 			btn.onClick( (e) => {
+				this.resolveModal(this.fileBacklog)
 				this.close();
-				importFiles(this.plugin, this.fileBacklog );
 			})
 		})
 
@@ -187,5 +196,6 @@ export class StartImportModal extends Modal {
 		const {titleEl, contentEl} = this;
 		titleEl.empty();
 		contentEl.empty();
+		this.rejectModal('Modal closed without doing anything');
 	}
 }

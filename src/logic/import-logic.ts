@@ -1,11 +1,11 @@
 import { DataWriteOptions, Plugin, TAbstractFile, TFile, TFolder, Vault } from "obsidian";
-import KeepPlugin from "src/main";
-import { addOutputLine, ImportProgressModal, updateProgress } from "src/modals/import-progress-modal/import-progress-modal";
-import { KeepListItem } from "src/types/KeepData";
+import MyPlugin from "src/main";
+import { ImportProgressModal } from "src/modals/import-progress-modal/import-progress-modal";
 import { filenameSanitize } from "./string-processes";
 import { CreatedDateTypes, PluginSettings } from "src/types/PluginSettings";
 import { KeepAttachment, KeepJson } from "src/types/KeepData";
 import { IgnoreImportType, ImportResult, ImportOutcomeType } from "src/types/Results";
+import { StartImportModal } from "src/modals/start-import-modal/start-import-modal";
 
 
 
@@ -14,10 +14,33 @@ import { IgnoreImportType, ImportResult, ImportOutcomeType } from "src/types/Res
 
 
 
+export async function runImportSequence(plugin: MyPlugin) {
+	const modal = await new StartImportModal(this);
+	let fileBacklog;
+	try {
+		fileBacklog = await modal.showModal();
+	}
+	catch {
+		// Modal was cancelled
+		return;
+	}
 
+	const fileImporter = new FileImporter(plugin);
+	fileImporter.import(fileBacklog);
+	
+	const progressModal = await new ImportProgressModal(this, fileImporter);
+	try {
+		await progressModal.showModal();
+	}
+	catch {
+		// Import was cancelled
+		fileImporter.stop();
+		return;
+	}
 
+	// Import was finished. Clean up
 
-
+}
 
 
 
@@ -73,97 +96,108 @@ async function getOrCreateFolder(folderPath: string, vault: Vault): Promise<TFol
 
 
 
+interface OutputLogItem {
+	status: string;
+	title: string;
+	desc: string;
+}
 
 
 
-export async function importFiles(plugin: KeepPlugin, files: Array<Object>) {
-	const vault = plugin.app.vault;
-	const settings = plugin.settings;
+export class FileImporter {
+	private plugin: MyPlugin;
+	private totalImports = 0;
+	private successCount = 0;
+	private failCount = 0;
+	private activeImport = false;
+	private outputLog: Array<OutputLogItem> = [];
+	private outputLogIter = 0;
 
-	const importProgressModal = new ImportProgressModal(plugin)
-	importProgressModal.open();
-
-	let noteFolder, assetFolder;
-	let successCount = 0;
-	let failCount = 0;
-
-	updateProgress({
-        successCount,
-        failCount,
-		totalImports: files.length,
-		modal: importProgressModal,
-	})
-
-	// try {
-	// 	for(let i=0; i<files.length; i++) {
-	// 		const file = files[i] as File;
-
-	// 		const isNote = file.type === 'application/json';
-	// 		if(isNote && noteFolder === undefined) {
-	// 			noteFolder = await getOrCreateFolder(settings.folderNames.notes, vault);
-			
-	// 		} else if (!isNote && assetFolder === undefined) {
-	// 			assetFolder = await getOrCreateFolder(settings.folderNames.attachments, vault);
-	// 		}
-	// 	}
-	// } catch(error) {
-	// 	addOutputLine({
-	// 		status: 'Error',
-	// 		title: `Error creating folders`,
-	// 		desc: `Couldn't create required Obsidian folders (${error})`,
-	// 		modal: importProgressModal,
-	// 	})
-	// 	return;
-	// }
-
-	for(let i=0; i<files.length; i++) {
-		const file = files[i] as File;
-        let result: ImportResult;
-
-		if(file.type === 'application/json') {
-			if(!noteFolder) noteFolder = await getOrCreateFolder(settings.folderNames.notes, vault);
-            result = await importJson(vault, noteFolder, file, settings);
-        } else if(	file.type === 'video/3gpp'	||
-					file.type === 'audio/amr'	||
-					file.type === 'image/png'	||
-					file.type === 'image/jpeg'	||
-					file.type === 'image/jpg'	||
-					file.type === 'image/webp'	||
-					file.type === 'image/gif'
-		) {
-			if(!assetFolder) assetFolder = await getOrCreateFolder(settings.folderNames.attachments, vault);
-            result = await importBinaryFile(vault, assetFolder, file);
-		} else {
-			result = {
-				keepFilename: file.name,
-				outcome: ImportOutcomeType.CreationError,
-				details: `This file wasn't imported because this plugin doesn\'t support importing ${file.type} files.`,
-			}
-		}
-
-		// Populate output log on error
-        if(result.outcome === ImportOutcomeType.CreationError || result.outcome === ImportOutcomeType.ContentError) {
-			failCount++;
-			addOutputLine({
-				status: 'Error',
-				title: `${result.keepFilename}`,
-				desc: `${result.details} ${result.obsidianFilepath || ''} (${result.error})`,
-				modal: importProgressModal,
-			})
-        } else {
-            successCount++;
-        }
-		
-		updateProgress({
-			successCount,
-			failCount,
-			totalImports: files.length,
-			modal: importProgressModal,
-		})
-
+	constructor(plugin: MyPlugin) {
+		this.plugin = plugin;
 	}
 
+	async import(files: Array<Object>) {
+		const vault = this.plugin.app.vault;
+		const settings = this.plugin.settings;
+		this.activeImport = true;
+	
+		let noteFolder, assetFolder;
+		this.totalImports = files.length;
+		this.successCount = 0;
+		this.failCount = 0;
+
+		
+		for(let i=0; i<files.length; i++) {
+			const file = files[i] as File;
+			let result: ImportResult;
+
+			if(!this.activeImport) return;
+	
+			if(file.type === 'application/json') {
+				if(!noteFolder) noteFolder = await getOrCreateFolder(settings.folderNames.notes, vault);
+				result = await importJson(vault, noteFolder, file, settings);
+			} else if(	file.type === 'video/3gpp'	||
+						file.type === 'audio/amr'	||
+						file.type === 'image/png'	||
+						file.type === 'image/jpeg'	||
+						file.type === 'image/jpg'	||
+						file.type === 'image/webp'	||
+						file.type === 'image/gif'
+			) {
+				if(!assetFolder) assetFolder = await getOrCreateFolder(settings.folderNames.attachments, vault);
+				result = await importBinaryFile(vault, assetFolder, file);
+			} else {
+				result = {
+					keepFilename: file.name,
+					outcome: ImportOutcomeType.CreationError,
+					details: `This file wasn't imported because this plugin doesn\'t support importing ${file.type} files.`,
+				}
+			}
+	
+			// Populate output log on error
+			if(result.outcome === ImportOutcomeType.CreationError || result.outcome === ImportOutcomeType.ContentError) {
+				this.failCount++;
+				this.outputLog.push({
+					status: 'Error',
+					title: `${result.keepFilename}`,
+					desc: `${result.details} ${result.obsidianFilepath || ''} (${result.error})`,
+					// modal: importProgressModal,
+				})
+			} else {
+				this.successCount++;
+			}
+	
+		}
+	
+	}
+
+	getTotalImports() {
+		return this.totalImports;
+	}
+
+	getLatestProgress() {
+		let newLogEntries: Array<OutputLogItem> = [];
+		if(this.outputLogIter < this.totalImports) {
+			newLogEntries = this.outputLog.slice(this.outputLogIter);
+			this.outputLogIter += newLogEntries.length;
+		}
+		return  {
+			successCount: this.successCount,
+			failCount: this.failCount,
+			newLogEntries
+		};
+	}
+
+	stop() {
+		console.log('Stopping import');
+		this.activeImport = false;
+	}
+
+
+
 }
+
 
 
 
