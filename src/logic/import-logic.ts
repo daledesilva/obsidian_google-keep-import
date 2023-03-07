@@ -122,7 +122,7 @@ export class FileImporter {
 		const settings = this.plugin.settings;
 		this.activeImport = true;
 	
-		let noteFolder, assetFolder;
+		let noteFolder, assetFolder, unsupportedFolder;
 		this.totalImports = files.length;
 		this.successCount = 0;
 		this.failCount = 0;
@@ -133,37 +133,106 @@ export class FileImporter {
 			let result: ImportResult;
 
 			if(!this.activeImport) return;
+
+			// TODO: These could be functions
+			const fileIsJson = file.type === 'application/json';
+
+			const fileIsPlainText =		file.type === 'text/plain'		||
+										file.type === 'text/markdown'	||
+										file.type === 'text/x-markdown';
+
+			const fileIsBinaryAndSupportedByKeep =	file.type === 'video/3gpp'	||
+													file.type === 'audio/amr'	||
+													file.type === 'image/png'	||
+													file.type === 'image/jpeg'	||
+													file.type === 'image/jpg'	||
+													file.type === 'image/webp'	||
+													file.type === 'image/gif';
+
+			// TODO: Check all these mim-types here: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
+			const fileIsBinaryAndSupportedByObsidian =	file.type === 'image/png'		||
+														file.type === 'image/webp'		||
+														file.type === 'image/jpg'		||
+														file.type === 'image/jpeg'		||
+														file.type === 'image/gif'		||
+														file.type === 'image/bmp'		||
+														file.type === 'image/svg+xml'	||
+														file.type === 'video/mp3'		||
+														file.type === 'video/webm'		||
+														file.type === 'video/wav'		||
+														file.type === 'video/m4a'		||
+														file.type === 'video/ogg'		||
+														file.type === 'video/3gpp'		||
+														file.type === 'video/flac'		||
+														file.type === 'video/mp4'		||
+														file.type === 'video/webm'		||
+														file.type === 'video/ogv'		||
+														file.type === 'video/mov'		||
+														file.type === 'video/mkv'		||
+														file.type === 'application/pdf';
+
 	
-			if(file.type === 'application/json') {
+			if(fileIsJson) {
+				// Assume is Google Keep note and attempt to import
 				if(!noteFolder) noteFolder = await getOrCreateFolder(settings.folderNames.notes, vault);
 				result = await importJson(vault, noteFolder, file, settings);
-			} else if(	file.type === 'video/3gpp'	||
-						file.type === 'audio/amr'	||
-						file.type === 'image/png'	||
-						file.type === 'image/jpeg'	||
-						file.type === 'image/jpg'	||
-						file.type === 'image/webp'	||
-						file.type === 'image/gif'
-			) {
+			
+			} else if(fileIsPlainText) {
+				// Import as is
 				if(!assetFolder) assetFolder = await getOrCreateFolder(settings.folderNames.attachments, vault);
 				result = await importBinaryFile(vault, assetFolder, file);
-			} else {
+
+			} else if(fileIsBinaryAndSupportedByKeep && fileIsBinaryAndSupportedByObsidian) {
+				// Import as supported binary file
+				if(!assetFolder) assetFolder = await getOrCreateFolder(settings.folderNames.attachments, vault);
+				result = await importBinaryFile(vault, assetFolder, file);
+				
+			} else if(fileIsBinaryAndSupportedByKeep && !fileIsBinaryAndSupportedByObsidian) {
+				// Import as unsupported binary file
+			
+				if(!unsupportedFolder) unsupportedFolder = await getOrCreateFolder(settings.folderNames.unsupportedAttachments, vault);
+				result = await importBinaryFile(vault, unsupportedFolder, file);
 				result = {
 					keepFilename: file.name,
-					outcome: ImportOutcomeType.CreationError,
-					details: `This file wasn't imported because this plugin doesn\'t support importing ${file.type} files.`,
+					outcome: ImportOutcomeType.FormatError,
+					details: `This file type isn't supported by Obsidian. The file has been imported into '${settings.folderNames.unsupportedAttachments}'. Open that folder outside of Obsidian to convert or deleted those files. Any links to those files in notes will also need to be updated.`,
+				}
+
+			} else if(fileIsBinaryAndSupportedByObsidian) {
+				// Import as supported binary file
+				if(!assetFolder) assetFolder = await getOrCreateFolder(settings.folderNames.attachments, vault);
+				result = await importBinaryFile(vault, assetFolder, file);
+
+			} else {
+				// Import as unrecognised file
+				
+				if(!unsupportedFolder) unsupportedFolder = await getOrCreateFolder(settings.folderNames.unsupportedAttachments, vault);
+				result = await importBinaryFile(vault, unsupportedFolder, file);
+				result = {
+					keepFilename: file.name,
+					outcome: ImportOutcomeType.FormatError,
+					details: `This file's format isn't recognised. The file has been imported into '${settings.folderNames.unsupportedAttachments}'. It will appear in Obsidian if supported, otherwise you can access it outside of obsidian.`,
 				}
 			}
 	
+
 			// Populate output log on error
-			if(result.outcome === ImportOutcomeType.CreationError || result.outcome === ImportOutcomeType.ContentError) {
+			if(result.outcome === ImportOutcomeType.FormatError) {
+				this.successCount++;
+				this.outputLog.push({
+					status: 'Warning',
+					title: `${result.keepFilename}`,
+					desc: `${result.details} ${result.obsidianFilepath || ''}`,
+				})
+
+			} else if(result.outcome === ImportOutcomeType.CreationError || result.outcome === ImportOutcomeType.ContentError) {
 				this.failCount++;
 				this.outputLog.push({
 					status: 'Error',
 					title: `${result.keepFilename}`,
-					desc: `${result.details} ${result.obsidianFilepath || ''} (${result.error})`,
-					// modal: importProgressModal,
+					desc: `${result.details} ${result.obsidianFilepath || ''} ${result.error ? '('+result.error+')' : ''}`,
 				})
+
 			} else {
 				this.successCount++;
 			}

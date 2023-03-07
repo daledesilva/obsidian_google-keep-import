@@ -56,7 +56,8 @@ export class StartImportModal extends Modal {
 			attr: {
 				'multiple': true,
 				'id': 'uo_file',
-				'accept': '.json, .jpg, .png, .3gp',
+				// 'accept': '.json, .jpg, .png, .3gp',
+				// 'accept': '.json, .jpg, .png, .3gp',
 			}
 		})
 
@@ -196,6 +197,5 @@ export class StartImportModal extends Modal {
 		const {titleEl, contentEl} = this;
 		titleEl.empty();
 		contentEl.empty();
-		this.rejectModal('Modal closed without doing anything');
 	}
 }

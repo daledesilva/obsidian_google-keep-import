@@ -10,7 +10,8 @@ import { KeepImportSettingTab } from './tabs/settings-tab/settings-tab';
 export const DEFAULT_SETTINGS: PluginSettings = {
 	folderNames: {
 		notes: 'Keep Imports',
-		attachments: 'Keep Imports/Attachments'
+		attachments: 'Keep Imports/Attachments',
+		unsupportedAttachments: 'Keep Imports/Unsupported Attachments'
 	},
 	createdDate: CreatedDateTypes.googleKeep, 
 	importArchived: true,

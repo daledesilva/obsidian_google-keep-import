@@ -3,6 +3,7 @@ export enum ImportOutcomeType {
     UserIgnored,
     CreationError,
     ContentError,
+    FormatError,
     Imported,
 }
 
