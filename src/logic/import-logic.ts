@@ -256,7 +256,6 @@ export class FileImporter {
 	}
 
 	stop() {
-		console.log('Stopping import');
 		this.activeImport = false;
 	}
 

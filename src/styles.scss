@@ -148,10 +148,17 @@ If your plugin does not need CSS, delete this file.
             .uo_status {
                 font-size: 0.8em;
                 padding: 0.25em 0.6em;
-                background-color: rgba($color: #FF5555, $alpha: 0.3);
-                color: #FFF;
                 border-radius: 4px;
                 margin-right: 0.5em;
+                
+                &.error {
+                    background-color: rgba($color: #FF5555, $alpha: 0.3);
+                    color: #FFF;
+                }
+                &.warning {
+                    background-color: rgba($color: #e87400, $alpha: 0.3);
+                    color: #FFF;
+                }
             }
             .uo_title {
                 font-size: 1.1em;

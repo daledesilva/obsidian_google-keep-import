@@ -106,7 +106,8 @@ export class ImportProgressModal extends Modal {
 		const itemEl = this.outputLogEl.createDiv({cls: 'uo_item'});
 
 		const itemHeaderEl = itemEl.createEl('p', {cls: 'uo_item-header'});
-		itemHeaderEl.createEl('span', {cls: 'uo_status'}).setText(options.status);
+		const statusClass = options.status.toLowerCase();
+		itemHeaderEl.createEl('span', {cls: `uo_status ${statusClass}`}).setText(options.status);
 		itemHeaderEl.createEl('span', {cls: 'uo_title'}).setText(options.title);
 
 		const itemBodyEl = itemEl.createEl('p', {cls: 'uo_item-body'});
