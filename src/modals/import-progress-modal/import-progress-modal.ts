@@ -16,6 +16,7 @@ export class ImportProgressModal extends Modal {
 	importedSpan: HTMLSpanElement;
 	outputStr: string = '';
 	outputLogEl: HTMLParagraphElement;
+	importCompleted: Boolean = false;
 
 	resolveModal: (value: string) => void;
 	rejectModal: (value: string) => void;
@@ -94,6 +95,7 @@ export class ImportProgressModal extends Modal {
 
 		// Finalise or continue on next frame
 		if(successCount + failCount == totalImports) {
+			this.importCompleted = true;
 			this.applyCompletedState();
 		} else {
 			window.requestAnimationFrame(() => this.updateProgressVisuals());
@@ -129,7 +131,9 @@ export class ImportProgressModal extends Modal {
 		titleEl.empty();
 		contentEl.empty();
 
-		this.fileImporter.stop();
+		if(!this.importCompleted) {
+			this.rejectModal('Import cancelled');
+		}
 	}
 }
 

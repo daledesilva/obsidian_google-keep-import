@@ -1,4 +1,4 @@
-import { DataWriteOptions, Plugin, TAbstractFile, TFile, TFolder, Vault } from "obsidian";
+import { DataWriteOptions, Notice, Plugin, TAbstractFile, TFile, TFolder, Vault } from "obsidian";
 import MyPlugin from "src/main";
 import { ImportProgressModal } from "src/modals/import-progress-modal/import-progress-modal";
 import { filenameSanitize } from "./string-processes";
@@ -32,13 +32,12 @@ export async function runImportSequence(plugin: MyPlugin) {
 	try {
 		await progressModal.showModal();
 	}
-	catch {
+	catch(message) {
 		// Import was cancelled
 		fileImporter.stop();
+		new Notice(message, 9000);
 		return;
 	}
-
-	// Import was finished. Clean up
 
 }
 
@@ -179,39 +178,37 @@ export class FileImporter {
 			
 			} else if(fileIsPlainText) {
 				// Import as is
-				if(!assetFolder) assetFolder = await getOrCreateFolder(settings.folderNames.attachments, vault);
+				if(!assetFolder) assetFolder = await getOrCreateFolder(settings.folderNames.assets, vault);
 				result = await importBinaryFile(vault, assetFolder, file);
 
 			} else if(fileIsBinaryAndSupportedByKeep && fileIsBinaryAndSupportedByObsidian) {
 				// Import as supported binary file
-				if(!assetFolder) assetFolder = await getOrCreateFolder(settings.folderNames.attachments, vault);
+				if(!assetFolder) assetFolder = await getOrCreateFolder(settings.folderNames.assets, vault);
 				result = await importBinaryFile(vault, assetFolder, file);
 				
 			} else if(fileIsBinaryAndSupportedByKeep && !fileIsBinaryAndSupportedByObsidian) {
 				// Import as unsupported binary file
-			
-				if(!unsupportedFolder) unsupportedFolder = await getOrCreateFolder(settings.folderNames.unsupportedAttachments, vault);
+				if(!unsupportedFolder) unsupportedFolder = await getOrCreateFolder(settings.folderNames.unsupportedAssets, vault);
 				result = await importBinaryFile(vault, unsupportedFolder, file);
 				result = {
 					keepFilename: file.name,
 					outcome: ImportOutcomeType.FormatError,
-					details: `This file type isn't supported by Obsidian. The file has been imported into '${settings.folderNames.unsupportedAttachments}'. Open that folder outside of Obsidian to convert or deleted those files. Any links to those files in notes will also need to be updated.`,
+					details: `This file type isn't supported by Obsidian. The file has been imported into '${settings.folderNames.unsupportedAssets}'. Open that folder outside of Obsidian to convert or deleted those files. Any links to those files in notes will also need to be updated.`,
 				}
 
 			} else if(fileIsBinaryAndSupportedByObsidian) {
 				// Import as supported binary file
-				if(!assetFolder) assetFolder = await getOrCreateFolder(settings.folderNames.attachments, vault);
+				if(!assetFolder) assetFolder = await getOrCreateFolder(settings.folderNames.assets, vault);
 				result = await importBinaryFile(vault, assetFolder, file);
 
 			} else {
 				// Import as unrecognised file
-				
-				if(!unsupportedFolder) unsupportedFolder = await getOrCreateFolder(settings.folderNames.unsupportedAttachments, vault);
+				if(!unsupportedFolder) unsupportedFolder = await getOrCreateFolder(settings.folderNames.unsupportedAssets, vault);
 				result = await importBinaryFile(vault, unsupportedFolder, file);
 				result = {
 					keepFilename: file.name,
 					outcome: ImportOutcomeType.FormatError,
-					details: `This file's format isn't recognised. The file has been imported into '${settings.folderNames.unsupportedAttachments}'. It will appear in Obsidian if supported, otherwise you can access it outside of obsidian.`,
+					details: `This file's format isn't recognised. The file has been imported into '${settings.folderNames.unsupportedAssets}'. It will appear in Obsidian if supported, otherwise you can access it outside of obsidian.`,
 				}
 			}
 	

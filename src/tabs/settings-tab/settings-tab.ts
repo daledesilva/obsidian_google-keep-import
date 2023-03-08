@@ -42,9 +42,9 @@ export class KeepImportSettingTab extends PluginSettingTab {
 			.setClass('uo_setting')
 			.setName('Attachment import folder')
 			.addText((text) => {
-				text.setValue(this.plugin.settings.folderNames.attachments);
+				text.setValue(this.plugin.settings.folderNames.assets);
 				text.onChange(async (value) => {
-					this.plugin.settings.folderNames.attachments = value;
+					this.plugin.settings.folderNames.assets = value;
 					await this.plugin.saveSettings();
 				});
 			});

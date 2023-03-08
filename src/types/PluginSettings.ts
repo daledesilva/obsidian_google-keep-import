@@ -6,8 +6,8 @@ export enum CreatedDateTypes {
 export interface PluginSettings {
 	folderNames: {
 		notes: string,
-		attachments: string,
-		unsupportedAttachments: string
+		assets: string,
+		unsupportedAssets: string
 	},
 	createdDate: CreatedDateTypes,
 	importArchived: boolean,
