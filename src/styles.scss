@@ -11,7 +11,8 @@ If your plugin does not need CSS, delete this file.
 
 .uo_drop-frame {
     width: 100%;
-    padding: 1.5em;
+    padding: 5.5em 70px;
+    margin-top: 2em;
     border-radius: 10px;
     border: 1px white dashed;
     text-align: center;
@@ -36,6 +37,12 @@ If your plugin does not need CSS, delete this file.
     color: pink;
     text-decoration: underline;
     cursor: pointer;
+}
+
+.uo_info-bubble {
+    background-color: rgba($color: #FFF, $alpha: 0.05);
+    border-radius: 10px;
+    padding: 20px;
 }
 
 

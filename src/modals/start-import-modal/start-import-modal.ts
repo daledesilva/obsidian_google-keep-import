@@ -33,16 +33,28 @@ export class StartImportModal extends Modal {
 	onOpen() {
 		const {titleEl, contentEl} = this;
 
-		titleEl.setText('Import Google Keep backup');
+		titleEl.setText('Import Google Keep export');
 
-		contentEl.createEl('p', {text: 'Here you can upload a set of jsons output from a Google Keep backup (<a href="https://takeout.google.com/">Google Takeout</a>).'});
-		contentEl.createEl('p', {text: 'Upload each json one at a time or all together. You should also upload any attachments in the backup as well such as png\'s jpgs, etc.'});
-		contentEl.createEl('p', {text: 'If you import attachments or jsons separately and close this dialog, they will will automatically link together once their counterparts are imported later provided you haven\'t changed the names of attachments or modified the markdown embeds in the notes.'});
+
+
+
+
+		const firstParaEl = contentEl.createEl('p', {
+			text: 'To export your files from Google Keep, open ',
+			cls: 'uo_info-bubble'
+		});
+		firstParaEl.createEl('a', {
+			text: 'Google Takeout',
+			href: 'https://takeout.google.com/'
+		});
+		firstParaEl.appendText(' and select only Google Keep files. Once you have the exported zip, unzip it and drag all the files in below.');
+
+
 
 
 		const dropFrame = contentEl.createEl('div', {cls: 'uo_drop-frame'});
 
-		const dropFrameText = dropFrame.createEl('p', { text: 'Drag your files here or ' });
+		const dropFrameText = dropFrame.createEl('p', { text: 'Drag all files here or ' });
 		// const linkText = dropFrameText.createEl('a', {text: 'browse local files'})
 		dropFrameText.createEl('label', { 
 			text: 'browse local files',
@@ -67,6 +79,12 @@ export class StartImportModal extends Modal {
 		this.noteSpan = summaryP.createEl('span', {cls: 'uo_import-number', text: `0`});
 		summaryP.createEl('span', {text: ` | attachments: `});
 		this.assetSpan = summaryP.createEl('span', {cls: 'uo_import-number', text: `0`});
+
+
+
+
+
+
 
 
 		this.modalActions = new Setting(contentEl).addButton(btn => {
