@@ -57,9 +57,10 @@ export default class MyPlugin extends Plugin {
 
 	}
 
+	// Run when deactivating or uninstalling a plugin
 	onunload() {
 		// TODO: Make sure to stop anything here
-
+		
 	}
 
 	async loadSettings() {

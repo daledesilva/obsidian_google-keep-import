@@ -144,30 +144,33 @@ export class FileImporter {
 													file.type === 'audio/amr'	||
 													file.type === 'image/png'	||
 													file.type === 'image/jpeg'	||
-													file.type === 'image/jpg'	||
 													file.type === 'image/webp'	||
 													file.type === 'image/gif';
 
-			// TODO: Check all these mim-types here: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
-			const fileIsBinaryAndSupportedByObsidian =	file.type === 'image/png'		||
-														file.type === 'image/webp'		||
-														file.type === 'image/jpg'		||
-														file.type === 'image/jpeg'		||
-														file.type === 'image/gif'		||
-														file.type === 'image/bmp'		||
-														file.type === 'image/svg+xml'	||
-														file.type === 'video/mp3'		||
-														file.type === 'video/webm'		||
-														file.type === 'video/wav'		||
-														file.type === 'video/m4a'		||
-														file.type === 'video/ogg'		||
-														file.type === 'video/3gpp'		||
-														file.type === 'video/flac'		||
-														file.type === 'video/mp4'		||
-														file.type === 'video/webm'		||
-														file.type === 'video/ogv'		||
-														file.type === 'video/mov'		||
-														file.type === 'video/mkv'		||
+			// Based on accepted file formats listed here: https://help.obsidian.md/Advanced+topics/Accepted+file+formats
+			const fileIsBinaryAndSupportedByObsidian =	// Image files
+														file.type === 'image/png'				||
+														file.type === 'image/webp'				||
+														file.type === 'image/jpeg'				||	// .jpg or .jpeg
+														file.type === 'image/gif'				||
+														file.type === 'image/bmp'				||
+														file.type === 'image/svg+xml'			||
+														// Audio files
+														file.type === 'audio/mpeg'				||	// .m4a
+														file.type === 'audio/m4a'				||	// .m4a
+														file.type === 'audio/webm'				||
+														file.type === 'audio/wav'				||
+														file.type === 'audio/ogg'				||
+														file.type === 'audio/3gpp'				||
+														file.type === 'audio/x-flac'			||
+														// Video files
+														file.type === 'video/mp4'				||
+														file.type === 'video/webm'				||
+														file.type === 'video/ogg'				||	// .ogv
+														file.type === 'video/3gpp'				||	// .3gp
+														file.type === 'video/quicktime'			||	// .mov
+														file.type === 'video/x-matroska'		||	// .mkv
+														// Other files
 														file.type === 'application/pdf';
 
 	

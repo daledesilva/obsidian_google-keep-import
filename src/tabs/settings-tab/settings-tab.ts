@@ -52,7 +52,7 @@ export class KeepImportSettingTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setClass('uo_setting')
 			.setName('Note creation date')
-			.setDesc('Should the imported not have a creation date set to the same date it was created on in Google Keep, or should it change to the date it was imported into Obsidian on?')
+			.setDesc('Should the imported note have a creation date set to the Google Keep note\'s creation date, or the date imported into Obsidian?')
 			.addDropdown((dropdown) => {
 				dropdown.addOption(CreatedDateTypes.googleKeep, CreatedDateTypes.googleKeep);
 				dropdown.addOption(CreatedDateTypes.import, CreatedDateTypes.import);
