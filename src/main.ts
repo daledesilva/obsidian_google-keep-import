@@ -2,7 +2,7 @@ import { fileSyntax } from 'esbuild-sass-plugin/lib/utils';
 import { App, DataWriteOptions, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, TFile, TFolder, Vault } from 'obsidian';
 import { CreatedDateTypes, PluginSettings } from 'src/types/PluginSettings';
 import { runImportSequence } from './logic/import-logic';
-import { KeepImportSettingTab } from './tabs/settings-tab/settings-tab';
+import { MySettingsTab } from './tabs/settings-tab/settings-tab';
 
 
 
@@ -47,7 +47,7 @@ export default class MyPlugin extends Plugin {
 
 		
 		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new KeepImportSettingTab(this.app, this));
+		this.addSettingTab(new MySettingsTab(this.app, this));
 
 		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
 		// Using this function will automatically remove the event listener when this plugin is disabled.
