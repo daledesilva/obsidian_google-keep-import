@@ -4,6 +4,7 @@ import MyPlugin, { DEFAULT_SETTINGS } from "src/main";
 import { ConfirmationModal } from "src/modals/confirmation-modal/confirmation-modal";
 import { resetSettings } from "src/logic/admin-logic";
 import { AddBasicSettings, AddInclusionSettings, addResetButton, AddSettingsButtons, AddTagSettings } from "src/components/settings-groups/settings-groups";
+import { SupportButtonSet } from "src/components/support-button-set/support-button-set";
 
 
 
@@ -21,6 +22,8 @@ export class MySettingsTab extends PluginSettingTab {
 
 		containerEl.createEl('h1', {text: 'Google Keep Import Plugin'});
 		containerEl.createEl('p', {text: 'This plugin allows importing notes from Google keep as a one time operation.'});
+		const headerActions = new Setting(containerEl);
+		new SupportButtonSet(headerActions);
 		
 		containerEl.createEl('hr');
 		containerEl.createEl('h2', {text: 'Basics'});

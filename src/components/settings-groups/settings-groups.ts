@@ -207,28 +207,6 @@ export function AddTagSettings(containerEl: HTMLElement, plugin: MyPlugin) {
 }
 
 
-export function AddSettingsButtons(containerEl: HTMLElement, plugin: MyPlugin) {
-        
-    new Setting(containerEl)
-        .addButton( (button) => {
-            button.setButtonText('Reset settings');
-            button.setClass('uo_button');
-            button.onClick(() => {
-                new ConfirmationModal({
-                    plugin: plugin,
-                    title: 'Please confirm',
-                    message: 'Revert to default settings for Google Keep Import?',
-                    confirmLabel: 'Reset settings',
-                    confirmAction: async () => {
-                        await plugin.resetSettings();
-                        this.display();
-                    }
-                }).open();
-            })
-        })
-    
-}
-
 
 export function addResetButton(settingEl: Setting, plugin: MyPlugin, onComplete: Function) {
     settingEl.addButton( (button) => {

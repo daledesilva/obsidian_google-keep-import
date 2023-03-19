@@ -1,4 +1,5 @@
 import { App, Modal, Setting, TFile, TFolder } from "obsidian";
+import { SupportButtonSet } from "src/components/support-button-set/support-button-set";
 import { FileImporter } from "src/logic/import-logic";
 import MyPlugin from "src/main";
 
@@ -46,7 +47,7 @@ export class ImportProgressModal extends Modal {
 		
 		const summaryEl = contentEl.createDiv('uo_during-import-summary');
 		let bubbleEl;
-		let pBubbleEl
+		let pBubbleEl;
 
 		bubbleEl = summaryEl.createDiv('uo_import-remaining');
 		pBubbleEl = bubbleEl.createEl('p');
@@ -69,22 +70,7 @@ export class ImportProgressModal extends Modal {
 		this.outputLogEl = contentEl.createDiv('uo_import-log');
 
 		this.modalActions = new Setting(this.contentEl);
-		this.modalActions.addButton(btn => {
-			btn.setClass('uo_button');
-			btn.setTooltip('Message or follow developer');
-			btn.setIcon('twitter');
-			btn.onClick( (e) => {
-				window.open('https://twitter.com/daledesilva', 'twitter');
-			})
-		})
-		this.modalActions.addButton(btn => {
-			btn.setClass('uo_button');
-			btn.setTooltip('Tip Developer');
-			btn.setIcon('heart');
-			btn.onClick( (e) => {
-				window.open('https://ko-fi.com/N4N3JLUCW', 'tip-tab');
-			})
-		})
+		new SupportButtonSet(this.modalActions);
 
 		this.updateProgressVisuals()
 	}
