@@ -1,6 +1,8 @@
 import { App, Modal, Notice, Setting } from "obsidian";
+import { AddBasicSettings, AddInclusionSettings, AddSettingsButtons, AddTagSettings } from "src/components/settings-groups/settings-groups";
 import { singleOrPlural } from "src/logic/string-processes";
 import MyPlugin from "src/main";
+import { EditSettingsModal } from "../edit-settings-modal/edit-settings-modal";
 
 
 
@@ -14,6 +16,7 @@ export class StartImportModal extends Modal {
 	fileBacklog: Array<File> = [];
 	uploadInput: HTMLInputElement;
 	modalActions: Setting;
+	startBtn: Setting;
 	resolveModal: (value: Array<File>) => void;
 	rejectModal: (value: string) => void;
 
@@ -81,18 +84,16 @@ export class StartImportModal extends Modal {
 		this.assetSpan = summaryP.createEl('span', {cls: 'uo_import-number', text: `0`});
 
 
-
-
-
-
-
-		
-
-
-
-
-
-		this.modalActions = new Setting(contentEl).addButton(btn => {
+		this.modalActions = new Setting(contentEl);
+		this.modalActions.addButton(btn => {
+			btn.setClass('uo_button');
+			btn.setButtonText('Edit settings');
+			btn.onClick( async (e) => {
+				const modal = new EditSettingsModal(this.plugin)
+				modal.showModal();
+			})
+		})
+		this.startBtn = this.modalActions.addButton(btn => {
 			btn.setClass('uo_button');
 			btn.setCta();
 			btn.setButtonText('Start Import');
@@ -102,6 +103,7 @@ export class StartImportModal extends Modal {
 				this.close();
 			})
 		})
+		
 
 		this.uploadInput.addEventListener('change', () => {
 			// Add imports to accumulative array
@@ -179,8 +181,7 @@ export class StartImportModal extends Modal {
 		this.assetSpan.setText(`${breakdown.assets}`);
 
 		// Activate start button
-		const importBtn = this.modalActions.components[0];
-		importBtn.setDisabled(false);
+		this.startBtn.setDisabled(false);
 	}
 
 	backlogContains(file: File) {

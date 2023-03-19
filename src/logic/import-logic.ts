@@ -6,6 +6,7 @@ import { CreatedDateTypes, PluginSettings } from "src/types/PluginSettings";
 import { KeepAttachment, KeepJson } from "src/types/KeepData";
 import { IgnoreImportType, ImportResult, ImportOutcomeType } from "src/types/Results";
 import { StartImportModal } from "src/modals/start-import-modal/start-import-modal";
+import { EditSettingsModal } from "src/modals/edit-settings-modal/edit-settings-modal";
 
 
 
@@ -15,7 +16,8 @@ import { StartImportModal } from "src/modals/start-import-modal/start-import-mod
 
 
 export async function runImportSequence(plugin: MyPlugin) {
-	const modal = await new StartImportModal(this);
+
+	const modal = new StartImportModal(plugin);
 	let fileBacklog;
 	try {
 		fileBacklog = await modal.showModal();
@@ -28,7 +30,7 @@ export async function runImportSequence(plugin: MyPlugin) {
 	const fileImporter = new FileImporter(plugin);
 	fileImporter.import(fileBacklog);
 	
-	const progressModal = await new ImportProgressModal(this, fileImporter);
+	const progressModal = await new ImportProgressModal(plugin, fileImporter);
 	try {
 		await progressModal.showModal();
 	}

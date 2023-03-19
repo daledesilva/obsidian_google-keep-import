@@ -3,7 +3,7 @@ import { CreatedDateTypes } from "src/types/PluginSettings";
 import MyPlugin, { DEFAULT_SETTINGS } from "src/main";
 import { ConfirmationModal } from "src/modals/confirmation-modal/confirmation-modal";
 import { resetSettings } from "src/logic/admin-logic";
-import { AddBasicSettings, AddInclusionSettings, AddSettingsButtons, AddTagSettings } from "src/components/settings-groups/settings-groups";
+import { AddBasicSettings, AddInclusionSettings, addResetButton, AddSettingsButtons, AddTagSettings } from "src/components/settings-groups/settings-groups";
 
 
 
@@ -35,7 +35,7 @@ export class MySettingsTab extends PluginSettingTab {
 		AddTagSettings(containerEl, this.plugin);
 
 		containerEl.createEl('hr');
-		AddSettingsButtons(containerEl, this.plugin);
-
+		const modalActions = new Setting(containerEl);
+		addResetButton(modalActions, this.plugin, () => this.display());
 	}
 }

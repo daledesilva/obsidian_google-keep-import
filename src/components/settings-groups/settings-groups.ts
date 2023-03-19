@@ -6,8 +6,8 @@ import { CreatedDateTypes } from "src/types/PluginSettings";
 
 
 export function AddBasicSettings(containerEl: HTMLElement, plugin: MyPlugin) {
-        
-    new Setting(containerEl)
+    
+    const setting1 = new Setting(containerEl)
         .setClass('uo_setting')
         .setName('Note import folder')
         .addText((text) => {
@@ -17,7 +17,7 @@ export function AddBasicSettings(containerEl: HTMLElement, plugin: MyPlugin) {
                 await plugin.saveSettings();
             });
         });
-        
+    
     new Setting(containerEl)
         .setClass('uo_setting')
         .setName('Attachment import folder')
@@ -28,7 +28,7 @@ export function AddBasicSettings(containerEl: HTMLElement, plugin: MyPlugin) {
                 await plugin.saveSettings();
             });
         });
-                    
+    
     new Setting(containerEl)
         .setClass('uo_setting')
         .setName('Note creation date')
@@ -227,4 +227,24 @@ export function AddSettingsButtons(containerEl: HTMLElement, plugin: MyPlugin) {
             })
         })
     
+}
+
+
+export function addResetButton(settingEl: Setting, plugin: MyPlugin, onComplete: Function) {
+    settingEl.addButton( (button) => {
+        button.setButtonText('Reset settings');
+        button.setClass('uo_button');
+        button.onClick(() => {
+            new ConfirmationModal({
+                plugin: plugin,
+                title: 'Please confirm',
+                message: 'Revert to default settings for Google Keep Import?',
+                confirmLabel: 'Reset settings',
+                confirmAction: async () => {
+                    await plugin.resetSettings();
+                    onComplete();
+                }
+            }).open();
+        })
+    })
 }
