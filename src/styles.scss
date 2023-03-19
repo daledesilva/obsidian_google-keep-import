@@ -9,7 +9,7 @@ If your plugin does not need CSS, delete this file.
 
 
 
-.uo_drop-frame {
+.gki_drop-frame {
     width: 100%;
     padding: 5.5em 70px;
     margin-top: 2em;
@@ -17,7 +17,7 @@ If your plugin does not need CSS, delete this file.
     border: 1px white dashed;
     text-align: center;
 
-    &.uo_drag-over-active {
+    &.gki_drag-over-active {
         // User outlines so that thickened border doesn't change layout
         outline: 2px solid white;
         outline-offset: -2px;
@@ -29,17 +29,17 @@ If your plugin does not need CSS, delete this file.
     }
 }
 
-#uo_file {
+#gki_file {
     display: none;
 }
 
-.uo_file-label {
+.gki_file-label {
     color: pink;
     text-decoration: underline;
     cursor: pointer;
 }
 
-.uo_info-bubble {
+.gki_info-bubble {
     background-color: rgba($color: #FFF, $alpha: 0.05);
     border-radius: 10px;
     padding: 20px;
@@ -47,10 +47,13 @@ If your plugin does not need CSS, delete this file.
 
 
 
+.gki_accordion {
+    
+}
 
 
 
-.uo_setting {
+.gki_setting {
     &.is-disabled {
         display: none;
     }
@@ -60,7 +63,7 @@ If your plugin does not need CSS, delete this file.
 
 // Increase the width of text inputs and drop down to their own line on small windows.
 // But not toggles
-.uo_setting:not(.mod-toggle) {
+.gki_setting:not(.mod-toggle) {
     flex-wrap: wrap;
 
     .setting-item-info {
@@ -83,14 +86,14 @@ If your plugin does not need CSS, delete this file.
 
 
 
-.uo_progress-bar {
+.gki_progress-bar {
     width: 100%;
     height: 0.5em;
     border-radius: 10px;
     background-color: #333;
     margin-top: 1em;
     
-    .uo_bar {
+    .gki_bar {
         width: 50%;
         height: 100%;
         background-color: white;
@@ -100,11 +103,11 @@ If your plugin does not need CSS, delete this file.
 
 
 
-.uo_before-import-summary {
+.gki_before-import-summary {
     text-align: right;
 }
 
-.uo_during-import-summary {
+.gki_during-import-summary {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -115,25 +118,25 @@ If your plugin does not need CSS, delete this file.
         text-align: center;
     }
 
-    .uo_import-number {
+    .gki_import-number {
         font-size: 2em;
         font-weight: 600;
     }
 }
 
-.uo_import-log {
+.gki_import-log {
     margin-top: 1rem;
     background-color: rgba($color: #000000, $alpha: 0.3);
     max-height: 0;
     overflow-y: auto;
     border-radius: 6px;
     
-    &.uo_visible {
+    &.gki_visible {
         max-height: 300px;
         overflow-y: auto;
     }
     
-    .uo_item {
+    .gki_item {
         font-size: 0.8rem;
         box-sizing: border-box;
         padding: 0 0.8em;
@@ -149,10 +152,10 @@ If your plugin does not need CSS, delete this file.
             background-color: rgba($color: #FFF, $alpha: 0.01);
         }
         
-        .uo_item-header {
+        .gki_item-header {
             margin: 0;
             
-            .uo_status {
+            .gki_status {
                 font-size: 0.8em;
                 padding: 0.25em 0.6em;
                 border-radius: 4px;
@@ -167,16 +170,16 @@ If your plugin does not need CSS, delete this file.
                     color: #FFF;
                 }
             }
-            .uo_title {
+            .gki_title {
                 font-size: 1.1em;
                 color: rgba($color: #FFF, $alpha: 0.6);
             }
         }
         
-        .uo_item-body {
+        .gki_item-body {
             margin: 0.4em 0 0 0;
             
-            .uo_desc {
+            .gki_desc {
                 margin: 0;
                 color: rgba($color: #FFF, $alpha: 0.3);
             }
@@ -189,13 +192,13 @@ If your plugin does not need CSS, delete this file.
 
 
 
-.uo_button {
+.gki_button {
     margin-top: 1rem;
     cursor: pointer;
 }
 
 
-button.uo_button[disabled] {
+button.gki_button[disabled] {
     opacity: 0.3;
     background-color: unset !important;
     color: unset !important;
@@ -208,7 +211,7 @@ button.uo_button[disabled] {
 }
 
 
-.uo_hidden {
+.gki_hidden {
     display: none;
 }
 
@@ -219,12 +222,12 @@ button.uo_button[disabled] {
 
 // Animation
 
-.uo_import-log {
+.gki_import-log {
     transition: max-height 1s;
 }
 
 
-.uo_item {
+.gki_item {
     animation-name: log-item-appear;
     animation-duration: 1s;
     animation-timing-function: cubic-bezier(0.77,0,0.18,1);

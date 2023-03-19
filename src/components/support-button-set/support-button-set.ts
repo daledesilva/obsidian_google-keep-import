@@ -6,7 +6,7 @@ export class SupportButtonSet {
 
     constructor(SettingEl: Setting) {
         SettingEl.addButton(btn => {
-            btn.setClass('uo_button');
+            btn.setClass('gki_button');
             btn.setTooltip('Message or follow developer');
             btn.setIcon('twitter');
             btn.onClick( (e) => {
@@ -14,7 +14,7 @@ export class SupportButtonSet {
             })
         })
         SettingEl.addButton(btn => {
-            btn.setClass('uo_button');
+            btn.setClass('gki_button');
             btn.setTooltip('Tip Developer');
             btn.setIcon('heart');
             btn.onClick( (e) => {

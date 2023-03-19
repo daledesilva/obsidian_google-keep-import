@@ -42,7 +42,7 @@ export class StartImportModal extends Modal {
 
 		const firstParaEl = contentEl.createEl('p', {
 			text: 'To export your files from Google Keep, open ',
-			cls: 'uo_info-bubble'
+			cls: 'gki_info-bubble'
 		});
 		firstParaEl.createEl('a', {
 			text: 'Google Takeout',
@@ -53,39 +53,39 @@ export class StartImportModal extends Modal {
 
 
 
-		const dropFrame = contentEl.createEl('div', {cls: 'uo_drop-frame'});
+		const dropFrame = contentEl.createEl('div', {cls: 'gki_drop-frame'});
 
 		const dropFrameText = dropFrame.createEl('p', { text: 'Drag all files here or ' });
 		// const linkText = dropFrameText.createEl('a', {text: 'browse local files'})
 		dropFrameText.createEl('label', { 
 			text: 'browse local files',
 			attr: {
-				'class': 'uo_file-label',
-				'for': 'uo_file',
+				'class': 'gki_file-label',
+				'for': 'gki_file',
 			}
 		})
 		this.uploadInput = dropFrameText.createEl('input', { 
 			type: 'file',
 			attr: {
 				'multiple': true,
-				'id': 'uo_file',
+				'id': 'gki_file',
 				// 'accept': '.json, .jpg, .png, .3gp',
 				// 'accept': '.json, .jpg, .png, .3gp',
 			}
 		})
 
 
-		const summaryP = contentEl.createEl('p', {cls: 'uo_before-import-summary'});
+		const summaryP = contentEl.createEl('p', {cls: 'gki_before-import-summary'});
 		summaryP.createEl('span', {text: `notes: `});
-		this.noteSpan = summaryP.createEl('span', {cls: 'uo_import-number', text: `0`});
+		this.noteSpan = summaryP.createEl('span', {cls: 'gki_import-number', text: `0`});
 		summaryP.createEl('span', {text: ` | attachments: `});
-		this.assetSpan = summaryP.createEl('span', {cls: 'uo_import-number', text: `0`});
+		this.assetSpan = summaryP.createEl('span', {cls: 'gki_import-number', text: `0`});
 
 
 		this.modalActions = new Setting(contentEl);
 		new SupportButtonSet(this.modalActions);
 		this.modalActions.addButton(btn => {
-			btn.setClass('uo_button');
+			btn.setClass('gki_button');
 			btn.setButtonText('Edit settings');
 			btn.onClick( async (e) => {
 				const modal = new EditSettingsModal(this.plugin)
@@ -93,7 +93,7 @@ export class StartImportModal extends Modal {
 			})
 		})
 		this.startBtn = this.modalActions.addButton(btn => {
-			btn.setClass('uo_button');
+			btn.setClass('gki_button');
 			btn.setCta();
 			btn.setButtonText('Start Import');
 			btn.setDisabled(true);
@@ -110,7 +110,7 @@ export class StartImportModal extends Modal {
 		});
 		
 		dropFrame.addEventListener('dragenter', (e) => {
-			dropFrame.addClass('uo_drag-over-active');
+			dropFrame.addClass('gki_drag-over-active');
 		});
 		
 		dropFrame.addEventListener('dragover', (e) => {
@@ -119,7 +119,7 @@ export class StartImportModal extends Modal {
 		});
 		
 		dropFrame.addEventListener('dragleave', (e) => {
-			dropFrame.removeClass('uo_drag-over-active');
+			dropFrame.removeClass('gki_drag-over-active');
 		});
 		
 		dropFrame.addEventListener('drop', (e) => {
@@ -128,7 +128,7 @@ export class StartImportModal extends Modal {
 
 			if(e.dataTransfer === null) return;
 
-			dropFrame.removeClass('uo_drag-over-active');
+			dropFrame.removeClass('gki_drag-over-active');
 			
 			const files: Array<File> = [];
 

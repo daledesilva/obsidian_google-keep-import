@@ -41,33 +41,33 @@ export class ImportProgressModal extends Modal {
 
 		titleEl.setText('Import in progress');
 
-		const progressBarEl = contentEl.createEl('div', {cls: 'uo_progress-bar'});
-		this.bar = progressBarEl.createEl('div', {cls: 'uo_bar'});	
+		const progressBarEl = contentEl.createEl('div', {cls: 'gki_progress-bar'});
+		this.bar = progressBarEl.createEl('div', {cls: 'gki_bar'});	
 
 		
-		const summaryEl = contentEl.createDiv('uo_during-import-summary');
+		const summaryEl = contentEl.createDiv('gki_during-import-summary');
 		let bubbleEl;
 		let pBubbleEl;
 
-		bubbleEl = summaryEl.createDiv('uo_import-remaining');
+		bubbleEl = summaryEl.createDiv('gki_import-remaining');
 		pBubbleEl = bubbleEl.createEl('p');
-		this.remainingSpan = pBubbleEl.createEl('span', {cls: 'uo_import-number', text: `-`});
+		this.remainingSpan = pBubbleEl.createEl('span', {cls: 'gki_import-number', text: `-`});
 		pBubbleEl.createEl('br');
-		pBubbleEl.createEl('span', {cls: 'uo_import-label', text: `remaining`});
+		pBubbleEl.createEl('span', {cls: 'gki_import-label', text: `remaining`});
 
-		bubbleEl = summaryEl.createDiv('uo_import-failed');
+		bubbleEl = summaryEl.createDiv('gki_import-failed');
 		pBubbleEl = bubbleEl.createEl('p');
-		this.failedSpan = pBubbleEl.createEl('span', {cls: 'uo_import-number', text: `-`});
+		this.failedSpan = pBubbleEl.createEl('span', {cls: 'gki_import-number', text: `-`});
 		pBubbleEl.createEl('br');
-		pBubbleEl.createEl('span', {cls: 'uo_import-label', text: `failed/skipped`});
+		pBubbleEl.createEl('span', {cls: 'gki_import-label', text: `failed/skipped`});
 
-		bubbleEl = summaryEl.createDiv('uo_import-imported');
+		bubbleEl = summaryEl.createDiv('gki_import-imported');
 		pBubbleEl = bubbleEl.createEl('p');
-		this.importedSpan = pBubbleEl.createEl('span', {cls: 'uo_import-number', text: `-`});
+		this.importedSpan = pBubbleEl.createEl('span', {cls: 'gki_import-number', text: `-`});
 		pBubbleEl.createEl('br');
-		pBubbleEl.createEl('span', {cls: 'uo_import-label', text: `imported`});
+		pBubbleEl.createEl('span', {cls: 'gki_import-label', text: `imported`});
 
-		this.outputLogEl = contentEl.createDiv('uo_import-log');
+		this.outputLogEl = contentEl.createDiv('gki_import-log');
 
 		this.modalActions = new Setting(this.contentEl);
 		new SupportButtonSet(this.modalActions);
@@ -108,23 +108,23 @@ export class ImportProgressModal extends Modal {
 	}
 
 	public addOutputLine(options: {status: string, title: string, desc: string}) {
-		const itemEl = this.outputLogEl.createDiv({cls: 'uo_item'});
+		const itemEl = this.outputLogEl.createDiv({cls: 'gki_item'});
 
-		const itemHeaderEl = itemEl.createEl('p', {cls: 'uo_item-header'});
+		const itemHeaderEl = itemEl.createEl('p', {cls: 'gki_item-header'});
 		const statusClass = options.status.toLowerCase();
-		itemHeaderEl.createEl('span', {cls: `uo_status ${statusClass}`}).setText(options.status);
-		itemHeaderEl.createEl('span', {cls: 'uo_title'}).setText(options.title);
+		itemHeaderEl.createEl('span', {cls: `gki_status ${statusClass}`}).setText(options.status);
+		itemHeaderEl.createEl('span', {cls: 'gki_title'}).setText(options.title);
 
-		const itemBodyEl = itemEl.createEl('p', {cls: 'uo_item-body'});
-		itemBodyEl.createEl('p', {cls: 'uo_desc'}).setText(options.desc);
+		const itemBodyEl = itemEl.createEl('p', {cls: 'gki_item-body'});
+		itemBodyEl.createEl('p', {cls: 'gki_desc'}).setText(options.desc);
 
-		this.outputLogEl.addClass('uo_visible');
+		this.outputLogEl.addClass('gki_visible');
 	}
 
 	public applyCompletedState() {
 		this.modalActions.addButton(btn => {
 			btn.setCta();
-			btn.setClass('uo_button');
+			btn.setClass('gki_button');
 			btn.setButtonText('Close');
 			btn.onClick( (e) => {
 				this.close();

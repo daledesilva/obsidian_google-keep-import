@@ -1,11 +1,11 @@
 {
-	"id": "ublik-om_google-keep-import",
+	"id": "daledesilva_google-keep-import",
 	"name": "Google Keep Import",
-	"version": "0.0.5",
+	"version": "0.0.8",
 	"minAppVersion": "1.00.0",
-	"description": "Allows import of Google Keep backup json files",
+	"description": "Allows import of Google Keep backup json files and their attachments.",
 	"author": "Dale de Silva",
-	"authorUrl": "https://ublik-om.net",
-	"fundingUrl": "https://twitter.com/daledesilva",
+	"authorUrl": "https://designdebt.club",
+	"fundingUrl": "https://ko-fi.com/daledesilva",
 	"isDesktopOnly": false
 }

@@ -60,7 +60,7 @@ export class EditSettingsModal extends Modal {
 		addResetButton(modalActions, this.plugin, () => this.onOpen());
 		modalActions.addButton( (button) => {
 			button.setButtonText('Close');
-			button.setClass('uo_button');
+			button.setClass('gki_button');
 			button.setCta();
 			button.onClick(() => {
 				this.close();

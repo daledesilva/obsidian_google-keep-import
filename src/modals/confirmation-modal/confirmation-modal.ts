@@ -39,7 +39,7 @@ export class ConfirmationModal extends Modal {
 		contentEl.createEl('p', {text: this.message});
 		
 		new Setting(contentEl).addButton(cancelBtn => {
-			cancelBtn.setClass('uo_button');
+			cancelBtn.setClass('gki_button');
 			cancelBtn.setButtonText(this.cancelLabel);
 			cancelBtn.onClick( () => {
 				this.close();
@@ -47,7 +47,7 @@ export class ConfirmationModal extends Modal {
 			})
 		})
 		.addButton( confirmBtn => {
-			confirmBtn.setClass('uo_button');
+			confirmBtn.setClass('gki_button');
 			confirmBtn.setWarning();
 			confirmBtn.setButtonText(this.confirmLabel);
 			confirmBtn.onClick( () => {

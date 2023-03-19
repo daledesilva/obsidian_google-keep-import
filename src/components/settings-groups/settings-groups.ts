@@ -8,7 +8,7 @@ import { CreatedDateTypes } from "src/types/PluginSettings";
 export function AddBasicSettings(containerEl: HTMLElement, plugin: MyPlugin) {
     
     const setting1 = new Setting(containerEl)
-        .setClass('uo_setting')
+        .setClass('gki_setting')
         .setName('Note import folder')
         .addText((text) => {
             text.setValue(plugin.settings.folderNames.notes);
@@ -19,7 +19,7 @@ export function AddBasicSettings(containerEl: HTMLElement, plugin: MyPlugin) {
         });
     
     new Setting(containerEl)
-        .setClass('uo_setting')
+        .setClass('gki_setting')
         .setName('Attachment import folder')
         .addText((text) => {
             text.setValue(plugin.settings.folderNames.assets);
@@ -30,7 +30,7 @@ export function AddBasicSettings(containerEl: HTMLElement, plugin: MyPlugin) {
         });
     
     new Setting(containerEl)
-        .setClass('uo_setting')
+        .setClass('gki_setting')
         .setName('Note creation date')
         .setDesc('Should the imported note have a creation date set to the Google Keep note\'s creation date, or the date imported into Obsidian?')
         .addDropdown((dropdown) => {
@@ -49,7 +49,7 @@ export function AddBasicSettings(containerEl: HTMLElement, plugin: MyPlugin) {
 export function AddInclusionSettings(containerEl: HTMLElement, plugin: MyPlugin) {
         
     new Setting(containerEl)
-        .setClass('uo_setting')
+        .setClass('gki_setting')
         .setName('Import archived notes')
         .addToggle(toggle => {
             toggle.setValue(plugin.settings.importArchived)
@@ -60,7 +60,7 @@ export function AddInclusionSettings(containerEl: HTMLElement, plugin: MyPlugin)
         });
     
     new Setting(containerEl)
-        .setClass('uo_setting')
+        .setClass('gki_setting')
         .setName('Import trashed notes')
         .addToggle(toggle => {
             toggle.setValue(plugin.settings.importTrashed)
@@ -76,7 +76,7 @@ export function AddInclusionSettings(containerEl: HTMLElement, plugin: MyPlugin)
 export function AddTagSettings(containerEl: HTMLElement, plugin: MyPlugin) {
         
     new Setting(containerEl)
-        .setClass('uo_setting')
+        .setClass('gki_setting')
         .setName('Colour tags')
         .setDesc('Add a tag representing the color of the note in Google Keep.')
         .addToggle(toggle => {
@@ -88,8 +88,8 @@ export function AddTagSettings(containerEl: HTMLElement, plugin: MyPlugin) {
             });
         })
     let colorPrefixInput = new Setting(containerEl)
-        .setClass('uo_setting')
-        .setClass('uo_setting-child')
+        .setClass('gki_setting')
+        .setClass('gki_setting-child')
         .setDesc('Text to prepend to each colour tag.')
         .addText((text) => {
             text.setValue(plugin.settings.tagNames.colorPrepend);
@@ -102,7 +102,7 @@ export function AddTagSettings(containerEl: HTMLElement, plugin: MyPlugin) {
 
 
     new Setting(containerEl)
-        .setClass('uo_setting')
+        .setClass('gki_setting')
         .setName('Pinned tags')
         .setDesc('Add a tag if the note was pinned in Google Keep.')
         .addToggle(toggle => {
@@ -114,8 +114,8 @@ export function AddTagSettings(containerEl: HTMLElement, plugin: MyPlugin) {
             });
         })
     let pinnedTagInput = new Setting(containerEl)
-        .setClass('uo_setting')
-        .setClass('uo_setting-child')
+        .setClass('gki_setting')
+        .setClass('gki_setting-child')
         .setDesc('Pinned tag.')
         .addText((text) => {
             text.setValue(plugin.settings.tagNames.isPinned);
@@ -128,7 +128,7 @@ export function AddTagSettings(containerEl: HTMLElement, plugin: MyPlugin) {
 
 
     new Setting(containerEl)
-        .setClass('uo_setting')
+        .setClass('gki_setting')
         .setName('Attachment tags')
         .setDesc('Add a tag if the note has an attachment.')
         .addToggle(toggle => {
@@ -140,8 +140,8 @@ export function AddTagSettings(containerEl: HTMLElement, plugin: MyPlugin) {
             });
         })
     let attachmentTagInput = new Setting(containerEl)
-        .setClass('uo_setting')
-        .setClass('uo_setting-child')
+        .setClass('gki_setting')
+        .setClass('gki_setting-child')
         .setDesc('Attachment tag.')
         .addText((text) => {
             text.setValue(plugin.settings.tagNames.hasAttachment);
@@ -154,7 +154,7 @@ export function AddTagSettings(containerEl: HTMLElement, plugin: MyPlugin) {
 
 
     new Setting(containerEl)
-        .setClass('uo_setting')
+        .setClass('gki_setting')
         .setName('Archived tags')
         .setDesc('Add a tag if the note was archived in Google Keep (If imported).')
         .addToggle(toggle => {
@@ -166,8 +166,8 @@ export function AddTagSettings(containerEl: HTMLElement, plugin: MyPlugin) {
             });
         })
     let archivedTagInput = new Setting(containerEl)
-        .setClass('uo_setting')
-        .setClass('uo_setting-child')
+        .setClass('gki_setting')
+        .setClass('gki_setting-child')
         .setDesc('Archived tag.')
         .addText((text) => {
             text.setValue(plugin.settings.tagNames.isArchived);
@@ -180,7 +180,7 @@ export function AddTagSettings(containerEl: HTMLElement, plugin: MyPlugin) {
 
 
     new Setting(containerEl)
-        .setClass('uo_setting')
+        .setClass('gki_setting')
         .setName('Trashed tags')
         .setDesc('Add a tag if the note was trashed in Google Keep (If imported).')
         .addToggle(toggle => {
@@ -192,8 +192,8 @@ export function AddTagSettings(containerEl: HTMLElement, plugin: MyPlugin) {
             });
         })
     let trashedTag = new Setting(containerEl)
-        .setClass('uo_setting')
-        .setClass('uo_setting-child')
+        .setClass('gki_setting')
+        .setClass('gki_setting-child')
         .setDesc('Trashed tag.')
         .addText((text) => {
             text.setValue(plugin.settings.tagNames.isTrashed);
@@ -211,7 +211,7 @@ export function AddTagSettings(containerEl: HTMLElement, plugin: MyPlugin) {
 export function addResetButton(settingEl: Setting, plugin: MyPlugin, onComplete: Function) {
     settingEl.addButton( (button) => {
         button.setButtonText('Reset settings');
-        button.setClass('uo_button');
+        button.setClass('gki_button');
         button.onClick(() => {
             new ConfirmationModal({
                 plugin: plugin,

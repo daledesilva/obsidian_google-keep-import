@@ -40,7 +40,7 @@ export default class MyPlugin extends Plugin {
 		await this.loadSettings();
 		
 		this.addCommand({
-			id: 'ublik-om_import-google-keep-jsons',
+			id: 'daledesilva_import-google-keep-jsons',
 			name: 'Import backup from Google Keep',
 			callback: () => runImportSequence(this)
 		});
@@ -59,7 +59,7 @@ export default class MyPlugin extends Plugin {
 
 	// Run when deactivating or uninstalling a plugin
 	onunload() {
-		// TODO: Make sure to stop anything here
+		// TODO: Double check there isn't anything I need to clean up
 		
 	}
 
