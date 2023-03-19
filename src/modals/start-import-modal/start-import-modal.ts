@@ -39,9 +39,6 @@ export class StartImportModal extends Modal {
 		titleEl.setText('Import Google Keep export');
 
 
-
-
-
 		const firstParaEl = contentEl.createEl('p', {
 			text: 'To export your files from Google Keep, open ',
 			cls: 'uo_info-bubble'
@@ -85,6 +82,22 @@ export class StartImportModal extends Modal {
 
 
 		this.modalActions = new Setting(contentEl);
+		this.modalActions.addButton(btn => {
+			btn.setClass('uo_button');
+			btn.setTooltip('Message or follow developer');
+			btn.setIcon('twitter');
+			btn.onClick( (e) => {
+				window.open('https://twitter.com/daledesilva', 'twitter');
+			})
+		})
+		this.modalActions.addButton(btn => {
+			btn.setClass('uo_button');
+			btn.setTooltip('Tip Developer');
+			btn.setIcon('heart');
+			btn.onClick( (e) => {
+				window.open('https://ko-fi.com/N4N3JLUCW', 'tip-tab');
+			})
+		})
 		this.modalActions.addButton(btn => {
 			btn.setClass('uo_button');
 			btn.setButtonText('Edit settings');

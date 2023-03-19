@@ -17,6 +17,7 @@ export class ImportProgressModal extends Modal {
 	outputStr: string = '';
 	outputLogEl: HTMLParagraphElement;
 	importCompleted: Boolean = false;
+	modalActions: Setting;
 
 	resolveModal: (value: string) => void;
 	rejectModal: (value: string) => void;
@@ -66,6 +67,24 @@ export class ImportProgressModal extends Modal {
 		pBubbleEl.createEl('span', {cls: 'uo_import-label', text: `imported`});
 
 		this.outputLogEl = contentEl.createDiv('uo_import-log');
+
+		this.modalActions = new Setting(this.contentEl);
+		this.modalActions.addButton(btn => {
+			btn.setClass('uo_button');
+			btn.setTooltip('Message or follow developer');
+			btn.setIcon('twitter');
+			btn.onClick( (e) => {
+				window.open('https://twitter.com/daledesilva', 'twitter');
+			})
+		})
+		this.modalActions.addButton(btn => {
+			btn.setClass('uo_button');
+			btn.setTooltip('Tip Developer');
+			btn.setIcon('heart');
+			btn.onClick( (e) => {
+				window.open('https://ko-fi.com/N4N3JLUCW', 'tip-tab');
+			})
+		})
 
 		this.updateProgressVisuals()
 	}
@@ -117,7 +136,7 @@ export class ImportProgressModal extends Modal {
 	}
 
 	public applyCompletedState() {
-		const modalActions = new Setting(this.contentEl).addButton(btn => {
+		this.modalActions.addButton(btn => {
 			btn.setCta();
 			btn.setClass('uo_button');
 			btn.setButtonText('Close');
