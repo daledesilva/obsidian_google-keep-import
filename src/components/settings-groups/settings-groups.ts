@@ -28,6 +28,17 @@ export function AddBasicSettings(containerEl: HTMLElement, plugin: MyPlugin) {
                 await plugin.saveSettings();
             });
         });
+
+    new Setting(containerEl)
+        .setClass('gki_setting')
+        .setName('Unsupported attachment import folder')
+        .addText((text) => {
+            text.setValue(plugin.settings.folderNames.unsupportedAssets);
+            text.onChange(async (value) => {
+                plugin.settings.folderNames.unsupportedAssets = value;
+                await plugin.saveSettings();
+            });
+        });
     
     new Setting(containerEl)
         .setClass('gki_setting')
