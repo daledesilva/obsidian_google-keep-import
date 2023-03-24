@@ -6,6 +6,10 @@
 	"description": "Allows import of Google Keep backup json files and their attachments.",
 	"author": "Dale de Silva",
 	"authorUrl": "https://designdebt.club",
-	"fundingUrl": "https://ko-fi.com/daledesilva",
+	"fundingUrl": {
+		"Funding": "https://ko-fi.com/daledesilva",
+		"Twitter": "https://twitter.com/daledesilva",
+		"Mastadon": "https://indieweb.social/@daledesilva"
+	},
 	"isDesktopOnly": false
 }

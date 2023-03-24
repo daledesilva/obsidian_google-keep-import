@@ -1,96 +1,89 @@
-# Obsidian Sample Plugin
+# Google Keep Import Plugin
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+Google Keep Import is a plugin for [Obsidian](https://obsidian.md) that enables easily importing an exported set of backup notes and related attachments from Google Keep.
 
-This project uses Typescript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in Typescript Definition format, which contains TSDoc comments describing what it does.
+>Insert animated gif of uploading
 
-**Note:** The Obsidian API is still in early alpha and is subject to change at any time!
+#### Requirements
+- Minimum Obsidian Version: **1.1.10** *(Anything downloaded after Jan 13th 2023)*
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
-- Changes the default font color to red using `styles.css`.
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open Sample Modal" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and output 'click' to the console.
-- Registers a global interval which logs 'setInterval' to the console.
+<blockquote style="background-color: #f7f7f7; color: #333; padding: 10px; font-size:0.9em">
+  <strong>Note:</strong>The plugin will likely work on older versions of Obsidian, however, these haven't been tested. If you have some reason to not be updating your Obsidian and it's not letting you install, you can either edit this plugin yourself or consider contacting me through the support section below.
+</blockquote>
 
-## First time developing plugins?
 
-Quick starting guide for new plugin devs:
+#### Usage
+1. Install this plugin from the community plugins section of Obsidian's settings.
+1. To export your files from Google Keep, open [Google Takeout](https://takeout.google.com/) and select only Google Keep files *(Depending on the amount of notes and attachments, this might take a while)*
+2. Once you have the exported zip, unzip it so you have all the files separately.
+3. In Obsidian, press `CMD+P` and select the `Google Keep Import` action.
+3. In the modal that opens, drag in all the unzipped files and follow the instructions import the files.
 
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `main.ts` to `main.js`.
-- Make changes to `main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+>Insert youtube marketing video
 
-## Releasing new releases
+#### Features
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
+**Error log**
+The plugin will always give you a real-time log of any files it is unable to import or that it believes aren't supported so that you can cancel the import immediately if needed, or find the files later to edit or convert.
 
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
+**Imports binary files irrelevant of Keep notes**
+The plugin will import any binary files like images even if there isn't a corresponding Keep note. This means you can use the plugin as a batch import for a folder of files that didn't come from Keep if needed.
 
-## Adding your plugin to the community plugin list
+**Unsupported files**
+By default, the plugin will import any file it sees regardless of whether Obsidian supports it. This is on by default to enable markdown file import (As those files erroneously weren't recognised during testing).
 
-- Check https://github.com/obsidianmd/obsidian-releases/blob/master/plugin-review.md
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
+**Customisable settings**
+The plugin provides a settings page that is also accessible during the import process. This allows you to tailor what gets imported and how dates, colours, tags, and more from the Keep files are treated in Obsidian.
 
-## How to use
+Settings:
+>Insert image of settings
 
+<details>
+  <summary>Expand to read breakdown of settings</summary>
+  
+  ##### Basics
+  - **Note import folder**: Defines the Obsidian folder where notes will be imported.
+  - **Attachment import folder**: Defines the Obsidian folder where note attachments will be imported.
+  - **Unsupported attachment import folder**: Defines the Obsidian folder where note attachments that aren't supported by Obsidian will be imported.
+  - **Note creation date**: Defines which date should be used as the 'created on' date for each new Obsidian note; The date of Obsidian import, or the original Google Keep creation date.
+  ##### Inclusions
+  Whether to import specific types of notes or ignore them.
+  - **Import archived notes**: 
+  - **Import trashed notes**: 
+  ##### Tags
+  Whether to apply tags to notes in Obsidian to represent these attributes of the original Google Keep notes.
+  - **Add colour tags**
+  - **Add pinned tags**
+  - **Add attachment tags**
+  - **Add archived tags**
+  - **Add trashed tags**
+
+</details>
+
+---
+
+#### Support
+If you find this plugin saves you time or helps you in some way, please consider supporting my development of plugins and other free community material like this. A simply way is to follow and message me on twitter at [@daledesilva](https://twitter.com/daledesilva) or Mastadon at [indieweb.social/@daledesilva](https://indieweb.social/@daledesilva), and you can also support with a donation below.
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/N4N3JLUCW)
+
+#### My other work
+You can find links to my other projects on [designdebt.club](https://designdebt.club), where I blog about design and development, as well as release other plugins like this one. You can also find my writing at at [falterinresolute.com](https://falterinresolute.com) where I combine philosophy and animation.
+
+
+---
+
+## Technical details
+
+#### Code tour
+While some people have the technical skills to read through a plugins code, not everyone does. I've therefore created a video tour in which I describe how the plugin is constructed fro anyone who is curious or would like to adapt the plugin.
+
+>Insert code tour video
+
+#### Manually installing the plugin
+The plugin is listed in Community Plugins within your Obsidian install, however, if for some reason you would like to manually install it instead, you will need to follow the How to Contribute section below in order to build the plugin, and then copy the dist folder into your Obsidian vault's plugins folder.
+
+#### How to contribute
 - Clone this repo.
-- `npm i` or `yarn` to install dependencies
+- `npm i` to install dependencies
 - `npm run dev` to start compilation in watch mode.
-
-## Manually installing the plugin
-
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
-
-## Improve code quality with eslint (optional)
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code. 
-- To use eslint with this project, make sure to install eslint from terminal:
-  - `npm install -g eslint`
-- To use eslint to analyze this project use this command:
-  - `eslint main.ts`
-  - eslint will then create a report with suggestions for code improvement by file and line number.
-- If your source code is in a folder, such as `src`, you can use eslint with this command to analyze all files in that folder:
-  - `eslint .\src\`
-
-## Funding URL
-
-You can include funding URLs where people who use your plugin can financially support it.
-
-The simple way is to set the `fundingUrl` field to your link in your `manifest.json` file:
-
-```json
-{
-    "fundingUrl": "https://buymeacoffee.com"
-}
-```
-
-If you have multiple URLs, you can also do:
-
-```json
-{
-    "fundingUrl": {
-        "Buy Me a Coffee": "https://buymeacoffee.com",
-        "GitHub Sponsor": "https://github.com/sponsors",
-        "Patreon": "https://www.patreon.com/"
-    }
-}
-```
-
-## API Documentation
-
-See https://github.com/obsidianmd/obsidian-api

@@ -88,7 +88,7 @@ export function AddTagSettings(containerEl: HTMLElement, plugin: MyPlugin) {
         
     new Setting(containerEl)
         .setClass('gki_setting')
-        .setName('Colour tags')
+        .setName('Add colour tags')
         .setDesc('Add a tag representing the color of the note in Google Keep.')
         .addToggle(toggle => {
             toggle.setValue(plugin.settings.addColorTags)
@@ -101,7 +101,7 @@ export function AddTagSettings(containerEl: HTMLElement, plugin: MyPlugin) {
     let colorPrefixInput = new Setting(containerEl)
         .setClass('gki_setting')
         .setClass('gki_setting-child')
-        .setDesc('Text to prepend to each colour tag.')
+        .setDesc('Text to prepend to each colour tag:')
         .addText((text) => {
             text.setValue(plugin.settings.tagNames.colorPrepend);
             text.onChange(async (value) => {
@@ -114,7 +114,7 @@ export function AddTagSettings(containerEl: HTMLElement, plugin: MyPlugin) {
 
     new Setting(containerEl)
         .setClass('gki_setting')
-        .setName('Pinned tags')
+        .setName('Add pinned tags')
         .setDesc('Add a tag if the note was pinned in Google Keep.')
         .addToggle(toggle => {
             toggle.setValue(plugin.settings.addPinnedTags)
@@ -127,7 +127,7 @@ export function AddTagSettings(containerEl: HTMLElement, plugin: MyPlugin) {
     let pinnedTagInput = new Setting(containerEl)
         .setClass('gki_setting')
         .setClass('gki_setting-child')
-        .setDesc('Pinned tag.')
+        .setDesc('Pinned tag:')
         .addText((text) => {
             text.setValue(plugin.settings.tagNames.isPinned);
             text.onChange(async (value) => {
@@ -140,7 +140,7 @@ export function AddTagSettings(containerEl: HTMLElement, plugin: MyPlugin) {
 
     new Setting(containerEl)
         .setClass('gki_setting')
-        .setName('Attachment tags')
+        .setName('Add attachment tags')
         .setDesc('Add a tag if the note has an attachment.')
         .addToggle(toggle => {
             toggle.setValue(plugin.settings.addAttachmentTags)
@@ -153,7 +153,7 @@ export function AddTagSettings(containerEl: HTMLElement, plugin: MyPlugin) {
     let attachmentTagInput = new Setting(containerEl)
         .setClass('gki_setting')
         .setClass('gki_setting-child')
-        .setDesc('Attachment tag.')
+        .setDesc('Attachment tag:')
         .addText((text) => {
             text.setValue(plugin.settings.tagNames.hasAttachment);
             text.onChange(async (value) => {
@@ -166,7 +166,7 @@ export function AddTagSettings(containerEl: HTMLElement, plugin: MyPlugin) {
 
     new Setting(containerEl)
         .setClass('gki_setting')
-        .setName('Archived tags')
+        .setName('Add archived tags')
         .setDesc('Add a tag if the note was archived in Google Keep (If imported).')
         .addToggle(toggle => {
             toggle.setValue(plugin.settings.addArchivedTags)
@@ -179,7 +179,7 @@ export function AddTagSettings(containerEl: HTMLElement, plugin: MyPlugin) {
     let archivedTagInput = new Setting(containerEl)
         .setClass('gki_setting')
         .setClass('gki_setting-child')
-        .setDesc('Archived tag.')
+        .setDesc('Archived tag:')
         .addText((text) => {
             text.setValue(plugin.settings.tagNames.isArchived);
             text.onChange(async (value) => {
@@ -192,7 +192,7 @@ export function AddTagSettings(containerEl: HTMLElement, plugin: MyPlugin) {
 
     new Setting(containerEl)
         .setClass('gki_setting')
-        .setName('Trashed tags')
+        .setName('Add trashed tags')
         .setDesc('Add a tag if the note was trashed in Google Keep (If imported).')
         .addToggle(toggle => {
             toggle.setValue(plugin.settings.addTrashedTags)
@@ -205,7 +205,7 @@ export function AddTagSettings(containerEl: HTMLElement, plugin: MyPlugin) {
     let trashedTag = new Setting(containerEl)
         .setClass('gki_setting')
         .setClass('gki_setting-child')
-        .setDesc('Trashed tag.')
+        .setDesc('Trashed tag:')
         .addText((text) => {
             text.setValue(plugin.settings.tagNames.isTrashed);
             text.onChange(async (value) => {
