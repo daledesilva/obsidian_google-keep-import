@@ -65,11 +65,29 @@ Settings:
 #### Support
 If you find this plugin saves you time or helps you in some way, please consider supporting my development of plugins and other free community material like this. A simply way is to follow and message me on twitter at [@daledesilva](https://twitter.com/daledesilva) or Mastadon at [indieweb.social/@daledesilva](https://indieweb.social/@daledesilva), and you can also support with a donation below.
 
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/N4N3JLUCW)
+<p>
+  <a href="https://twitter.com/daledesilva">
+    <img src="docs/images/twitter-btn.svg" height="40px" alt="Dale de Silva on Twitter">
+  </a>
+  <a href="https://indieweb.social/@daledesilva">
+    <img src="docs/images/mastodon-btn.svg" height="40px" alt="Dale de Silva on Mastodon">
+  </a>
+  <a href="https://ko-fi.com/N4N3JLUCW">
+    <img src="docs/images/support-btn.svg" height="40px" alt="Support me on Ko-fi">
+  </a>
+</p>
 
 #### My other work
 You can find links to my other projects on [designdebt.club](https://designdebt.club), where I blog about design and development, as well as release other plugins like this one. You can also find my writing at at [falterinresolute.com](https://falterinresolute.com) where I combine philosophy and animation.
 
+<p>
+  <a href="https://designdebt.club">
+    <img src="docs/images/design-debt-club-btn.svg" height="50px" alt="Design Debt Club">
+  </a>
+  <a href="https://falterinresolute.com">
+    <img src="docs/images/falter-in-resolute-btn.svg" height="50px" alt="Falter In Resolute Blog">
+  </a>
+</p>
 
 ---
 
