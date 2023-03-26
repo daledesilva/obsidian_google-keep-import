@@ -20,3 +20,4 @@ export interface ImportResult {
     ignoredReason?: IgnoreImportType,
     details?: string,
 }
+

@@ -227,7 +227,7 @@ export function addResetButton(settingEl: Setting, plugin: MyPlugin, onComplete:
             new ConfirmationModal({
                 plugin: plugin,
                 title: 'Please confirm',
-                message: 'Revert to default settings for Google Keep Import?',
+                message: 'Reset to default settings for Google Keep Import?',
                 confirmLabel: 'Reset settings',
                 confirmAction: async () => {
                     await plugin.resetSettings();

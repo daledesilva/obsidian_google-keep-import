@@ -1,11 +1,11 @@
-import { App, Modal, Notice, Setting } from "obsidian";
-import { AddBasicSettings, AddInclusionSettings, addResetButton, AddSettingsButtons, AddTagSettings } from "src/components/settings-groups/settings-groups";
+import { Modal, Setting } from "obsidian";
+import { AddBasicSettings, AddInclusionSettings, addResetButton, AddTagSettings } from "src/components/settings-groups/settings-groups";
 import { SupportButtonSet } from "src/components/support-button-set/support-button-set";
-import { singleOrPlural } from "src/logic/string-processes";
 import MyPlugin from "src/main";
 
 
-
+///////////////////
+///////////////////
 
 export class EditSettingsModal extends Modal {
 	plugin: MyPlugin;
@@ -39,8 +39,6 @@ export class EditSettingsModal extends Modal {
 
 		contentEl.createEl('h1', {text: 'Google Keep Import Settings'});
 		contentEl.createEl('p', {text: 'All settings will save immediately. Close this modal to return to your import.'});
-		const headerActions = new Setting(contentEl);
-		
 		
 		contentEl.createEl('hr');
 		contentEl.createEl('h2', {text: 'Basics'});
@@ -70,6 +68,6 @@ export class EditSettingsModal extends Modal {
 
 
 	onClose() {
-		// Any cleanup?
+		this.contentEl.empty();
 	}
 }

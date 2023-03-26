@@ -1,12 +1,14 @@
-import { fileSyntax } from 'esbuild-sass-plugin/lib/utils';
-import { App, DataWriteOptions, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, TFile, TFolder, Vault } from 'obsidian';
+import { Notice, Plugin } from 'obsidian';
 import { CreatedDateTypes, PluginSettings } from 'src/types/PluginSettings';
 import { runImportSequence } from './logic/import-logic';
 import { MySettingsTab } from './tabs/settings-tab/settings-tab';
 
 
+///////////////////
+///////////////////
 
 
+// The default settings that a new install starts with
 export const DEFAULT_SETTINGS: PluginSettings = {
 	folderNames: {
 		notes: 'Keep Imports',
@@ -31,8 +33,6 @@ export const DEFAULT_SETTINGS: PluginSettings = {
 }
 
 
-
-
 export default class MyPlugin extends Plugin {
 	settings: PluginSettings;
 
@@ -40,27 +40,17 @@ export default class MyPlugin extends Plugin {
 		await this.loadSettings();
 		
 		this.addCommand({
-			id: 'daledesilva_import-google-keep-jsons',
-			name: 'Import backup from Google Keep',
+			id: 'gki_import-files',
+			name: 'Import files from Google Keep',
 			callback: () => runImportSequence(this)
 		});
 
-		
-		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new MySettingsTab(this.app, this));
-
-		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-		// Using this function will automatically remove the event listener when this plugin is disabled.
-		// this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-		// 	console.log('click', evt);
-		// });
-
 	}
 
 	// Run when deactivating or uninstalling a plugin
 	onunload() {
 		// TODO: Double check there isn't anything I need to clean up
-		
 	}
 
 	async loadSettings() {
@@ -77,5 +67,3 @@ export default class MyPlugin extends Plugin {
 		new Notice('Google Keep Import settings reset');
 	}
 }
-
-

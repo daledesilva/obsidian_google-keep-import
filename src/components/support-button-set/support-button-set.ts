@@ -15,7 +15,7 @@ export class SupportButtonSet {
         })
         SettingEl.addButton(btn => {
             btn.setClass('gki_button');
-            btn.setTooltip('Support Developer');
+            btn.setTooltip('Support developer');
             btn.setIcon('heart');
             btn.onClick( (e) => {
                 window.open('https://ko-fi.com/N4N3JLUCW', '_blank');

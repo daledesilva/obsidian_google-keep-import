@@ -1,11 +1,12 @@
-import { App, Modal, Notice, Setting } from "obsidian";
-import { AddBasicSettings, AddInclusionSettings, AddSettingsButtons, AddTagSettings } from "src/components/settings-groups/settings-groups";
+import { Modal, Notice, Setting } from "obsidian";
 import { singleOrPlural } from "src/logic/string-processes";
 import MyPlugin from "src/main";
 import { EditSettingsModal } from "../edit-settings-modal/edit-settings-modal";
 import { SupportButtonSet } from 'src/components/support-button-set/support-button-set';
 
 
+///////////////////
+///////////////////
 
 
 export class StartImportModal extends Modal {
@@ -35,10 +36,9 @@ export class StartImportModal extends Modal {
 	}
 
 	onOpen() {
-		const {titleEl, contentEl} = this;
+		const {contentEl} = this;
 
-		titleEl.setText('Import Google Keep export');
-
+		contentEl.createEl('h1', {text: 'Import Google Keep Files'});
 
 		const firstParaEl = contentEl.createEl('p', {
 			text: 'To export your files from Google Keep, open ',
@@ -50,13 +50,8 @@ export class StartImportModal extends Modal {
 		});
 		firstParaEl.appendText(' and select only Google Keep files. Once you have the exported zip, unzip it and drag all the files in below.');
 
-
-
-
 		const dropFrame = contentEl.createEl('div', {cls: 'gki_drop-frame'});
-
 		const dropFrameText = dropFrame.createEl('p', { text: 'Drag all files here or ' });
-		// const linkText = dropFrameText.createEl('a', {text: 'browse local files'})
 		dropFrameText.createEl('label', { 
 			text: 'browse local files',
 			attr: {
@@ -69,18 +64,14 @@ export class StartImportModal extends Modal {
 			attr: {
 				'multiple': true,
 				'id': 'gki_file',
-				// 'accept': '.json, .jpg, .png, .3gp',
-				// 'accept': '.json, .jpg, .png, .3gp',
 			}
 		})
-
 
 		const summaryP = contentEl.createEl('p', {cls: 'gki_before-import-summary'});
 		summaryP.createEl('span', {text: `notes: `});
 		this.noteSpan = summaryP.createEl('span', {cls: 'gki_import-number', text: `0`});
 		summaryP.createEl('span', {text: ` | attachments: `});
 		this.assetSpan = summaryP.createEl('span', {cls: 'gki_import-number', text: `0`});
-
 
 		this.modalActions = new Setting(contentEl);
 		new SupportButtonSet(this.modalActions);
@@ -103,39 +94,40 @@ export class StartImportModal extends Modal {
 			})
 		})
 		
+		/////////////
+		/////////////
 
+		// Enable adding files by clicking
 		this.uploadInput.addEventListener('change', () => {
-			// Add imports to accumulative array
 			this.addToFilesBacklog( Object.values(this.uploadInput.files as FileList) );
 		});
-		
+
+		// Add visual drag and drop feedback
 		dropFrame.addEventListener('dragenter', (e) => {
 			dropFrame.addClass('gki_drag-over-active');
-		});
-		
-		dropFrame.addEventListener('dragover', (e) => {
-			// Prevent default to allow drop
-			e.preventDefault();
-		});
-		
+		});		
 		dropFrame.addEventListener('dragleave', (e) => {
 			dropFrame.removeClass('gki_drag-over-active');
 		});
-		
-		dropFrame.addEventListener('drop', (e) => {
-			// Prevent default to stop browser opening file
-			e.preventDefault();
 
+		// Enable adding files by dragging and dropping
+		dropFrame.addEventListener('dragover', (e) => {
+			e.preventDefault(); // Prevent default to allow drop
+		});
+		dropFrame.addEventListener('drop', (e) => {
+			e.preventDefault(); // Prevent default to stop browser opening file
+			dropFrame.removeClass('gki_drag-over-active');
+
+			// Bail if there are no files
 			if(e.dataTransfer === null) return;
 
-			dropFrame.removeClass('gki_drag-over-active');
-			
+			// Add all files to the import backlog
 			const files: Array<File> = [];
-
+			// TODO: Find out the difference between these two things and if I can just use dataTransfer.files
 			if (e.dataTransfer.items) {
-				// DataTransferItems is supporter in this browser
-				const items = [...e.dataTransfer.items];
+				// DataTransferItems is supported in this browser
 
+				const items = [...e.dataTransfer.items];
 				for(let i=0; i<items.length; i++) {
 					const item = items[i];
 					if (item.kind === 'file') {
@@ -143,16 +135,17 @@ export class StartImportModal extends Modal {
 						if(file) files.push(file);
 					}
 				};
+
 			} else {
 				// Use DataTransfer interface to access the file(s)
 				files.push(...e.dataTransfer.files);
+
 			}
 			this.addToFilesBacklog(files);
 		});
 
 
 	}
-
 
 	addToFilesBacklog( files: Array<File> ) {
 		let newFiles = 0;
@@ -168,14 +161,17 @@ export class StartImportModal extends Modal {
 			}
 		})
 
-		if(duplicateFiles>0) new Notice(`${duplicateFiles} ${singleOrPlural(duplicateFiles, 'file')} ignored because ${singleOrPlural(duplicateFiles, 'it\'s', 'they\'re')} already in the import list.`, 9000);
+		// Let the user know how many files were added and how many were skipped due to duplicates
+		if(duplicateFiles>0) {
+			new Notice(`${duplicateFiles} ${singleOrPlural(duplicateFiles, 'file')} ignored because ${singleOrPlural(duplicateFiles, 'it\'s', 'they\'re')} already in the import list.`, 9000);
+		}
 		new Notice(`${newFiles} new ${singleOrPlural(newFiles, 'file')} queued for import.`, 10000);
 
 		// Erase references in upload component to prepare for new set
 		this.uploadInput.files = null;
 			
 		// Update summary numbers
-		const breakdown = this.getFilesBacklogBreakdown();
+		const breakdown = this.getBacklogBreakdown();
 		this.noteSpan.setText(`${breakdown.notes}`);
 		this.assetSpan.setText(`${breakdown.assets}`);
 
@@ -183,20 +179,27 @@ export class StartImportModal extends Modal {
 		this.startBtn.setDisabled(false);
 	}
 
-	backlogContains(file: File) {
+	/**
+	 * Checks if the backlog already contains a file
+	 */
+	backlogContains(file: File): boolean {
 		for(let i=0; i<this.fileBacklog.length; i++) {
+			// TODO: Look up which environments this might not be supported in and deal with if necessary
 			// NOTE: Path isn't necessarily guaranteed in all environments.
-			// Could do a name and content comparison for jsons, and a so too for binary if possible.
-			// Maybe even just a content comparison. For not this is fine.
+			// Could do a name and content comparison for jsons, and also too for binary if possible.
+			// Maybe even just a content comparison. For now this is fine.
 			if((file as any).path) {
 				if((file as any).path == (this.fileBacklog[i] as any).path) return true;
 			}
 		}
-		// If no duplicates found
+		// If no file found in backlog
 		return false;
 	}
 
-	getFilesBacklogBreakdown(): { notes : number, assets: number } {
+	/**
+	 * Gets the number of notes and assets that have been added to the backlog for import
+	 */
+	getBacklogBreakdown(): { notes : number, assets: number } {
 		let notes = 0;
 		let assets = 0;
 
@@ -215,10 +218,11 @@ export class StartImportModal extends Modal {
 		}
 	}
 
-
+	/**
+	 * Called when modal is closed by user
+	 */
 	onClose() {
-		const {titleEl, contentEl} = this;
-		titleEl.empty();
-		contentEl.empty();
+		this.titleEl.empty();
+		this.contentEl.empty();
 	}
 }

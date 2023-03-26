@@ -1,10 +1,9 @@
-import { App, Modal, Notice, Setting } from "obsidian";
-import { importFiles } from "src/logic/import-logic";
-import { singleOrPlural } from "src/logic/string-processes";
+import { Modal, Setting } from "obsidian";
 import MyPlugin from "src/main";
 
 
-
+///////////////////
+///////////////////
 
 export class ConfirmationModal extends Modal {
 	title: string = 'Confirmation';
@@ -59,8 +58,7 @@ export class ConfirmationModal extends Modal {
 	}
 
 	onClose() {
-		const {titleEl, contentEl} = this;
-		titleEl.empty();
-		contentEl.empty();
+		this.titleEl.empty();
+		this.contentEl.empty();
 	}
 }

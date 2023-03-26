@@ -1,5 +1,8 @@
 
 
+///////////////////
+///////////////////
+
 
 export const singleOrPlural = (count: number, singleVersion: string, pluralVersion?: string) => {
 	if(count == 1 || count == -1) {
@@ -14,7 +17,6 @@ export const singleOrPlural = (count: number, singleVersion: string, pluralVersi
 		}
 	}
 }
-
 
 
 export function filenameSanitize(str: string) {

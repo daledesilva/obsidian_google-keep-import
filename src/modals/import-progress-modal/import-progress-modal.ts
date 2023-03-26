@@ -1,16 +1,16 @@
-import { App, Modal, Setting, TFile, TFolder } from "obsidian";
+import { Modal, Setting } from "obsidian";
 import { SupportButtonSet } from "src/components/support-button-set/support-button-set";
 import { FileImporter } from "src/logic/import-logic";
 import MyPlugin from "src/main";
 
 
-
-
-
+///////////////////
+///////////////////
 
 export class ImportProgressModal extends Modal {
 	fileImporter: FileImporter;
 	result: string;
+	modalHeaderDiv: HTMLDivElement;
 	bar: HTMLDivElement;
 	remainingSpan: HTMLSpanElement;
 	failedSpan: HTMLSpanElement;
@@ -40,7 +40,7 @@ export class ImportProgressModal extends Modal {
 		const {titleEl, contentEl} = this;
 
 		titleEl.setText('Import in progress');
-
+		this.modalHeaderDiv = contentEl.createDiv();
 		const progressBarEl = contentEl.createEl('div', {cls: 'gki_progress-bar'});
 		this.bar = progressBarEl.createEl('div', {cls: 'gki_bar'});	
 
@@ -122,6 +122,8 @@ export class ImportProgressModal extends Modal {
 	}
 
 	public applyCompletedState() {
+		this.titleEl.empty();
+		this.modalHeaderDiv.createEl('h1', {text: 'Import Complete'});
 		this.modalActions.addButton(btn => {
 			btn.setCta();
 			btn.setClass('gki_button');
@@ -133,9 +135,8 @@ export class ImportProgressModal extends Modal {
 	}
 
 	onClose() {
-		const {titleEl, contentEl} = this;
-		titleEl.empty();
-		contentEl.empty();
+		this.titleEl.empty();
+		this.contentEl.empty();
 
 		if(!this.importCompleted) {
 			this.rejectModal('Import cancelled');
