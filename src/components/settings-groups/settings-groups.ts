@@ -7,7 +7,7 @@ import { CreatedDateTypes } from "src/types/PluginSettings";
 
 export function AddBasicSettings(containerEl: HTMLElement, plugin: MyPlugin) {
     
-    const setting1 = new Setting(containerEl)
+    new Setting(containerEl)
         .setClass('gki_setting')
         .setName('Note import folder')
         .addText((text) => {

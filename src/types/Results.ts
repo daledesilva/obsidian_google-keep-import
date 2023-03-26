@@ -1,3 +1,5 @@
+// Type definitions for results and errors
+//////////////////////////////////////////
 
 export enum ImportOutcomeType {
     UserIgnored,
@@ -7,7 +9,7 @@ export enum ImportOutcomeType {
     Imported,
 }
 
-export enum IgnoreImportType {
+export enum IgnoreImportReason {
     Trashed,
     Archived,
 }
@@ -17,7 +19,6 @@ export interface ImportResult {
     obsidianFilepath?: string;
     outcome: ImportOutcomeType,
     error?: Error;
-    ignoredReason?: IgnoreImportType,
+    ignoredReason?: IgnoreImportReason,
     details?: string,
 }
-

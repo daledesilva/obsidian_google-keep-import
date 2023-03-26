@@ -5,24 +5,28 @@ import MyPlugin from "src/main";
 ///////////////////
 ///////////////////
 
+
+interface ConfirmationOptions {
+	plugin: MyPlugin,
+	title?: string,
+	message?: string,
+	cancelLabel?: string,
+	cancelAction?: Function,
+	confirmLabel?: string,
+	confirmAction: Function,
+}
+
 export class ConfirmationModal extends Modal {
 	title: string = 'Confirmation';
 	message: string = 'Are you sure?';
 	cancelLabel: string = 'Cancel';
-	cancelAction: Function = () => {};	// REVIEW: Is this the best way to set a default nothing action on this parameter?
+	cancelAction: Function = () => {};
 	confirmLabel: string = 'Yes';
 	confirmAction: Function;
 
-	constructor(options: {
-		plugin: MyPlugin,
-		title?: string,
-		message?: string,
-		cancelLabel?: string,
-		cancelAction?: Function,
-		confirmLabel?: string,
-		confirmAction: Function,
-	}) {
+	constructor(options: ConfirmationOptions) {
 		super(options.plugin.app);
+		
 		this.title = options.title || this.title;
 		this.message = options.message || this.message;
 		this.cancelLabel = options.cancelLabel || this.cancelLabel;
@@ -31,6 +35,9 @@ export class ConfirmationModal extends Modal {
 		this.confirmAction = options.confirmAction;
 	}
 
+	/**
+	 * Called automatically by the Modal class when modal is opened.
+	 */
 	onOpen() {
 		const {titleEl, contentEl} = this;
 
@@ -57,6 +64,9 @@ export class ConfirmationModal extends Modal {
 
 	}
 
+	/**
+	 * Called automatically by the Modal class when modal is closed.
+	 */
 	onClose() {
 		this.titleEl.empty();
 		this.contentEl.empty();

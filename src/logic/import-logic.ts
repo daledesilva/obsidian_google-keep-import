@@ -4,23 +4,30 @@ import { ImportProgressModal } from "src/modals/import-progress-modal/import-pro
 import { filenameSanitize } from "./string-processes";
 import { CreatedDateTypes, PluginSettings } from "src/types/PluginSettings";
 import { KeepJson } from "src/types/KeepData";
-import { IgnoreImportType, ImportResult, ImportOutcomeType } from "src/types/Results";
+import { IgnoreImportReason, ImportResult, ImportOutcomeType } from "src/types/Results";
 import { StartImportModal } from "src/modals/start-import-modal/start-import-modal";
 
-// TODO: Put these somewhere
+
+///////////////////
+///////////////////
+
+
 interface ProgressSummary {
 	successCount: number,
 	failCount: number,
 	newLogEntries: Array<OutputLogItem>;
 };
+
 interface OutputLogItem {
 	status: string;
 	title: string;
 	desc: string;
 }
 
+
 ///////////////////
 ///////////////////
+
 
 /**
  * Runs and manages the import sequence of import modals and import logic.
@@ -201,7 +208,7 @@ export class FileImporter {
 	/**
 	 * Returns the number of files passed to the object.
 	 */
-	getTotalImports(): Number {
+	getTotalImports(): number {
 		return this.totalImports;
 	}
 
@@ -329,12 +336,12 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 			// Abort if user doesn't want this type of file
 			if(content.isArchived && !settings.importArchived) {
 				result.outcome = ImportOutcomeType.UserIgnored;
-				result.ignoredReason = IgnoreImportType.Archived;
+				result.ignoredReason = IgnoreImportReason.Archived;
 				return resolve(result);
 			}
 			if(content.isTrashed && !settings.importTrashed) {
 				result.outcome = ImportOutcomeType.UserIgnored;
-				result.ignoredReason = IgnoreImportType.Trashed;
+				result.ignoredReason = IgnoreImportReason.Trashed;
 				return resolve(result);
 			}
 
@@ -446,11 +453,9 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 				// await plugin.app.vault.process(fileRef, (str) => str, options);	// TODO: Error in docs. Exists in docs but not in class
 			}
 
-			
+
 			
 			return resolve(result);	
-
-
 		}
 		
 	})

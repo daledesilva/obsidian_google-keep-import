@@ -7,6 +7,7 @@ import MyPlugin from "src/main";
 ///////////////////
 ///////////////////
 
+
 export class EditSettingsModal extends Modal {
 	plugin: MyPlugin;
 	result: string;
@@ -24,8 +25,11 @@ export class EditSettingsModal extends Modal {
 		super(plugin.app);
 		this.plugin = plugin;
 	}
-
-	showModal(): Promise<Array<File>> {
+	
+	/**
+	 * Opens the modal and returns of a result.
+	 */
+	public showModal(): Promise<Array<File>> {
 		return new Promise((resolve, reject) => {
 			this.open();
 			this.resolveModal = resolve;
@@ -33,6 +37,9 @@ export class EditSettingsModal extends Modal {
 		})
 	}
 
+	/**
+	 * Called automatically by the Modal class when modal is opened.
+	 */
 	onOpen() {
 		const {titleEl, contentEl} = this;
 		contentEl.empty();
@@ -50,12 +57,12 @@ export class EditSettingsModal extends Modal {
 		
 		contentEl.createEl('hr');
 		contentEl.createEl('h2', {text: 'Tags'});
-		AddTagSettings(contentEl, this.plugin);
+		AddTagSettings(contentEl, this.plugin);	// TODO: Can these be refactored as new TagSettings(contentEl, this.plugin)
 
 		contentEl.createEl('hr');
 		const modalActions = new Setting(contentEl);
 		new SupportButtonSet(modalActions);
-		addResetButton(modalActions, this.plugin, () => this.onOpen());
+		addResetButton(modalActions, this.plugin, () => this.onOpen());	// TODO: Can this be refactored as new ResetButton(modalActions, this.plugin, () => this.onOpen())
 		modalActions.addButton( (button) => {
 			button.setButtonText('Close');
 			button.setClass('gki_button');
@@ -66,7 +73,9 @@ export class EditSettingsModal extends Modal {
 		})
 	}
 
-
+	/**
+	 * Called automatically by the Modal class when the modal is closed.
+	 */
 	onClose() {
 		this.contentEl.empty();
 	}

@@ -1,3 +1,66 @@
+// General content components
+/////////////////////////////
+
+.gki_info-bubble {
+    background-color: rgba($color: #FFF, $alpha: 0.05);
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.gki_button {
+    margin-top: 1rem;
+    cursor: pointer;
+}
+
+button.gki_button[disabled] {
+    opacity: 0.3;
+    background-color: unset !important;
+    color: unset !important;
+    box-shadow: var(--input-shadow);
+    &:hover {
+        background-color: unset !important;
+        color: unset !important;
+        box-shadow: var(--input-shadow);
+    }
+}
+
+.gki_hidden {
+    display: none;
+}
+
+
+// Settings components
+//////////////////////
+
+.gki_setting {
+    &.is-disabled {
+        display: none;
+    }
+}
+
+// Increase the width of text and dropdown inputs to their own line on small windows.
+.gki_setting:not(.mod-toggle) {
+    flex-wrap: wrap;
+
+    .setting-item-info {
+        padding-bottom: 0.5em;
+    }
+
+    .setting-item-info {
+        flex: 1 0 30ch;
+    }
+    .setting-item-control {
+        flex: 1 30ch;
+        input, select {
+            width: 100%;
+        }
+    }
+}
+
+
+// Drag and drop file uploader
+//////////////////////////////
+
 .gki_drop-frame {
     width: 100%;
     padding: 5.5em 70px;
@@ -18,47 +81,24 @@
     }
 }
 
-#gki_file {
+#gki_file-input {
     display: none;
 }
 
-.gki_file-label {
+.gki_file-input_label {
     color: pink;
     text-decoration: underline;
     cursor: pointer;
 }
 
-.gki_info-bubble {
-    background-color: rgba($color: #FFF, $alpha: 0.05);
-    border-radius: 10px;
-    padding: 20px;
+// TODO: Put this inside upload dropzone
+.gki_file-upload-summary {
+    text-align: right;
 }
 
-.gki_setting {
-    &.is-disabled {
-        display: none;
-    }
-}
 
-// Increase the width of text inputs and drop down to their own line on small windows.
-// But not toggles
-.gki_setting:not(.mod-toggle) {
-    flex-wrap: wrap;
-
-    .setting-item-info {
-        padding-bottom: 0.5em;
-    }
-
-    .setting-item-info {
-        flex: 1 0 30ch;
-    }
-    .setting-item-control {
-        flex: 1 30ch;
-        input, select {
-            width: 100%;
-        }
-    }
-}
+// Progress modal components
+////////////////////////////
 
 .gki_progress-bar {
     width: 100%;
@@ -75,11 +115,7 @@
     }
 }
 
-.gki_before-import-summary {
-    text-align: right;
-}
-
-.gki_during-import-summary {
+.gki_import-summary {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -96,7 +132,11 @@
     }
 }
 
-.gki_import-log {
+
+// Error log components
+////////////////////////
+
+.gki_error-log {
     margin-top: 1rem;
     background-color: rgba($color: #000000, $alpha: 0.3);
     max-height: 0;
@@ -159,39 +199,17 @@
 
     }    
 
-    
-}
-
-.gki_button {
-    margin-top: 1rem;
-    cursor: pointer;
-}
-
-button.gki_button[disabled] {
-    opacity: 0.3;
-    background-color: unset !important;
-    color: unset !important;
-    box-shadow: var(--input-shadow);
-    &:hover {
-        background-color: unset !important;
-        color: unset !important;
-        box-shadow: var(--input-shadow);
-    }
-}
-
-.gki_hidden {
-    display: none;
 }
 
 
 // Animation
 ////////////
- 
-.gki_import-log {
+
+.gki_error-log {
     transition: max-height 1s;
 }
 
-.gki_item {
+.gki_error-log .gki_item {
     animation-name: log-item-appear;
     animation-duration: 1s;
     animation-timing-function: cubic-bezier(0.77,0,0.18,1);
@@ -206,4 +224,4 @@ button.gki_button[disabled] {
     to {
         max-height: 7rem; // Approximately standard size from 3 lines of content // NOTE: This would cause issues if content is longer than 3 lines
     }
-  }
+}

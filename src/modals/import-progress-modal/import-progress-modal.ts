@@ -7,6 +7,7 @@ import MyPlugin from "src/main";
 ///////////////////
 ///////////////////
 
+
 export class ImportProgressModal extends Modal {
 	fileImporter: FileImporter;
 	result: string;
@@ -28,7 +29,10 @@ export class ImportProgressModal extends Modal {
 		this.fileImporter = fileImporter
 	}
 
-	showModal() {
+	/**
+	 * Opens the modal and returns of a result.
+	 */
+	public showModal() {
 		return new Promise((resolve, reject) => {
 			this.open();
 			this.resolveModal = resolve;
@@ -36,7 +40,10 @@ export class ImportProgressModal extends Modal {
 		})
 	}
 
-	onOpen() {
+	/**
+	 * Called automatically by the Modal class when modal is opened.
+	 */
+	public onOpen() {
 		const {titleEl, contentEl} = this;
 
 		titleEl.setText('Import in progress');
@@ -45,7 +52,7 @@ export class ImportProgressModal extends Modal {
 		this.bar = progressBarEl.createEl('div', {cls: 'gki_bar'});	
 
 		
-		const summaryEl = contentEl.createDiv('gki_during-import-summary');
+		const summaryEl = contentEl.createDiv('gki_import-summary');
 		let bubbleEl;
 		let pBubbleEl;
 
@@ -67,7 +74,7 @@ export class ImportProgressModal extends Modal {
 		pBubbleEl.createEl('br');
 		pBubbleEl.createEl('span', {cls: 'gki_import-label', text: `imported`});
 
-		this.outputLogEl = contentEl.createDiv('gki_import-log');
+		this.outputLogEl = contentEl.createDiv('gki_error-log');
 
 		this.modalActions = new Setting(this.contentEl);
 		new SupportButtonSet(this.modalActions);
@@ -75,7 +82,10 @@ export class ImportProgressModal extends Modal {
 		this.updateProgressVisuals()
 	}
 
-	public updateProgressVisuals() {
+	/**
+	 * Tells the modal to check the fileImporter that was passed in on instantiation and update the progress.
+	 */
+	private updateProgressVisuals() {
 
 		const totalImports = this.fileImporter.getTotalImports();
 		const {
@@ -107,7 +117,10 @@ export class ImportProgressModal extends Modal {
 		}
 	}
 
-	public addOutputLine(options: {status: string, title: string, desc: string}) {
+	/**
+	 * Adds a new line to the output log.
+	 */
+	private addOutputLine(options: {status: string, title: string, desc: string}) {
 		const itemEl = this.outputLogEl.createDiv({cls: 'gki_item'});
 
 		const itemHeaderEl = itemEl.createEl('p', {cls: 'gki_item-header'});
@@ -121,6 +134,9 @@ export class ImportProgressModal extends Modal {
 		this.outputLogEl.addClass('gki_visible');
 	}
 
+	/**
+	 * Restyles the modal to indicate the uploads have completed.
+	 */
 	public applyCompletedState() {
 		this.titleEl.empty();
 		this.modalHeaderDiv.createEl('h1', {text: 'Import Complete'});
@@ -134,7 +150,10 @@ export class ImportProgressModal extends Modal {
 		})
 	}
 
-	onClose() {
+	/**
+	 * Called automatically by the Modal class when the modal is closed.
+	 */
+	public onClose() {
 		this.titleEl.empty();
 		this.contentEl.empty();
 

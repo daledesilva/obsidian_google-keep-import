@@ -8,7 +8,9 @@ import { MySettingsTab } from './tabs/settings-tab/settings-tab';
 ///////////////////
 
 
-// The default settings that a new install starts with
+/**
+ * The default settings that a new install starts with
+ */
 export const DEFAULT_SETTINGS: PluginSettings = {
 	folderNames: {
 		notes: 'Keep Imports',
@@ -33,6 +35,9 @@ export const DEFAULT_SETTINGS: PluginSettings = {
 }
 
 
+/**
+ * The base plugin class initialised by Obsidian on launch
+ */
 export default class MyPlugin extends Plugin {
 	settings: PluginSettings;
 
@@ -49,19 +54,28 @@ export default class MyPlugin extends Plugin {
 	}
 
 	// Run when deactivating or uninstalling a plugin
-	onunload() {
+	public onunload() {
 		// TODO: Double check there isn't anything I need to clean up
 	}
 
-	async loadSettings() {
+	/**
+	 * Load any existing plugin settings from Obsidian into the plugins settings object.
+	 */
+	private async loadSettings() {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
 	}
 
-	async saveSettings() {
+	/**
+	 * Save the plugins settings object to Obsidian.
+	 */
+	public async saveSettings() {
 		await this.saveData(this.settings);
 	}
 
-	async resetSettings() {
+	/**
+	 * Reset the plugins settings object back to defaults and save to Obsidian.
+	 */
+	public async resetSettings() {
 		this.settings = JSON.parse( JSON.stringify(DEFAULT_SETTINGS) );
 		this.saveSettings();
 		new Notice('Google Keep Import settings reset');

@@ -27,7 +27,10 @@ export class StartImportModal extends Modal {
 		this.plugin = plugin;
 	}
 
-	showModal(): Promise<Array<File>> {
+	/**
+	 * Opens the modal and returns of a result.
+	 */
+	public showModal(): Promise<Array<File>> {
 		return new Promise((resolve, reject) => {
 			this.open();
 			this.resolveModal = resolve;
@@ -35,7 +38,10 @@ export class StartImportModal extends Modal {
 		})
 	}
 
-	onOpen() {
+	/**
+	 * Called automatically by the Modal class when modal is opened.
+	 */
+	public onOpen() {
 		const {contentEl} = this;
 
 		contentEl.createEl('h1', {text: 'Import Google Keep Files'});
@@ -55,19 +61,19 @@ export class StartImportModal extends Modal {
 		dropFrameText.createEl('label', { 
 			text: 'browse local files',
 			attr: {
-				'class': 'gki_file-label',
-				'for': 'gki_file',
+				'class': 'gki_file-input_label',
+				'for': 'gki_file-input',
 			}
 		})
 		this.uploadInput = dropFrameText.createEl('input', { 
 			type: 'file',
 			attr: {
 				'multiple': true,
-				'id': 'gki_file',
+				'id': 'gki_file-input',
 			}
 		})
 
-		const summaryP = contentEl.createEl('p', {cls: 'gki_before-import-summary'});
+		const summaryP = contentEl.createEl('p', {cls: 'gki_file-upload-summary'});
 		summaryP.createEl('span', {text: `notes: `});
 		this.noteSpan = summaryP.createEl('span', {cls: 'gki_import-number', text: `0`});
 		summaryP.createEl('span', {text: ` | attachments: `});
@@ -94,8 +100,8 @@ export class StartImportModal extends Modal {
 			})
 		})
 		
-		/////////////
-		/////////////
+		// Actions
+		//////////
 
 		// Enable adding files by clicking
 		this.uploadInput.addEventListener('change', () => {
@@ -147,11 +153,14 @@ export class StartImportModal extends Modal {
 
 	}
 
-	addToFilesBacklog( files: Array<File> ) {
+	/**
+	 * Adds files to the backlog which can then be passed to a fileImporter object
+	 */
+	private addToFilesBacklog( files: Array<File> ) {
 		let newFiles = 0;
 		let duplicateFiles = 0;
 
-		// Add non-duplicates to backlog
+		// Add all files not already in the backlog
 		files.forEach( (file) => {
 			if( this.backlogContains(file) ) {
 				duplicateFiles++;
@@ -182,7 +191,7 @@ export class StartImportModal extends Modal {
 	/**
 	 * Checks if the backlog already contains a file
 	 */
-	backlogContains(file: File): boolean {
+	private backlogContains(file: File): boolean {
 		for(let i=0; i<this.fileBacklog.length; i++) {
 			// TODO: Look up which environments this might not be supported in and deal with if necessary
 			// NOTE: Path isn't necessarily guaranteed in all environments.
@@ -199,7 +208,7 @@ export class StartImportModal extends Modal {
 	/**
 	 * Gets the number of notes and assets that have been added to the backlog for import
 	 */
-	getBacklogBreakdown(): { notes : number, assets: number } {
+	private getBacklogBreakdown(): { notes : number, assets: number } {
 		let notes = 0;
 		let assets = 0;
 
@@ -221,7 +230,7 @@ export class StartImportModal extends Modal {
 	/**
 	 * Called when modal is closed by user
 	 */
-	onClose() {
+	public onClose() {
 		this.titleEl.empty();
 		this.contentEl.empty();
 	}

@@ -1,5 +1,5 @@
-// Types definitions for Google Keep data shapes
-////////////////////////////////////////////////
+// Type definitions for Google Keep data structure
+//////////////////////////////////////////////////
 
 export interface KeepListItem {
 	text: string;

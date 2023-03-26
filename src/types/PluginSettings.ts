@@ -1,3 +1,6 @@
+// Type definitions for plugin settings
+///////////////////////////////////////
+
 export enum CreatedDateTypes {
 	googleKeep = 'Google Keep creation date',
 	import = 'Obsidian import date',
