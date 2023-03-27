@@ -1,4 +1,5 @@
 import { Modal, Setting } from "obsidian";
+import { ImportSummary } from "src/components/import-summary/import-summary";
 import { SupportButtonSet } from "src/components/support-button-set/support-button-set";
 import { FileImporter } from "src/logic/import-logic";
 import MyPlugin from "src/main";
@@ -50,29 +51,11 @@ export class ImportProgressModal extends Modal {
 		this.modalHeaderDiv = contentEl.createDiv();
 		const progressBarEl = contentEl.createEl('div', {cls: 'gki_progress-bar'});
 		this.bar = progressBarEl.createEl('div', {cls: 'gki_bar'});	
-
 		
-		const summaryEl = contentEl.createDiv('gki_import-summary');
-		let bubbleEl;
-		let pBubbleEl;
-
-		bubbleEl = summaryEl.createDiv('gki_import-remaining');
-		pBubbleEl = bubbleEl.createEl('p');
-		this.remainingSpan = pBubbleEl.createEl('span', {cls: 'gki_import-number', text: `-`});
-		pBubbleEl.createEl('br');
-		pBubbleEl.createEl('span', {cls: 'gki_import-label', text: `remaining`});
-
-		bubbleEl = summaryEl.createDiv('gki_import-failed');
-		pBubbleEl = bubbleEl.createEl('p');
-		this.failedSpan = pBubbleEl.createEl('span', {cls: 'gki_import-number', text: `-`});
-		pBubbleEl.createEl('br');
-		pBubbleEl.createEl('span', {cls: 'gki_import-label', text: `failed/skipped`});
-
-		bubbleEl = summaryEl.createDiv('gki_import-imported');
-		pBubbleEl = bubbleEl.createEl('p');
-		this.importedSpan = pBubbleEl.createEl('span', {cls: 'gki_import-number', text: `-`});
-		pBubbleEl.createEl('br');
-		pBubbleEl.createEl('span', {cls: 'gki_import-label', text: `imported`});
+		let importSummary = new ImportSummary(contentEl);
+		this.remainingSpan = importSummary.addItem('remaining');
+		this.failedSpan = importSummary.addItem('failed/skipped');
+		this.importedSpan = importSummary.addItem('imported');
 
 		this.outputLogEl = contentEl.createDiv('gki_error-log');
 

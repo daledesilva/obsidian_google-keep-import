@@ -3,6 +3,7 @@ import { singleOrPlural } from "src/logic/string-processes";
 import MyPlugin from "src/main";
 import { EditSettingsModal } from "../edit-settings-modal/edit-settings-modal";
 import { SupportButtonSet } from 'src/components/support-button-set/support-button-set';
+import { ImportSummary } from "src/components/import-summary/import-summary";
 
 
 ///////////////////
@@ -13,9 +14,9 @@ export class StartImportModal extends Modal {
 	plugin: MyPlugin;
 	result: string;
 	duplicateNotes: number = 0;
-	noteSpan: HTMLSpanElement;
-	assetSpan: HTMLSpanElement;
-	summaryEl: HTMLElement;
+	notesSpan: HTMLSpanElement;
+	attachmentsSpan: HTMLSpanElement;
+	importSummary: ImportSummary;
 	fileBacklog: Array<File> = [];
 	uploadInput: HTMLInputElement;
 	modalActions: Setting;
@@ -74,22 +75,10 @@ export class StartImportModal extends Modal {
 			}
 		})
 
-		this.summaryEl = dropFrameText.createDiv('gki_import-summary');
-		this.summaryEl.addClass('gki_hidden');
-		let bubbleEl;
-		let pBubbleEl;
-
-		bubbleEl = this.summaryEl.createDiv('gki_import-imported');
-		pBubbleEl = bubbleEl.createEl('p');
-		this.noteSpan = pBubbleEl.createEl('span', {cls: 'gki_import-number', text: `0`});
-		pBubbleEl.createEl('br');
-		pBubbleEl.createEl('span', {cls: 'gki_import-label', text: `notes`});
-
-		bubbleEl = this.summaryEl.createDiv('gki_import-imported');
-		pBubbleEl = bubbleEl.createEl('p');
-		this.assetSpan = pBubbleEl.createEl('span', {cls: 'gki_import-number', text: `0`});
-		pBubbleEl.createEl('br');
-		pBubbleEl.createEl('span', {cls: 'gki_import-label', text: `attachments`});
+		this.importSummary = new ImportSummary(dropFrame);
+		this.importSummary.hide();
+		this.notesSpan = this.importSummary.addItem('notes');
+		this.attachmentsSpan = this.importSummary.addItem('attachments');
 
 		this.modalActions = new Setting(contentEl);
 		new SupportButtonSet(this.modalActions);
@@ -193,9 +182,9 @@ export class StartImportModal extends Modal {
 			
 		// Update summary numbers
 		const breakdown = this.getBacklogBreakdown();
-		this.noteSpan.setText(`${breakdown.notes}`);
-		this.assetSpan.setText(`${breakdown.assets}`);
-		this.summaryEl.removeClass('gki_hidden');
+		this.notesSpan.setText(`${breakdown.notes}`);
+		this.attachmentsSpan.setText(`${breakdown.assets}`);
+		this.importSummary.show();
 
 		// Activate start button
 		this.startBtn.setDisabled(false);
