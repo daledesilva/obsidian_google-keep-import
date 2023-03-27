@@ -15,6 +15,7 @@ export class StartImportModal extends Modal {
 	duplicateNotes: number = 0;
 	noteSpan: HTMLSpanElement;
 	assetSpan: HTMLSpanElement;
+	summaryEl: HTMLElement;
 	fileBacklog: Array<File> = [];
 	uploadInput: HTMLInputElement;
 	modalActions: Setting;
@@ -73,11 +74,22 @@ export class StartImportModal extends Modal {
 			}
 		})
 
-		const summaryP = contentEl.createEl('p', {cls: 'gki_file-upload-summary'});
-		summaryP.createEl('span', {text: `notes: `});
-		this.noteSpan = summaryP.createEl('span', {cls: 'gki_import-number', text: `0`});
-		summaryP.createEl('span', {text: ` | attachments: `});
-		this.assetSpan = summaryP.createEl('span', {cls: 'gki_import-number', text: `0`});
+		this.summaryEl = dropFrameText.createDiv('gki_import-summary');
+		this.summaryEl.addClass('gki_hidden');
+		let bubbleEl;
+		let pBubbleEl;
+
+		bubbleEl = this.summaryEl.createDiv('gki_import-imported');
+		pBubbleEl = bubbleEl.createEl('p');
+		this.noteSpan = pBubbleEl.createEl('span', {cls: 'gki_import-number', text: `0`});
+		pBubbleEl.createEl('br');
+		pBubbleEl.createEl('span', {cls: 'gki_import-label', text: `notes`});
+
+		bubbleEl = this.summaryEl.createDiv('gki_import-imported');
+		pBubbleEl = bubbleEl.createEl('p');
+		this.assetSpan = pBubbleEl.createEl('span', {cls: 'gki_import-number', text: `0`});
+		pBubbleEl.createEl('br');
+		pBubbleEl.createEl('span', {cls: 'gki_import-label', text: `attachments`});
 
 		this.modalActions = new Setting(contentEl);
 		new SupportButtonSet(this.modalActions);
@@ -183,6 +195,7 @@ export class StartImportModal extends Modal {
 		const breakdown = this.getBacklogBreakdown();
 		this.noteSpan.setText(`${breakdown.notes}`);
 		this.assetSpan.setText(`${breakdown.assets}`);
+		this.summaryEl.removeClass('gki_hidden');
 
 		// Activate start button
 		this.startBtn.setDisabled(false);
@@ -228,7 +241,7 @@ export class StartImportModal extends Modal {
 	}
 
 	/**
-	 * Called when modal is closed by user
+	 * Called automatically when modal is closed by user
 	 */
 	public onClose() {
 		this.titleEl.empty();
