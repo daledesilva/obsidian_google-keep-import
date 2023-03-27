@@ -1,6 +1,6 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
 import MyPlugin from "src/main";
-import { AddBasicSettings, AddInclusionSettings, addResetButton, AddTagSettings } from "src/components/settings-groups/settings-groups";
+import { addResetButton, BasicSettingsGroup, InclusionSettingsGroup, TagSettingsGroup } from "src/components/settings-groups/settings-groups";
 import { SupportButtonSet } from "src/components/support-button-set/support-button-set";
 
 
@@ -26,16 +26,13 @@ export class MySettingsTab extends PluginSettingTab {
 		new SupportButtonSet(headerActions);
 		
 		containerEl.createEl('hr');
-		containerEl.createEl('h2', {text: 'Basics'});
-		AddBasicSettings(containerEl, this.plugin);
+		new BasicSettingsGroup(containerEl, this.plugin);
 		
 		containerEl.createEl('hr');
-		containerEl.createEl('h2', {text: 'Inclusions'});
-		AddInclusionSettings(containerEl, this.plugin);
+		new InclusionSettingsGroup(containerEl, this.plugin);
 		
 		containerEl.createEl('hr');
-		containerEl.createEl('h2', {text: 'Tags'});
-		AddTagSettings(containerEl, this.plugin);
+		new TagSettingsGroup(containerEl, this.plugin);
 
 		containerEl.createEl('hr');
 		const modalActions = new Setting(containerEl);

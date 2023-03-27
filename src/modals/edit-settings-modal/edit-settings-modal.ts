@@ -1,5 +1,5 @@
 import { Modal, Setting } from "obsidian";
-import { AddBasicSettings, AddInclusionSettings, addResetButton, AddTagSettings } from "src/components/settings-groups/settings-groups";
+import { addResetButton, BasicSettingsGroup, InclusionSettingsGroup, TagSettingsGroup } from "src/components/settings-groups/settings-groups";
 import { SupportButtonSet } from "src/components/support-button-set/support-button-set";
 import MyPlugin from "src/main";
 
@@ -48,16 +48,13 @@ export class EditSettingsModal extends Modal {
 		contentEl.createEl('p', {text: 'All settings will save immediately. Close this modal to return to your import.'});
 		
 		contentEl.createEl('hr');
-		contentEl.createEl('h2', {text: 'Basics'});
-		AddBasicSettings(contentEl, this.plugin);
+		new BasicSettingsGroup(contentEl, this.plugin);
 		
 		contentEl.createEl('hr');
-		contentEl.createEl('h2', {text: 'Inclusions'});
-		AddInclusionSettings(contentEl, this.plugin);
+		new InclusionSettingsGroup(contentEl, this.plugin);
 		
 		contentEl.createEl('hr');
-		contentEl.createEl('h2', {text: 'Tags'});
-		AddTagSettings(contentEl, this.plugin);	// TODO: Can these be refactored as new TagSettings(contentEl, this.plugin)
+		new TagSettingsGroup(contentEl, this.plugin);
 
 		contentEl.createEl('hr');
 		const modalActions = new Setting(contentEl);
