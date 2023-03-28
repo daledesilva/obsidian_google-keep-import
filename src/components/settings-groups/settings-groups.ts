@@ -1,7 +1,7 @@
 import { Setting } from "obsidian";
 import MyPlugin from "src/main";
 import { ConfirmationModal } from "src/modals/confirmation-modal/confirmation-modal";
-import { CreatedDateTypes } from "src/types/PluginSettings";
+import { CreatedDateTypes } from "src/types/plugin-settings";
 
 
 ///////////////////
@@ -95,6 +95,18 @@ export class InclusionSettingsGroup {
                 toggle.setValue(plugin.settings.importTrashed)
                 toggle.onChange(async (value) => {
                     plugin.settings.importTrashed = value;
+                    await plugin.saveSettings();
+                });
+            });
+        
+        new Setting(containerEl)
+            .setClass('gki_setting')
+            .setName('Import unsupported files')
+            .setDesc('Importing unsupported files will place them in correct folders and notify you on import so that you can convert them manually. Otherwise they will be skipped.') //  TODO: If you are using this plugin to import markdown files rather than Google Keep files, turning this off might cause markdown files to be ignored on some systems if they report their file format incorrectly.
+            .addToggle(toggle => {
+                toggle.setValue(plugin.settings.importUnsupported)
+                toggle.onChange(async (value) => {
+                    plugin.settings.importUnsupported = value;
                     await plugin.saveSettings();
                 });
             });

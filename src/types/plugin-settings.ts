@@ -15,6 +15,7 @@ export interface PluginSettings {
 	createdDate: CreatedDateTypes,
 	importArchived: boolean,
 	importTrashed: boolean,
+	importUnsupported: boolean,
 	addColorTags: boolean,
 	addPinnedTags: boolean,
 	addAttachmentTags: boolean,

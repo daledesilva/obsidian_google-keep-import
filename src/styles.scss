@@ -173,6 +173,10 @@ button.gki_button[disabled] {
                 border-radius: 4px;
                 margin-right: 0.5em;
                 
+                &.note {
+                    background-color: rgba($color: #ffffff, $alpha: 0.3);
+                    color: #FFF;
+                }
                 &.error {
                     background-color: rgba($color: #FF5555, $alpha: 0.3);
                     color: #FFF;

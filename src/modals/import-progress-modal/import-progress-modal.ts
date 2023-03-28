@@ -15,6 +15,7 @@ export class ImportProgressModal extends Modal {
 	modalHeaderDiv: HTMLDivElement;
 	bar: HTMLDivElement;
 	remainingSpan: HTMLSpanElement;
+	skippedSpan: HTMLSpanElement;
 	failedSpan: HTMLSpanElement;
 	importedSpan: HTMLSpanElement;
 	outputStr: string = '';
@@ -54,7 +55,8 @@ export class ImportProgressModal extends Modal {
 		
 		let importSummary = new ImportSummary(contentEl);
 		this.remainingSpan = importSummary.addItem('remaining');
-		this.failedSpan = importSummary.addItem('failed/skipped');
+		this.skippedSpan = importSummary.addItem('skipped');
+		this.failedSpan = importSummary.addItem('failed');
 		this.importedSpan = importSummary.addItem('imported');
 
 		this.outputLogEl = contentEl.createDiv('gki_error-log');
@@ -73,16 +75,18 @@ export class ImportProgressModal extends Modal {
 		const totalImports = this.fileImporter.getTotalImports();
 		const {
 			successCount,
+			skipCount,
 			failCount,
 			newLogEntries,
 		} = this.fileImporter.getLatestProgress();
 
 		// Update bar visual
-		const perc = (successCount + failCount)/totalImports * 100;
+		const perc = (successCount + skipCount + failCount)/totalImports * 100;
 		this.bar.setAttr('style', `width: ${perc}%`);
 
 		// Update text
-		this.remainingSpan.setText(`${totalImports-successCount-failCount}`);
+		this.remainingSpan.setText(`${totalImports-successCount-failCount-skipCount}`);
+		this.skippedSpan.setText(`${skipCount}`);
 		this.failedSpan.setText(`${failCount}`);
 		this.importedSpan.setText(`${successCount}`);
 
@@ -92,7 +96,7 @@ export class ImportProgressModal extends Modal {
 		}
 
 		// Finalise or continue on next frame
-		if(successCount + failCount == totalImports) {
+		if(successCount + skipCount + failCount == totalImports) {
 			this.importCompleted = true;
 			this.applyCompletedState();
 		} else {

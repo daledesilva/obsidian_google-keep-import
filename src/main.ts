@@ -1,5 +1,5 @@
 import { Notice, Plugin } from 'obsidian';
-import { CreatedDateTypes, PluginSettings } from 'src/types/PluginSettings';
+import { CreatedDateTypes, PluginSettings } from 'src/types/plugin-settings';
 import { runImportSequence } from './logic/import-logic';
 import { MySettingsTab } from './tabs/settings-tab/settings-tab';
 
@@ -20,6 +20,7 @@ export const DEFAULT_SETTINGS: PluginSettings = {
 	createdDate: CreatedDateTypes.googleKeep, 
 	importArchived: true,
 	importTrashed: false,
+	importUnsupported: true,
 	addColorTags: true,
 	addPinnedTags: true,
 	addAttachmentTags: true,
