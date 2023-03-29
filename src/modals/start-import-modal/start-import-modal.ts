@@ -78,7 +78,7 @@ export class StartImportModal extends Modal {
 		this.importSummary = new ImportSummary(dropFrame);
 		this.importSummary.hide();
 		this.notesSpan = this.importSummary.addItem('notes');
-		this.attachmentsSpan = this.importSummary.addItem('attachments');
+		this.attachmentsSpan = this.importSummary.addItem('other');
 
 		this.modalActions = new Setting(contentEl);
 		new SupportButtonSet(this.modalActions);

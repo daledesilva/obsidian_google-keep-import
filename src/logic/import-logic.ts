@@ -147,7 +147,7 @@ export class FileImporter {
 				if(!noteFolder) noteFolder = await getOrCreateFolder(settings.folderNames.notes, vault);
 				result = await importJson(vault, noteFolder, file, settings);
 			
-			} else if(fileIsPlainText(file)) {
+			} else if(fileIsMarkdown(file)) {
 				// Import as is
 				if(!assetFolder) assetFolder = await getOrCreateFolder(settings.folderNames.assets, vault);
 				result = await importBinaryFile(vault, assetFolder, file);
@@ -251,12 +251,13 @@ function fileIsJson(file: File) {
 }
 
 /**
- * Returns if a file is a plain text file.
- * Note that some markdown files have been found to return a blank mime type in testing and maye return false.
+ * Returns if a file is a a markdown text file. Whether by mimetype or by file extension.
+ * File extension is also used because some seem to return a blank mime-type.
  */
-function fileIsPlainText(file: File) {
-	// file.name // TODO: Check for MD file name if type is blank
-	return	file.type === 'text/plain'		||
+function fileIsMarkdown(file: File) {
+	const ext = file.name.slice(-3);
+
+	return	ext === '.md'					||
 			file.type === 'text/markdown'	||
 			file.type === 'text/x-markdown';
 
