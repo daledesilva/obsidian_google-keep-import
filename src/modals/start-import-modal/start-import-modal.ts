@@ -4,6 +4,7 @@ import MyPlugin from "src/main";
 import { EditSettingsModal } from "../edit-settings-modal/edit-settings-modal";
 import { SupportButtonSet } from 'src/components/support-button-set/support-button-set';
 import { ImportSummary } from "src/components/import-summary/import-summary";
+import { fileIsJson } from "src/logic/import-logic";
 
 
 ///////////////////
@@ -217,9 +218,10 @@ export class StartImportModal extends Modal {
 		for(let i=0; i<this.fileBacklog.length; i++) {
 			const file = this.fileBacklog[i] as File;
 	
-			switch(file.type) {
-				case 'application/json':	notes++;				break;
-				default:					assets++;				break;
+			if(fileIsJson(file)) {
+				notes++;
+			} else {
+				assets++;
 			}
 		}
 

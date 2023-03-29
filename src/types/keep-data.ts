@@ -23,3 +23,16 @@ export interface KeepJson {
 	title: string;
 	userEditedTimestampUsec: number;
 }
+
+/**
+ * Returns if an imported json matches the Keep interface shape at runtime.
+ */
+export function objectIsKeepJson(fileContents: KeepJson) {
+	return	typeof fileContents.color !== 'undefined'						&&
+			typeof fileContents.isTrashed !== 'undefined'					&&
+			typeof fileContents.isPinned !== 'undefined'					&&
+			typeof fileContents.isArchived !== 'undefined'					&&
+			typeof fileContents.title !== 'undefined'						&&
+			typeof fileContents.userEditedTimestampUsec !== 'undefined'		&&
+			typeof fileContents.createdTimestampUsec !== 'undefined';
+}

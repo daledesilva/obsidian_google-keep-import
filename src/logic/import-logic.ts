@@ -3,7 +3,7 @@ import MyPlugin from "src/main";
 import { ImportProgressModal } from "src/modals/import-progress-modal/import-progress-modal";
 import { filenameSanitize } from "./string-processes";
 import { CreatedDateTypes, PluginSettings } from "src/types/plugin-settings";
-import { KeepJson } from "src/types/keep-data";
+import { KeepJson, objectIsKeepJson } from "src/types/keep-data";
 import { IgnoreImportReason, ImportResult, ImportOutcomeType } from "src/types/results";
 import { StartImportModal } from "src/modals/start-import-modal/start-import-modal";
 
@@ -246,8 +246,9 @@ export class FileImporter {
 /**
  * Returns if a file is a JSON file.
  */
-function fileIsJson(file: File) {
-	return file.type === 'application/json';
+export function fileIsJson(file: File) {
+	const ext = file.name.slice(-5);	
+	return ext === '.json' || file.type === 'application/json';
 }
 
 /**
@@ -256,7 +257,6 @@ function fileIsJson(file: File) {
  */
 function fileIsMarkdown(file: File) {
 	const ext = file.name.slice(-3);
-
 	return	ext === '.md'					||
 			file.type === 'text/markdown'	||
 			file.type === 'text/x-markdown';
@@ -335,7 +335,12 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 			}
 			
 			const content: KeepJson = JSON.parse(readerEvent.target.result as string);
-			// TODO: resolve with error if file is not Keep Json
+		
+			if(!objectIsKeepJson(content)) {
+				result.outcome = ImportOutcomeType.ContentError;
+				result.details = `JSON file doesn't match the expected Google Keep format.`;
+				return resolve(result);
+			}
 
 
 
