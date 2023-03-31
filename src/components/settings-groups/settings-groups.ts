@@ -102,14 +102,27 @@ export class InclusionSettingsGroup {
         new Setting(containerEl)
             .setClass('gki_setting')
             .setName('Import unsupported files')
-            .setDesc('Importing unsupported files will place them in correct folders and notify you on import so that you can convert them manually. Otherwise they will be skipped.') //  TODO: If you are using this plugin to import markdown files rather than Google Keep files, turning this off might cause markdown files to be ignored on some systems if they report their file format incorrectly.
+            .setDesc('Importing unsupported files will place them in correct folders and notify you on import. But they won\'t show up in Obsidian until you convert them manually through another program.')
             .addToggle(toggle => {
                 toggle.setValue(plugin.settings.importUnsupported)
                 toggle.onChange(async (value) => {
                     plugin.settings.importUnsupported = value;
                     await plugin.saveSettings();
+                    importHtmlToggle.setDisabled(!value);
                 });
             });
+        let importHtmlToggle = new Setting(containerEl)
+            .setClass('gki_setting')
+            .setName('Import html files')
+            .setDesc('While HTML files are unsupported, they\'re also duplicates of supported notes in a Google Keep export. So you probably don\'t want these regardless.')
+            .addToggle(toggle => {
+                toggle.setValue(plugin.settings.importHtml)
+                toggle.onChange(async (value) => {
+                    plugin.settings.importHtml = value;
+                    await plugin.saveSettings();
+                });
+            })
+            .setDisabled(!plugin.settings.importUnsupported)
         
     }
 
@@ -160,10 +173,10 @@ export class TagSettingsGroup {
                 toggle.onChange(async (value) => {
                     plugin.settings.addPinnedTags = value;
                     await plugin.saveSettings();
-                    pinnedTagInput.setDisabled(!value);
+                    pinnedTagTextField.setDisabled(!value);
                 });
             })
-        let pinnedTagInput = new Setting(containerEl)
+        let pinnedTagTextField = new Setting(containerEl)
             .setClass('gki_setting')
             .setClass('gki_setting-child')
             .setDesc('Pinned tag:')
@@ -186,10 +199,10 @@ export class TagSettingsGroup {
                 toggle.onChange(async (value) => {
                     plugin.settings.addAttachmentTags = value;
                     await plugin.saveSettings();
-                    attachmentTagInput.setDisabled(!value);
+                    attachmentTagTextField.setDisabled(!value);
                 });
             })
-        let attachmentTagInput = new Setting(containerEl)
+        let attachmentTagTextField = new Setting(containerEl)
             .setClass('gki_setting')
             .setClass('gki_setting-child')
             .setDesc('Attachment tag:')
@@ -212,10 +225,10 @@ export class TagSettingsGroup {
                 toggle.onChange(async (value) => {
                     plugin.settings.addArchivedTags = value;
                     await plugin.saveSettings();
-                    archivedTagInput.setDisabled(!value);
+                    archivedTagTextField.setDisabled(!value);
                 });
             })
-        let archivedTagInput = new Setting(containerEl)
+        let archivedTagTextField = new Setting(containerEl)
             .setClass('gki_setting')
             .setClass('gki_setting-child')
             .setDesc('Archived tag:')

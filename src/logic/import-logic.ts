@@ -158,7 +158,9 @@ export class FileImporter {
 				result = await importBinaryFile(vault, assetFolder, file);
 
 			} else {
-				if(settings.importUnsupported) {
+				const fileIsHtmlAndValidImport = fileIsHtml(file) && settings.importUnsupported && settings.importHtml;
+				const fileIsOtherAndValidImport = !fileIsHtml(file) && settings.importUnsupported;
+				if(fileIsHtmlAndValidImport || fileIsOtherAndValidImport) {
 					// Import as unsupported binary file
 					if(!unsupportedFolder) unsupportedFolder = await getOrCreateFolder(settings.folderNames.unsupportedAssets, vault);
 					result = await importBinaryFile(vault, unsupportedFolder, file);
@@ -269,18 +271,6 @@ function fileIsMarkdown(file: File) {
 }
 
 /**
- * Returns if a file is binary and a valid attachment from Google Keep.
- */
-function fileIsBinaryAndSupportedByKeep(file: File) {
-	return	file.type === 'video/3gpp'	||
-			file.type === 'audio/amr'	||
-			file.type === 'image/png'	||
-			file.type === 'image/jpeg'	||
-			file.type === 'image/webp'	||
-			file.type === 'image/gif';
-}
-
-/**
  * Returns if a file is binary and supported natively by Obsidian.
  * Based on accepted file formats listed here: https://help.obsidian.md/Advanced+topics/Accepted+file+formats
  */
@@ -310,6 +300,18 @@ function fileIsBinaryAndSupportedByObsidian(file: File) {
 	const isOtherFile = file.type === 'application/pdf';
 
 	return isImageFile || isAudioFile || isVideoFile || isOtherFile;
+}
+
+/**
+ * Returns if a file is an html file. Whether by mimetype or by file extension.
+ */
+function fileIsHtml(file: File) {
+	const ext4 = file.name.slice(-5);
+	const ext3 = file.name.slice(-4);
+	return	ext4 === '.html'					||
+			ext3 === '.htm'						||
+			file.type === 'text/html';
+
 }
 
 /**
