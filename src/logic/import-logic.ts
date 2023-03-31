@@ -4,7 +4,7 @@ import { ImportProgressModal } from "src/modals/import-progress-modal/import-pro
 import { filenameSanitize } from "./string-processes";
 import { CreatedDateTypes, PluginSettings } from "src/types/plugin-settings";
 import { KeepJson, objectIsKeepJson } from "src/types/keep-data";
-import { IgnoreImportReason, ImportResult, ImportOutcomeType } from "src/types/results";
+import { IgnoreImportReason, ImportResult, LogStatus as LogStatus } from "src/types/results";
 import { StartImportModal } from "src/modals/start-import-modal/start-import-modal";
 
 
@@ -162,65 +162,70 @@ export class FileImporter {
 					// Import as unsupported binary file
 					if(!unsupportedFolder) unsupportedFolder = await getOrCreateFolder(settings.folderNames.unsupportedAssets, vault);
 					result = await importBinaryFile(vault, unsupportedFolder, file);
-					result = {
-						keepFilename: file.name,
-						outcome: ImportOutcomeType.FormatError,
-						details: `This file type isn't supported by Obsidian. The file has been imported into '${settings.folderNames.unsupportedAssets}'. Open that folder outside of Obsidian to convert or deleted those files. Any links to those files in notes will also need to be updated.`,
+					if(result.logStatus === LogStatus.Success) {
+						result.logStatus = LogStatus.Warning;
+						result.details = `This file type isn't supported by Obsidian. The file has been imported into '${settings.folderNames.unsupportedAssets}'. Open that folder outside of Obsidian to convert or deleted those files. Any links to those files in notes will also need to be updated.`;
 					}
 				} else {
 					// Don't import unsupported binary file, but still log
 					result = {
 						keepFilename: file.name,
-						outcome: ImportOutcomeType.UserIgnored,
+						logStatus: LogStatus.Note,
 						details: `This file type isn't supported by Obsidian and has been skipped. You can change this behaviour in the settings.`,
 					}
 				}
 			}
 
-			// Populate output log on error
-			if(result.outcome === ImportOutcomeType.FormatError) {
-				this.successCount++;
-				this.outputLog.push({
-					status: 'Warning',
-					title: `${result.keepFilename}`,
-					desc: `${result.details} ${result.obsidianFilepath || ''}`,
-				})
-
-			} else if(result.outcome === ImportOutcomeType.CreationError || result.outcome === ImportOutcomeType.ContentError) {
-				this.failCount++;
-				this.outputLog.push({
-					status: 'Error',
-					title: `${result.keepFilename}`,
-					desc: `${result.details} ${result.obsidianFilepath || ''} ${result.error ? '('+result.error+')' : ''}`,
-				})
-				
-			} else if(result.outcome === ImportOutcomeType.UserIgnored) {
-				this.skipCount++;
-				this.outputLog.push({
-					status: 'Note',
-					title: `${result.keepFilename}`,
-					desc: `${result.details} ${result.error ? '('+result.error+')' : ''}`,
-				})
-
-			} else {
-				this.successCount++;
-			}
+			this.updateOutputLog(result);
 	
 		}
 	
 	}
 
 	/**
+	 * Updates the passes the result into the output log of the file loader object.
+	 */
+	private updateOutputLog(result: ImportResult) {
+		if(result.logStatus === LogStatus.Warning) {
+			this.successCount++;
+			this.outputLog.push({
+				status: 'Warning',
+				title: `${result.keepFilename}`,
+				desc: `${result.details} ${result.obsidianFilepath || ''}`,
+			})
+
+		} else if(result.logStatus === LogStatus.Error) {
+			this.failCount++;
+			this.outputLog.push({
+				status: 'Error',
+				title: `${result.keepFilename}`,
+				desc: `${result.details} ${result.obsidianFilepath || ''} ${result.error ? '('+result.error+')' : ''}`,
+			})
+			
+		} else if(result.logStatus === LogStatus.Note) {
+			this.skipCount++;
+			this.outputLog.push({
+				status: 'Note',
+				title: `${result.keepFilename}`,
+				desc: `${result.details} ${result.error ? '('+result.error+')' : ''}`,
+			})
+
+		} else {
+			this.successCount++;
+		}
+	}
+
+	/**
 	 * Returns the number of files passed to the object.
 	 */
-	getTotalImports(): number {
+	public getTotalImports(): number {
 		return this.totalImports;
 	}
 
 	/**
 	 * Returns a summary of the import objects progress, including any new output log entries since last call.
 	 */
-	getLatestProgress(): ProgressSummary {
+	public getLatestProgress(): ProgressSummary {
 		let newLogEntries: Array<OutputLogItem> = [];
 		if(this.outputLogIter < this.totalImports) {
 			newLogEntries = this.outputLog.slice(this.outputLogIter);
@@ -237,7 +242,7 @@ export class FileImporter {
 	/**
 	 * Stops the active import prematurely.
 	 */
-	stop() {
+	public stop() {
 		this.activeImport = false;
 	}
 
@@ -313,7 +318,7 @@ function fileIsBinaryAndSupportedByObsidian(file: File) {
 async function importJson(vault: Vault, folder: TFolder, file: File, settings: PluginSettings) : Promise<ImportResult> {
 	const result: ImportResult = {
 		keepFilename: file.name,
-		outcome: ImportOutcomeType.Imported,
+		logStatus: LogStatus.Success,
 	}
 
     // TODO: This composition is confusing - Attempt to simplify
@@ -329,7 +334,7 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 
 			// Bail if the file hasn't been interpreted properly
 			if(!readerEvent || !readerEvent.target) {
-				result.outcome = ImportOutcomeType.CreationError;
+				result.logStatus = LogStatus.Error;
 				result.details = 'Something went wrong reading the file.'
 				return resolve(result);
 			}
@@ -337,7 +342,7 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 			const content: KeepJson = JSON.parse(readerEvent.target.result as string);
 		
 			if(!objectIsKeepJson(content)) {
-				result.outcome = ImportOutcomeType.ContentError;
+				result.logStatus = LogStatus.Error;
 				result.details = `JSON file doesn't match the expected Google Keep format.`;
 				return resolve(result);
 			}
@@ -349,12 +354,12 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 			// TODO: Refactor this as IsUserAcceptedType function
 			// Abort if user doesn't want this type of file
 			if(content.isArchived && !settings.importArchived) {
-				result.outcome = ImportOutcomeType.UserIgnored;
+				result.logStatus = LogStatus.Note;
 				result.ignoredReason = IgnoreImportReason.Archived;
 				return resolve(result);
 			}
 			if(content.isTrashed && !settings.importTrashed) {
-				result.outcome = ImportOutcomeType.UserIgnored;
+				result.logStatus = LogStatus.Note;
 				result.ignoredReason = IgnoreImportReason.Trashed;
 				return resolve(result);
 			}
@@ -373,7 +378,7 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 			try {
 				fileRef = await createNewEmptyMdFile(vault, path, {});
 			} catch (error) {
-				result.outcome = ImportOutcomeType.CreationError;
+				result.logStatus = LogStatus.Error;
 				result.error = error;
 				result.details = `Error creating equivalent file in obsidian as ${path}`;
 				return resolve(result);
@@ -390,7 +395,7 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 				content.isArchived && settings.addArchivedTags ?	await vault.append(fileRef, `${settings.tagNames.isArchived} `) : null;
 				content.isTrashed && settings.addTrashedTags ? 		await vault.append(fileRef, `${settings.tagNames.isTrashed} `) : null;
 			} catch (error) {
-				result.outcome = ImportOutcomeType.ContentError;
+				result.logStatus = LogStatus.Error;
 				result.error = error;
 				result.details = 'Error adding tags to the new file.'
 				return resolve(result);
@@ -406,7 +411,7 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 					await vault.append(fileRef, `${content.textContent}\n`);
 				}
 			} catch (error) {
-				result.outcome = ImportOutcomeType.ContentError;
+				result.logStatus = LogStatus.Error;
 				result.error = error;
 				result.details = 'Error adding paragraph content to the new file.'
 				return resolve(result);
@@ -429,7 +434,7 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 					}
 				}
 			} catch (error) {
-				result.outcome = ImportOutcomeType.ContentError;
+				result.logStatus = LogStatus.Error;
 				result.error = error;
 				result.details = 'Error adding list content to the new file.'
 				return resolve(result);
@@ -446,7 +451,7 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 					try {
 						await vault.append(fileRef, `\n\n![[${attachment.filePath}]]`);
 					} catch (error) {
-						result.outcome = ImportOutcomeType.ContentError;
+						result.logStatus = LogStatus.Error;
 						result.error = error;
 						result.details = `Error embedding attachment '${attachment.filePath}' to the new file.`;
 						return resolve(result);
@@ -484,13 +489,13 @@ async function importBinaryFile(vault: Vault, folder: TFolder, file: File) : Pro
 	const path: string = `${folder.path}/${file.name}`;
 	const result: ImportResult = {
 		keepFilename: file.name,
-		outcome: ImportOutcomeType.Imported,
+		logStatus: LogStatus.Success,
 	}
 	
 	try {
 		fileRef = await vault.createBinary(path, await file.arrayBuffer());
 	} catch (error) {
-		result.outcome = ImportOutcomeType.CreationError;
+		result.logStatus = LogStatus.Error;
 		result.error = error;
 		result.details = 'Error creating file in obsidian.';
 		return Promise.resolve(result);
