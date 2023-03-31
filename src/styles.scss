@@ -73,11 +73,16 @@ button.gki_button[disabled] {
         // User outlines so that thickened border doesn't change layout
         outline: 2px solid white;
         outline-offset: -2px;
-        background-color: rgba(255,255,255,0.1);
+        // background-color: rgba(255,255,255,0.1);
 
         // Prevent children components firing dragleave
         // But only while dragging is active because otherwise it stops the link text working
         * {pointer-events: none;}
+    }
+
+    position: relative;
+    .gki_highlight {
+        position: absolute;
     }
 }
 
@@ -229,3 +234,23 @@ button.gki_button[disabled] {
         max-height: 7rem; // Approximately standard size from 3 lines of content // NOTE: This would cause issues if content is longer than 3 lines
     }
 }
+
+.gki_drop-frame .gki_highlight {
+    background-color: rgba(#FFF, 0);
+    inset: 30px;
+    border-radius: 100px;
+
+    transition-property: inset, background-color, border-radius;
+    transition-duration: 0.3s;
+    transition-timing-function: cubic-bezier(.27,.87,.55,1);
+}
+.gki_drop-frame.gki_drag-over-active .gki_highlight {
+    background-color: rgba(#FFF, 0.05);
+    inset: 1px;
+    border-radius: 10px;
+
+    transition-property: inset, background-color, border-radius;
+    transition-duration: 0.5s;
+    transition-timing-function: cubic-bezier(.27,.87,.55,1);
+}
+

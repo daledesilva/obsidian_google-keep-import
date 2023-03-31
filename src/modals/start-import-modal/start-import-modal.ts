@@ -60,6 +60,7 @@ export class StartImportModal extends Modal {
 		firstParaEl.appendText(' and select only Google Keep files. Once you have the exported zip, unzip it and drag all the files in below.');
 
 		const dropFrame = contentEl.createEl('div', {cls: 'gki_drop-frame'});
+		dropFrame.createEl('div', {cls: 'gki_highlight'});
 		const dropFrameText = dropFrame.createEl('p', { text: 'Drag all files here or ' });
 		dropFrameText.createEl('label', { 
 			text: 'browse local files',
