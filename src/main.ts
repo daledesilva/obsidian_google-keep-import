@@ -1,8 +1,8 @@
-import { Notice, Plugin } from 'obsidian';
+import { Notice, Plugin, addIcon } from 'obsidian';
 import { CreatedDateTypes, PluginSettings } from 'src/types/plugin-settings';
 import { runImportSequence } from './logic/import-logic';
 import { MySettingsTab } from './tabs/settings-tab/settings-tab';
-
+import MastodonIcon from 'src/assets/mastodon';
 
 ///////////////////
 ///////////////////
@@ -45,6 +45,8 @@ export default class MyPlugin extends Plugin {
 
 	async onload() {
 		await this.loadSettings();
+
+		addIcon("mastodon", MastodonIcon);
 		
 		this.addCommand({
 			id: 'gki_import-files',
