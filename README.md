@@ -2,7 +2,10 @@
 
 Google Keep Import is a plugin for [Obsidian](https://obsidian.md) that enables easily importing an exported set of backup notes and related attachments from Google Keep.
 
->Insert animated gif of uploading
+<image src="docs/media/start-import-modal.png" height="400px" alt="A screenshot of the plugin's file import dialog."/>
+<video controls height="400px" autoplay loop alt="A of the plugin running showing a progressbar and error log.">
+    <source src="docs/media/progress-preview.mp4" type="video/mp4">
+</video>
 
 #### Requirements
 - Minimum Obsidian Version: **1.1.10** *(Anything downloaded after Jan 13th 2023)*
@@ -19,8 +22,6 @@ Google Keep Import is a plugin for [Obsidian](https://obsidian.md) that enables 
 3. In Obsidian, press `CMD+P` and select the `Google Keep Import` action.
 3. In the modal that opens, drag in all the unzipped files and follow the instructions import the files.
 
->Insert youtube marketing video
-
 #### Features
 
 **Error log**
@@ -36,7 +37,7 @@ By default, the plugin will import any file it sees regardless of whether Obsidi
 The plugin provides a settings page that is also accessible during the import process. This allows you to tailor what gets imported and how dates, colours, tags, and more from the Keep files are treated in Obsidian.
 
 Settings:
->Insert image of settings
+<image src="docs/media/settings.png" width="500px" alt="A screenshot of the plugin's settings. See below for a description."/>
 
 <details>
   <summary>Expand to read breakdown of settings</summary>
@@ -50,6 +51,7 @@ Settings:
   Whether to import specific types of notes or ignore them.
   - **Import archived notes**: 
   - **Import trashed notes**: 
+  - **Import unsupported files**: 
   ##### Tags
   Whether to apply tags to notes in Obsidian to represent these attributes of the original Google Keep notes.
   - **Add colour tags**
@@ -67,13 +69,13 @@ If you find this plugin saves you time or helps you in some way, please consider
 
 <p>
   <a href="https://twitter.com/daledesilva" target="_blank_">
-    <img src="docs/images/twitter-btn.svg" height="40px" alt="Dale de Silva on Twitter">
+    <img src="docs/media/twitter-btn.svg" height="40px" alt="Dale de Silva on Twitter">
   </a>
   <a href="https://indieweb.social/@daledesilva" target="_blank">
-    <img src="docs/images/mastodon-btn.svg" height="40px" alt="Dale de Silva on Mastodon">
+    <img src="docs/media/mastodon-btn.svg" height="40px" alt="Dale de Silva on Mastodon">
   </a>
   <a href="https://ko-fi.com/N4N3JLUCW" target="_blank">
-    <img src="docs/images/support-btn.svg" height="40px" alt="Support me on Ko-fi">
+    <img src="docs/media/support-btn.svg" height="40px" alt="Support me on Ko-fi">
   </a>
 </p>
 
@@ -82,10 +84,10 @@ You can find links to my other projects on [designdebt.club](https://designdebt.
 
 <p>
   <a href="https://designdebt.club" target="_blank">
-    <img src="docs/images/design-debt-club-btn.svg" height="50px" alt="Design Debt Club">
+    <img src="docs/media/design-debt-club-btn.svg" height="50px" alt="Design Debt Club">
   </a>
   <a href="https://falterinresolute.com" target="_blank">
-    <img src="docs/images/falter-in-resolute-btn.svg" height="50px" alt="Falter In Resolute Blog">
+    <img src="docs/media/falter-in-resolute-btn.svg" height="50px" alt="Falter In Resolute Blog">
   </a>
 </p>
 
@@ -93,10 +95,10 @@ You can find links to my other projects on [designdebt.club](https://designdebt.
 
 ## Technical details
 
-#### Code tour
+<!-- #### Code tour
 While some people have the technical skills to read through a plugins code, not everyone does. I've therefore created a video tour in which I describe how the plugin is constructed fro anyone who is curious or would like to adapt the plugin.
 
->Insert code tour video
+>Insert code tour video -->
 
 #### Manually installing the plugin
 The plugin is listed in Community Plugins within your Obsidian install, however, if for some reason you would like to manually install it instead, you will need to follow the How to Contribute section below in order to build the plugin, and then copy the dist folder into your Obsidian vault's plugins folder.
@@ -105,3 +107,4 @@ The plugin is listed in Community Plugins within your Obsidian install, however,
 - Clone this repo.
 - `npm i` to install dependencies
 - `npm run dev` to start compilation in watch mode.
+- Copy the `dist` folder to your vault's plugins folder, or read the instructions inside `src/static/.hotreload/`
