@@ -5,6 +5,11 @@ Google Keep Import is a plugin for [Obsidian](https://obsidian.md) that enables 
 <image src="docs/media/start-import-modal.png" style="max-width:500px;" alt="A screenshot of the plugin's file import dialog."/>
 <video src="docs/media/progress-preview.mp4" controls style="max-width:500px;">
 </video>
+/docs/media/progress-preview.mp4
+
+docs/media/progress-preview.mp4
+
+![](docs/media/progress-preview.mp4)
 
 #### Requirements
 - Minimum Obsidian Version: **1.1.10** *(Anything downloaded after Jan 13th 2023)*
@@ -20,6 +25,8 @@ Google Keep Import is a plugin for [Obsidian](https://obsidian.md) that enables 
 2. Once you have the exported zip, unzip it so you have all the files separately.
 3. In Obsidian, press `CMD+P` and select the `Google Keep Import` action.
 3. In the modal that opens, drag in all the unzipped files and follow the instructions import the files.
+
+---
 
 #### Features
 
