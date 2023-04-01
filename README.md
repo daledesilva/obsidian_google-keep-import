@@ -2,14 +2,8 @@
 
 Google Keep Import is a plugin for [Obsidian](https://obsidian.md) that enables easily importing an exported set of backup notes and related attachments from Google Keep.
 
-<image src="docs/media/start-import-modal.png" style="max-width:500px;" alt="A screenshot of the plugin's file import dialog."/>
-<video src="docs/media/progress-preview.mp4" controls style="max-width:500px;">
-</video>
-/docs/media/progress-preview.mp4
-
-docs/media/progress-preview.mp4
-
-![](docs/media/progress-preview.mp4)
+<image src="docs/media/start-import-modal.png" height="300px" alt="A screenshot of the plugin's file import dialog."/>
+<image src="docs/media/progress-preview.gif" height="300px" alt="A preview of the progress dialog and error log."/>
 
 #### Requirements
 - Minimum Obsidian Version: **1.1.10** *(Anything downloaded after Jan 13th 2023)*
@@ -18,15 +12,12 @@ docs/media/progress-preview.mp4
   <strong>Note:</strong>The plugin will likely work on older versions of Obsidian, however, these haven't been tested. If you have some reason to not be updating your Obsidian and it's not letting you install, you can either edit this plugin yourself or consider contacting me through the support section below.
 </blockquote>
 
-
 #### Usage
 1. Install this plugin from the community plugins section of Obsidian's settings.
 1. To export your files from Google Keep, open [Google Takeout](https://takeout.google.com/) and select only Google Keep files *(Depending on the amount of notes and attachments, this might take a while)*
 2. Once you have the exported zip, unzip it so you have all the files separately.
 3. In Obsidian, press `CMD+P` and select the `Google Keep Import` action.
 3. In the modal that opens, drag in all the unzipped files and follow the instructions import the files.
-
----
 
 #### Features
 
@@ -43,7 +34,7 @@ By default, the plugin will import any file it sees regardless of whether Obsidi
 The plugin provides a settings page that is also accessible during the import process. This allows you to tailor what gets imported and how dates, colours, tags, and more from the Keep files are treated in Obsidian.
 
 Settings:<br/>
-<image src="docs/media/settings.png" style="max-width:500px;" alt="A screenshot of the plugin's settings. See below for a description."/>
+<image src="docs/media/settings.png" width="500px" alt="A screenshot of the plugin's settings. See below for a description."/>
 
 <details>
   <summary>Expand to read breakdown of settings</summary>
