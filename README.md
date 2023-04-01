@@ -2,9 +2,8 @@
 
 Google Keep Import is a plugin for [Obsidian](https://obsidian.md) that enables easily importing an exported set of backup notes and related attachments from Google Keep.
 
-<image src="docs/media/start-import-modal.png" height="400px" alt="A screenshot of the plugin's file import dialog."/>
-<video controls height="400px" autoplay loop alt="A of the plugin running showing a progressbar and error log.">
-    <source src="docs/media/progress-preview.mp4" type="video/mp4">
+<image src="docs/media/start-import-modal.png" style="max-width:500px;" alt="A screenshot of the plugin's file import dialog."/>
+<video src="docs/media/progress-preview.mp4" controls style="max-width:500px;">
 </video>
 
 #### Requirements
@@ -36,8 +35,8 @@ By default, the plugin will import any file it sees regardless of whether Obsidi
 **Customisable settings**
 The plugin provides a settings page that is also accessible during the import process. This allows you to tailor what gets imported and how dates, colours, tags, and more from the Keep files are treated in Obsidian.
 
-Settings:
-<image src="docs/media/settings.png" width="500px" alt="A screenshot of the plugin's settings. See below for a description."/>
+Settings:<br/>
+<image src="docs/media/settings.png" style="max-width:500px;" alt="A screenshot of the plugin's settings. See below for a description."/>
 
 <details>
   <summary>Expand to read breakdown of settings</summary>
