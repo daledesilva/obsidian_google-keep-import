@@ -255,3 +255,20 @@ button.gki_button[disabled] {
     transition-timing-function: cubic-bezier(.27,.87,.55,1);
 }
 
+.gki_smooth-appear {
+    transform-origin: 50% 50%;
+    animation-name: smooth-appear;
+    animation-duration: 0.3s;
+    animation-timing-function: cubic-bezier(0.77,0,0.18,1);
+}
+
+@keyframes smooth-appear {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

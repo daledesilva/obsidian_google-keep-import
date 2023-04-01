@@ -14,8 +14,9 @@ export class ImportSummary {
     hide() {
         this.summaryEl.addClass('gki_hidden');
     }
-
+    
     show() {
+        this.summaryEl.addClass('gki_smooth-appear');
         this.summaryEl.removeClass('gki_hidden');
     }
 
