@@ -83,6 +83,7 @@ button.gki_button[disabled] {
     position: relative;
     .gki_highlight {
         position: absolute;
+        z-index: -100;
     }
 }
 

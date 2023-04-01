@@ -1,5 +1,5 @@
 import { DataWriteOptions, Notice, Plugin, TAbstractFile, TFile, TFolder, Vault } from "obsidian";
-import MyPlugin from "src/main";
+import GoogleKeepImportPlugin from "src/main";
 import { ImportProgressModal } from "src/modals/import-progress-modal/import-progress-modal";
 import { filenameSanitize } from "./string-processes";
 import { CreatedDateTypes, PluginSettings } from "src/types/plugin-settings";
@@ -33,7 +33,7 @@ interface OutputLogItem {
 /**
  * Runs and manages the import sequence of import modals and import logic.
  */
-export async function runImportSequence(plugin: MyPlugin) {
+export async function runImportSequence(plugin: GoogleKeepImportPlugin) {
 
 	// Allow the user to select which files to import and adjust settings
 	const modal = new StartImportModal(plugin);
@@ -108,7 +108,7 @@ async function getOrCreateFolder(folderPath: string, vault: Vault): Promise<TFol
  * Creates an object to manage the importing of files, starts the import, and returns the object.
  */
 export class FileImporter {
-	private plugin: MyPlugin;
+	private plugin: GoogleKeepImportPlugin;
 	private totalImports = 0;
 	private successCount = 0;
 	private failCount = 0;
@@ -117,7 +117,7 @@ export class FileImporter {
 	private outputLog: Array<OutputLogItem> = [];
 	private outputLogIter = 0;
 
-	constructor(plugin: MyPlugin) {
+	constructor(plugin: GoogleKeepImportPlugin) {
 		this.plugin = plugin;
 	}
 

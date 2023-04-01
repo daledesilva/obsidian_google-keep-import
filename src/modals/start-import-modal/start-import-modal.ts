@@ -1,6 +1,6 @@
 import { Modal, Notice, Setting } from "obsidian";
 import { singleOrPlural } from "src/logic/string-processes";
-import MyPlugin from "src/main";
+import GoogleKeepImportPlugin from "src/main";
 import { EditSettingsModal } from "../edit-settings-modal/edit-settings-modal";
 import { SupportButtonSet } from 'src/components/support-button-set/support-button-set';
 import { ImportSummary } from "src/components/import-summary/import-summary";
@@ -12,7 +12,7 @@ import { fileIsJson } from "src/logic/import-logic";
 
 
 export class StartImportModal extends Modal {
-	plugin: MyPlugin;
+	plugin: GoogleKeepImportPlugin;
 	result: string;
 	duplicateNotes: number = 0;
 	notesSpan: HTMLSpanElement;
@@ -25,7 +25,7 @@ export class StartImportModal extends Modal {
 	resolveModal: (value: Array<File>) => void;
 	rejectModal: (value: string) => void;
 
-	constructor(plugin: MyPlugin) {
+	constructor(plugin: GoogleKeepImportPlugin) {
 		super(plugin.app);
 		this.plugin = plugin;
 	}

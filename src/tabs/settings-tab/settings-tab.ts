@@ -1,5 +1,5 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
-import MyPlugin from "src/main";
+import GoogleKeepImportPlugin from "src/main";
 import { addResetButton, BasicSettingsGroup, InclusionSettingsGroup, TagSettingsGroup } from "src/components/settings-groups/settings-groups";
 import { SupportButtonSet } from "src/components/support-button-set/support-button-set";
 
@@ -9,9 +9,9 @@ import { SupportButtonSet } from "src/components/support-button-set/support-butt
 
 
 export class MySettingsTab extends PluginSettingTab {
-	plugin: MyPlugin;
+	plugin: GoogleKeepImportPlugin;
 
-	constructor(app: App, plugin: MyPlugin) {
+	constructor(app: App, plugin: GoogleKeepImportPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}

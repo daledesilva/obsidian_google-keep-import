@@ -1,5 +1,5 @@
 import { Modal, Setting } from "obsidian";
-import MyPlugin from "src/main";
+import GoogleKeepImportPlugin from "src/main";
 
 
 ///////////////////
@@ -7,7 +7,7 @@ import MyPlugin from "src/main";
 
 
 interface ConfirmationOptions {
-	plugin: MyPlugin,
+	plugin: GoogleKeepImportPlugin,
 	title?: string,
 	message?: string,
 	cancelLabel?: string,

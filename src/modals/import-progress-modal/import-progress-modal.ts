@@ -2,7 +2,7 @@ import { Modal, Setting } from "obsidian";
 import { ImportSummary } from "src/components/import-summary/import-summary";
 import { SupportButtonSet } from "src/components/support-button-set/support-button-set";
 import { FileImporter } from "src/logic/import-logic";
-import MyPlugin from "src/main";
+import GoogleKeepImportPlugin from "src/main";
 
 
 ///////////////////
@@ -26,7 +26,7 @@ export class ImportProgressModal extends Modal {
 	resolveModal: (value: string) => void;
 	rejectModal: (value: string) => void;
 
-	constructor(plugin: MyPlugin, fileImporter: FileImporter) {
+	constructor(plugin: GoogleKeepImportPlugin, fileImporter: FileImporter) {
 		super(plugin.app);
 		this.fileImporter = fileImporter
 	}

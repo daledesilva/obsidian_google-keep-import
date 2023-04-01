@@ -1,5 +1,5 @@
 import { Setting } from "obsidian";
-import MyPlugin from "src/main";
+import GoogleKeepImportPlugin from "src/main";
 import { ConfirmationModal } from "src/modals/confirmation-modal/confirmation-modal";
 import { CreatedDateTypes } from "src/types/plugin-settings";
 
@@ -13,7 +13,7 @@ import { CreatedDateTypes } from "src/types/plugin-settings";
  */
 export class BasicSettingsGroup {
 
-    constructor(containerEl: HTMLElement, plugin: MyPlugin) {
+    constructor(containerEl: HTMLElement, plugin: GoogleKeepImportPlugin) {
 
         containerEl.createEl('h2', {text: 'Basics'});
 
@@ -73,7 +73,7 @@ export class BasicSettingsGroup {
  */
 export class InclusionSettingsGroup {
 
-    constructor(containerEl: HTMLElement, plugin: MyPlugin) {
+    constructor(containerEl: HTMLElement, plugin: GoogleKeepImportPlugin) {
         
         containerEl.createEl('h2', {text: 'Inclusions'});
         
@@ -134,7 +134,7 @@ export class InclusionSettingsGroup {
  */
 export class TagSettingsGroup {
     
-    constructor(containerEl: HTMLElement, plugin: MyPlugin) {
+    constructor(containerEl: HTMLElement, plugin: GoogleKeepImportPlugin) {
         
         containerEl.createEl('h2', {text: 'Tags'});
 
@@ -273,7 +273,7 @@ export class TagSettingsGroup {
 /**
  * Adds a button that resets the plugin's setting to default.
  */
-export function addResetButton(settingEl: Setting, plugin: MyPlugin, onComplete: Function): Setting {
+export function addResetButton(settingEl: Setting, plugin: GoogleKeepImportPlugin, onComplete: Function): Setting {
     return settingEl.addButton( (button) => {
         button.setButtonText('Reset settings');
         button.setClass('gki_button');

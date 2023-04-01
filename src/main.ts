@@ -40,7 +40,7 @@ export const DEFAULT_SETTINGS: PluginSettings = {
 /**
  * The base plugin class initialised by Obsidian on launch
  */
-export default class MyPlugin extends Plugin {
+export default class GoogleKeepImportPlugin extends Plugin {
 	settings: PluginSettings;
 
 	async onload() {

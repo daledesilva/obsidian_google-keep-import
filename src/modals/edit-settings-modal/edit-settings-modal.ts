@@ -1,7 +1,7 @@
 import { Modal, Setting } from "obsidian";
 import { addResetButton, BasicSettingsGroup, InclusionSettingsGroup, TagSettingsGroup } from "src/components/settings-groups/settings-groups";
 import { SupportButtonSet } from "src/components/support-button-set/support-button-set";
-import MyPlugin from "src/main";
+import GoogleKeepImportPlugin from "src/main";
 
 
 ///////////////////
@@ -9,7 +9,7 @@ import MyPlugin from "src/main";
 
 
 export class EditSettingsModal extends Modal {
-	plugin: MyPlugin;
+	plugin: GoogleKeepImportPlugin;
 	result: string;
 	duplicateNotes: number = 0;
 	noteSpan: HTMLSpanElement;
@@ -21,7 +21,7 @@ export class EditSettingsModal extends Modal {
 	resolveModal: (value: Array<File>) => void;
 	rejectModal: (value: string) => void;
 
-	constructor(plugin: MyPlugin) {
+	constructor(plugin: GoogleKeepImportPlugin) {
 		super(plugin.app);
 		this.plugin = plugin;
 	}
