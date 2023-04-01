@@ -30,7 +30,7 @@ The plugin will always give you a real-time log of any files it is unable to imp
 The plugin will import any binary files like images even if there isn't a corresponding Keep note. This means you can use the plugin as a batch import for a folder of files that didn't come from Keep if needed.
 
 ### Unsupported files
-By default, the plugin will import any file it sees regardless of whether Obsidian supports it. This is on by default to enable markdown file import (As those files erroneously weren't recognised during testing).
+The plugin can import any file it sees regardless of whether ut cam from Keep or Obsidian supports it. You can turn this on if needed in the settings, but it's off by default and will let you know which file it skips.
 
 ## ⚙️ Customisable settings
 The plugin provides a settings page that is also accessible during the import process. This allows you to tailor what gets imported and how dates, colours, tags, and more from the Keep files are treated in Obsidian.
