@@ -1,4 +1,5 @@
 import { Setting } from "obsidian";
+import { folderNameSanitize } from "src/logic/string-processes";
 import GoogleKeepImportPlugin from "src/main";
 import { ConfirmationModal } from "src/modals/confirmation-modal/confirmation-modal";
 import { CreatedDateTypes } from "src/types/plugin-settings";
@@ -22,8 +23,10 @@ export class BasicSettingsGroup {
             .setName('Note import folder')
             .addText((text) => {
                 text.setValue(plugin.settings.folderNames.notes);
-                text.onChange(async (value) => {
-                    plugin.settings.folderNames.notes = value;
+                text.inputEl.addEventListener('blur', async (e) => {
+                    const value = folderNameSanitize(text.getValue());
+                    plugin.settings.folderNames.notes = folderNameSanitize(value);
+                    text.setValue(value);
                     await plugin.saveSettings();
                 });
             });
@@ -33,8 +36,10 @@ export class BasicSettingsGroup {
             .setName('Attachment import folder')
             .addText((text) => {
                 text.setValue(plugin.settings.folderNames.assets);
-                text.onChange(async (value) => {
-                    plugin.settings.folderNames.assets = value;
+                text.inputEl.addEventListener('blur', async (e) => {
+                    const value = folderNameSanitize(text.getValue());
+                    plugin.settings.folderNames.assets = folderNameSanitize(value);
+                    text.setValue(value);
                     await plugin.saveSettings();
                 });
             });
@@ -44,8 +49,10 @@ export class BasicSettingsGroup {
             .setName('Unsupported attachment import folder')
             .addText((text) => {
                 text.setValue(plugin.settings.folderNames.unsupportedAssets);
-                text.onChange(async (value) => {
-                    plugin.settings.folderNames.unsupportedAssets = value;
+                text.inputEl.addEventListener('blur', async (e) => {
+                    const value = folderNameSanitize(text.getValue());
+                    plugin.settings.folderNames.unsupportedAssets = folderNameSanitize(value);
+                    text.setValue(value);
                     await plugin.saveSettings();
                 });
             });
@@ -156,8 +163,10 @@ export class TagSettingsGroup {
             .setDesc('Text to prepend to each colour tag:')
             .addText((text) => {
                 text.setValue(plugin.settings.tagNames.colorPrepend);
-                text.onChange(async (value) => {
+                text.inputEl.addEventListener('blur', async (e) => {
+                    const value = text.getValue();
                     plugin.settings.tagNames.colorPrepend = value;
+                    text.setValue(value);
                     await plugin.saveSettings();
                 });
             })
@@ -182,8 +191,10 @@ export class TagSettingsGroup {
             .setDesc('Pinned tag:')
             .addText((text) => {
                 text.setValue(plugin.settings.tagNames.isPinned);
-                text.onChange(async (value) => {
+                text.inputEl.addEventListener('blur', async (e) => {
+                    const value = text.getValue();
                     plugin.settings.tagNames.isPinned = value;
+                    text.setValue(value);
                     await plugin.saveSettings();
                 });
             })
@@ -208,8 +219,10 @@ export class TagSettingsGroup {
             .setDesc('Attachment tag:')
             .addText((text) => {
                 text.setValue(plugin.settings.tagNames.hasAttachment);
-                text.onChange(async (value) => {
+                text.inputEl.addEventListener('blur', async (e) => {
+                    const value = text.getValue();
                     plugin.settings.tagNames.hasAttachment = value;
+                    text.setValue(value);
                     await plugin.saveSettings();
                 });
             })
@@ -234,8 +247,10 @@ export class TagSettingsGroup {
             .setDesc('Archived tag:')
             .addText((text) => {
                 text.setValue(plugin.settings.tagNames.isArchived);
-                text.onChange(async (value) => {
+                text.inputEl.addEventListener('blur', async (e) => {
+                    const value = text.getValue();
                     plugin.settings.tagNames.isArchived = value;
+                    text.setValue(value);
                     await plugin.saveSettings();
                 });
             })
@@ -260,8 +275,10 @@ export class TagSettingsGroup {
             .setDesc('Trashed tag:')
             .addText((text) => {
                 text.setValue(plugin.settings.tagNames.isTrashed);
-                text.onChange(async (value) => {
+                text.inputEl.addEventListener('blur', async (e) => {
+                    const value = text.getValue();
                     plugin.settings.tagNames.isTrashed = value;
+                    text.setValue(value);
                     await plugin.saveSettings();
                 });
             })

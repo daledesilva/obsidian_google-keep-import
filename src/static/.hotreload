@@ -9,6 +9,6 @@ The hotlink will then handle the auto reloading of it.
 ln -s /path/to/original /path/to/link
 
 ie.
-ln -s ./dist ../
+ln -s <drag-in-dist-folder-for-abs-reference> ../
 
 The bplugin directory is in the obsidian vault. On mac, press cmd + shift + . to see hidden files and folders)

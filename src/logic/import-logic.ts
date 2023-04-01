@@ -89,18 +89,19 @@ async function createNewEmptyMdFile(vault: Vault, path: string, options: DataWri
 async function getOrCreateFolder(folderPath: string, vault: Vault): Promise<TFolder> {
 	let folder: TFolder | null = null;
 
-	Vault.recurseChildren(vault.getRoot(), (fileOrFolder) => {
-		if(fileOrFolder instanceof TFile) return;
-		if(fileOrFolder.path != folderPath) return;
-		folder = fileOrFolder as TFolder;
-	})
-	
-	// Create the folder if it doesn't exist
-	if(folder === null) {
-		await vault.createFolder(folderPath);		
-		folder = await getOrCreateFolder(folderPath, vault);
+	try {
+		folder = vault.getAbstractFileByPath(folderPath) as TFolder;
+		// Create the folder if it doesn't exist
+		if(folder === null) {
+			await vault.createFolder(folderPath);
+			folder = vault.getAbstractFileByPath(folderPath) as TFolder;	
+		}
+	} catch(e) {
+		const message = `There was an error creating folder '${folderPath}' (${e})`
+		new Notice(message, 9000);
+		throw new Error(`There was an error creating folder '${folderPath}' (${e})`);
 	}
-	
+
 	return folder;
 }
 

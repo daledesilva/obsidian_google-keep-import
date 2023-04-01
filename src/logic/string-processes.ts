@@ -26,18 +26,44 @@ export const singleOrPlural = (count: number, singleVersion: string, pluralVersi
  * Removes characters from a string that cannot be used in filenames and returns a new string.
  */
 export function filenameSanitize(str: string) {
+	let newArr;
+	let newStr = str;
 
 	// Remove /
-	let newArr = str.split('/');
-	let newStr = newArr.join();
+	newArr = str.split('/');
+	newStr = newArr.join('');
 
 	// Remove \
 	newArr = newStr.split('\\');
-	newStr = newArr.join();
+	newStr = newArr.join('');
 
 	// Remove :
 	newArr = newStr.split(':');
-	newStr = newArr.join();
+	newStr = newArr.join('');
+
+	return newStr;
+}
+
+/**
+ * Removes characters from a folder that cannot be used.
+ */
+export function folderNameSanitize(str: string) {
+	let newArr;
+	let newStr = str;
+
+	// Remove \
+	newArr = newStr.split('\\');
+	newStr = newArr.join('');
+
+	// Remove :
+	newArr = newStr.split(':');
+	newStr = newArr.join('');
+
+	// Remove trailing /
+	// NOTE: This has to be last incase changes above put a slash at the end
+	while(newStr.slice(-1) == '/') {
+		newStr = newStr.slice(0,-1);
+	}
 
 	return newStr;
 }
