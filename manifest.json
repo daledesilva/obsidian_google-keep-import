@@ -1,15 +1,11 @@
 {
-	"id": "daledesilva_google-keep-import",
+	"id": "google-keep-import",
 	"name": "Google Keep Import",
 	"description": "Allows import of Google Keep backup json files and their attachments. Can also be used to import other files.",
 	"version": "1.0.0",
 	"author": "Dale de Silva",
 	"minAppVersion": "1.1.10",
 	"authorUrl": "https://designdebt.club",
-	"fundingUrl": {
-		"Funding": "https://ko-fi.com/daledesilva",
-		"Twitter": "https://twitter.com/daledesilva",
-		"Mastadon": "https://indieweb.social/@daledesilva"
-	},
+	"fundingUrl": "https://ko-fi.com/daledesilva",
 	"isDesktopOnly": false
 }

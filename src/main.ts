@@ -49,8 +49,8 @@ export default class GoogleKeepImportPlugin extends Plugin {
 		addIcon("mastodon", MastodonIcon);
 		
 		this.addCommand({
-			id: 'gki_import-files',
-			name: 'Import files from Google Keep',
+			id: 'import-files',
+			name: 'Import files',
 			callback: () => runImportSequence(this)
 		});
 

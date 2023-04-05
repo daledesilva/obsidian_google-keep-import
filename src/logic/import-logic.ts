@@ -1,7 +1,7 @@
 import { DataWriteOptions, Notice, Plugin, TAbstractFile, TFile, TFolder, Vault } from "obsidian";
 import GoogleKeepImportPlugin from "src/main";
 import { ImportProgressModal } from "src/modals/import-progress-modal/import-progress-modal";
-import { filenameSanitize } from "./string-processes";
+import { filenameSanitize, getFileExtension } from "./string-processes";
 import { CreatedDateTypes, PluginSettings } from "src/types/plugin-settings";
 import { KeepJson, objectIsKeepJson } from "src/types/keep-data";
 import { IgnoreImportReason, ImportResult, LogStatus as LogStatus } from "src/types/results";
@@ -90,19 +90,20 @@ async function getOrCreateFolder(folderPath: string, vault: Vault): Promise<TFol
 	let folder: TFolder | null = null;
 
 	try {
-		folder = vault.getAbstractFileByPath(folderPath) as TFolder;
-		// Create the folder if it doesn't exist
-		if(folder === null) {
+		const folder = vault.getAbstractFileByPath(folderPath);
+		if (folder instanceof TFolder) {
+			return folder;
+		} else {
 			await vault.createFolder(folderPath);
-			folder = vault.getAbstractFileByPath(folderPath) as TFolder;	
+			return vault.getAbstractFileByPath(folderPath) as TFolder;	
 		}
+
 	} catch(e) {
 		const message = `There was an error creating folder '${folderPath}' (${e})`
 		new Notice(message, 9000);
 		throw new Error(`There was an error creating folder '${folderPath}' (${e})`);
 	}
 
-	return folder;
 }
 
 /**
@@ -255,8 +256,7 @@ export class FileImporter {
  * Returns if a file is a JSON file.
  */
 export function fileIsJson(file: File) {
-	const ext = file.name.slice(-5);	
-	return ext === '.json' || file.type === 'application/json';
+	return getFileExtension(file.name) === '.json' || file.type === 'application/json';
 }
 
 /**
@@ -264,11 +264,9 @@ export function fileIsJson(file: File) {
  * File extension is also used because some seem to return a blank mime-type.
  */
 function fileIsMarkdown(file: File) {
-	const ext = file.name.slice(-3);
-	return	ext === '.md'					||
+	return	getFileExtension(file.name)  === '.md'					||
 			file.type === 'text/markdown'	||
 			file.type === 'text/x-markdown';
-
 }
 
 /**

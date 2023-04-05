@@ -67,3 +67,15 @@ export function folderNameSanitize(str: string) {
 
 	return newStr;
 }
+
+/**
+ * Returns the file extension when passed a filename string.
+ */
+export function getFileExtension(filename: string): string {
+	let ext = filename.split('.').pop();
+	if(ext) {
+		return ext.toLowerCase();
+	} else {
+		return '';
+	}
+}
