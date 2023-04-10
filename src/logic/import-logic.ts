@@ -305,10 +305,9 @@ function fileIsBinaryAndSupportedByObsidian(file: File) {
  * Returns if a file is an html file. Whether by mimetype or by file extension.
  */
 function fileIsHtml(file: File) {
-	const ext4 = file.name.slice(-5);
-	const ext3 = file.name.slice(-4);
-	return	ext4 === '.html'					||
-			ext3 === '.htm'						||
+	const ext = getFileExtension(file.name);
+	return	ext === 'html'						||
+			ext === 'htm'						||
 			file.type === 'text/html';
 
 }
