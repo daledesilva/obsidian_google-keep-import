@@ -34,6 +34,68 @@ export const DEFAULT_SETTINGS: PluginSettings = {
 		isArchived: '#Keep/Archived',
 		isTrashed: '#Keep/Trashed',
 	},
+	// These characters aren't valid in the filepath or name on different operating systems.
+	invalidChars: [
+		{
+			char: '*',
+			replacement: '+'
+		},
+		{
+			char: '"',
+			replacement: "'"
+		},
+		{
+			char: '\\',
+			replacement: '-'
+		},
+		{
+			char: '/',
+			replacement: '-'
+		},
+		{
+			char: '<',
+			replacement: '('
+		},
+		{
+			char: '>',
+			replacement: ')'
+		},
+		{
+			char: ':',
+			replacement: '_'
+		},
+		{
+			char: '|',
+			replacement: '_'
+		},
+		{
+			char: '?',
+			replacement: ''
+		},
+	],
+	// These characters will work infilepath and name but will break linkability.
+	problemChars: [
+		{
+			char: '#',
+			replacement: ''
+		},
+		{
+			char: '^',
+			replacement: ''
+		},
+		{
+			char: '[',
+			replacement: '('
+		},
+		{
+			char: ']',
+			replacement: ')'
+		},
+		{
+			char: '|',
+			replacement: '_'
+		},
+	]
 }
 
 

@@ -1,5 +1,5 @@
 import { Modal, Setting } from "obsidian";
-import { addResetButton, BasicSettingsGroup, InclusionSettingsGroup, TagSettingsGroup } from "src/components/settings-groups/settings-groups";
+import { addResetButton, BasicSettingsGroup, CharMappingGroup, InclusionSettingsGroup, TagSettingsGroup } from "src/components/settings-groups/settings-groups";
 import { SupportButtonSet } from "src/components/support-button-set/support-button-set";
 import GoogleKeepImportPlugin from "src/main";
 
@@ -55,6 +55,9 @@ export class EditSettingsModal extends Modal {
 		
 		contentEl.createEl('hr');
 		new TagSettingsGroup(contentEl, this.plugin);
+		
+		contentEl.createEl('hr');
+		new CharMappingGroup(contentEl, this.plugin);
 
 		contentEl.createEl('hr');
 		const modalActions = new Setting(contentEl);

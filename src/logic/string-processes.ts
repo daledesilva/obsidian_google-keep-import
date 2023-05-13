@@ -29,17 +29,33 @@ export function filenameSanitize(str: string) {
 	let newArr;
 	let newStr = str;
 
-	// Remove /
+	// Remove characters obsidian doesn't support in filenames
 	newArr = str.split('/');
-	newStr = newArr.join('');
-
-	// Remove \
-	newArr = newStr.split('\\');
-	newStr = newArr.join('');
-
-	// Remove :
+	newStr = newArr.join('-');
+	//
+	newArr = newStr.split('\\');	// Single slash escaped
+	newStr = newArr.join('-');
+	//
 	newArr = newStr.split(':');
+	newStr = newArr.join('-');
+	
+
+	// Remove characters obsidian supports in filenames but will break linkability
+	newArr = newStr.split('#');
 	newStr = newArr.join('');
+	//
+	newArr = newStr.split('^');
+	newStr = newArr.join('');
+	//
+	newArr = newStr.split('[');
+	newStr = newArr.join('(');
+	//
+	newArr = newStr.split(']');
+	newStr = newArr.join(')');
+	//
+	newArr = newStr.split('|');
+	newStr = newArr.join('');
+	
 
 	return newStr;
 }
@@ -47,18 +63,34 @@ export function filenameSanitize(str: string) {
 /**
  * Removes characters from a folder that cannot be used.
  */
-export function folderNameSanitize(str: string) {
+export function folderPathSanitize(str: string) {
 	let newArr;
 	let newStr = str;
 
-	// Remove \
-	newArr = newStr.split('\\');
+	// Remove characters obsidian supports in filenames but will break linkability
+	newArr = newStr.split('#');
+	newStr = newArr.join('');
+	//
+	newArr = newStr.split('^');
+	newStr = newArr.join('');
+	//
+	newArr = newStr.split('[');
+	newStr = newArr.join('(');
+	//
+	newArr = newStr.split(']');
+	newStr = newArr.join(')');
+	//
+	newArr = newStr.split('|');
 	newStr = newArr.join('');
 
-	// Remove :
+	// Remove characters obsidian doesn't support in a file path
+	newArr = newStr.split('\\');	// Single slash escaped
+	newStr = newArr.join('-');
+	//
 	newArr = newStr.split(':');
-	newStr = newArr.join('');
+	newStr = newArr.join('-');
 
+	// Slashes can't be used in folder names but are used in folder paths to delineate folders
 	// Remove trailing /
 	// NOTE: This has to be last incase changes above put a slash at the end
 	while(newStr.slice(-1) == '/') {

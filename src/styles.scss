@@ -57,6 +57,27 @@ button.gki_button[disabled] {
     }
 }
 
+.gki_setting-mapping {
+    .setting-item-name {
+        font-size: calc(var(--font-ui-large)*1.5);
+        margin-left: 10px;
+
+        position: relative;
+        &::after {
+            content: "\2192";
+            opacity: 0.1;
+            position: absolute;
+            left: 50%;
+            translate: -50%;
+        }
+    }
+    .setting-item-control input {
+        font-size: calc(var(--font-ui-large)*1);
+        height: calc(var(--input-height)*1.5);
+        width: 100%;
+    }
+}
+
 
 // Drag and drop file uploader
 //////////////////////////////

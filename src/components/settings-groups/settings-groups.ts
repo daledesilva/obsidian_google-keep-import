@@ -1,5 +1,5 @@
 import { Setting } from "obsidian";
-import { folderNameSanitize } from "src/logic/string-processes";
+import { folderPathSanitize } from "src/logic/string-processes";
 import GoogleKeepImportPlugin from "src/main";
 import { ConfirmationModal } from "src/modals/confirmation-modal/confirmation-modal";
 import { CreatedDateTypes } from "src/types/plugin-settings";
@@ -24,8 +24,8 @@ export class BasicSettingsGroup {
             .addText((text) => {
                 text.setValue(plugin.settings.folderNames.notes);
                 text.inputEl.addEventListener('blur', async (e) => {
-                    const value = folderNameSanitize(text.getValue());
-                    plugin.settings.folderNames.notes = folderNameSanitize(value);
+                    const value = folderPathSanitize(text.getValue());
+                    plugin.settings.folderNames.notes = folderPathSanitize(value);
                     text.setValue(value);
                     await plugin.saveSettings();
                 });
@@ -37,8 +37,8 @@ export class BasicSettingsGroup {
             .addText((text) => {
                 text.setValue(plugin.settings.folderNames.assets);
                 text.inputEl.addEventListener('blur', async (e) => {
-                    const value = folderNameSanitize(text.getValue());
-                    plugin.settings.folderNames.assets = folderNameSanitize(value);
+                    const value = folderPathSanitize(text.getValue());
+                    plugin.settings.folderNames.assets = folderPathSanitize(value);
                     text.setValue(value);
                     await plugin.saveSettings();
                 });
@@ -50,8 +50,8 @@ export class BasicSettingsGroup {
             .addText((text) => {
                 text.setValue(plugin.settings.folderNames.unsupportedAssets);
                 text.inputEl.addEventListener('blur', async (e) => {
-                    const value = folderNameSanitize(text.getValue());
-                    plugin.settings.folderNames.unsupportedAssets = folderNameSanitize(value);
+                    const value = folderPathSanitize(text.getValue());
+                    plugin.settings.folderNames.unsupportedAssets = folderPathSanitize(value);
                     text.setValue(value);
                     await plugin.saveSettings();
                 });
@@ -283,6 +283,57 @@ export class TagSettingsGroup {
                 });
             })
             .setDisabled(!plugin.settings.addTrashedTags)
+
+    }
+}
+
+/**
+ * Inserts several fields to allow the user define how invalid and problematic characters get replaced.
+ */
+export class CharMappingGroup {
+    
+    constructor(containerEl: HTMLElement, plugin: GoogleKeepImportPlugin) {
+        
+        containerEl.createEl('h2', {text: 'Character Mapping'});
+
+        containerEl.createEl('h3', {text: 'Invalid characters'});
+        containerEl.createEl('p', {text: 'Some characters are invalid when used in file or folder names on certain operating systems.  They will therefore be converted to the following characters.'});
+
+        containerEl.createEl('p', {text: 'You can customise this mapping or selected from a preset.'});
+        
+        for(let k=0; k<plugin.settings.invalidChars.length; k++) {
+            new Setting(containerEl)
+            .setClass('gki_setting-mapping')
+            .setName(plugin.settings.invalidChars[k].char)
+            .addText((text) => {
+                text.setValue(plugin.settings.invalidChars[k].replacement);
+                text.inputEl.addEventListener('blur', async (e) => {
+                    const value = text.getValue();
+                    plugin.settings.invalidChars[k].replacement = value;
+                    text.setValue(value);
+                    await plugin.saveSettings();
+                });
+            })
+        }
+
+        containerEl.createEl('h3', {text: 'Problem characters'});
+        containerEl.createEl('p', {text: 'Some characters are valid but will prevent Obsidian links to them working properly. They will therefore be converted to the following characters.'});
+        
+        for(let k=0; k<plugin.settings.problemChars.length; k++) {
+            new Setting(containerEl)
+                .setClass('gki_setting-mapping')
+                .setName(plugin.settings.problemChars[k].char)
+                .addText((text) => {
+                    text.setValue(plugin.settings.problemChars[k].replacement);
+                    text.inputEl.addEventListener('blur', async (e) => {
+                        const value = text.getValue();
+                        plugin.settings.problemChars[k].replacement = value;
+                        text.setValue(value);
+                        await plugin.saveSettings();
+                    });
+                })
+        }
+        
 
     }
 }

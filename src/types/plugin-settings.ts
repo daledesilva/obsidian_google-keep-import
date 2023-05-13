@@ -6,6 +6,11 @@ export enum CreatedDateTypes {
 	import = 'Obsidian import date',
 };
 
+export interface CharMap {
+	char: string,
+	replacement: string,
+};
+
 export interface PluginSettings {
 	folderNames: {
 		notes: string,
@@ -29,4 +34,6 @@ export interface PluginSettings {
 		isArchived: string,
 		isTrashed: string,
 	},
+	invalidChars: Array<CharMap>,
+	problemChars: Array<CharMap>,
 }
