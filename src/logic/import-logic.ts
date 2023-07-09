@@ -342,7 +342,8 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 			let content: KeepJson | undefined;
 			try {
 				content = JSON.parse(readerEvent.target.result as string) as KeepJson;
-			} catch {
+			} catch(e) {
+				console.log(e);
 				result.logStatus = LogStatus.Error;
 				result.details = `<p>JSON file appears to be malformed and can't be imported. You can open this file and either attempt to correct and reimport it, or to copy it's contents manually.</p>
 				<p><a href="https://www.toptal.com/developers/json-formatter">Toptal JSON Formatter</a> can help to find errors and format JSON data for easier manual copying. Open the file in a text editor (or drag it into a browser tab), to copy the contents into the formatter.</p>`;
