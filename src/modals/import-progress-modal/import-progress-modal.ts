@@ -116,8 +116,9 @@ export class ImportProgressModal extends Modal {
 		itemHeaderEl.createEl('span', {cls: 'gki_title'}).setText(options.title);
 
 		const itemBodyEl = itemEl.createEl('p', {cls: 'gki_item-body'});
-		itemBodyEl.createEl('p', {cls: 'gki_desc'}).setText(options.desc);
-
+		// itemBodyEl.createEl('p', {cls: 'gki_desc'}).setText(options.desc);
+		itemBodyEl.createEl('p', {cls: 'gki_desc'}).innerHTML = options.desc;	// REVIEW: Used innerHTML to support links. Is it unsafe in this context?
+		
 		this.outputLogEl.addClass('gki_visible');
 	}
 
