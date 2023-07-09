@@ -2,7 +2,7 @@ import { Setting } from "obsidian";
 import { folderPathSanitize } from "src/logic/string-processes";
 import GoogleKeepImportPlugin from "src/main";
 import { ConfirmationModal } from "src/modals/confirmation-modal/confirmation-modal";
-import { CreatedDateTypes } from "src/types/plugin-settings";
+import { CreatedDateTypes, MappingPresets } from "src/types/plugin-settings";
 
 
 ///////////////////
@@ -295,29 +295,10 @@ export class CharMappingGroup {
     constructor(containerEl: HTMLElement, plugin: GoogleKeepImportPlugin) {
         
         containerEl.createEl('h2', {text: 'Character Mapping'});
-
-        containerEl.createEl('h3', {text: 'Invalid characters'});
-        containerEl.createEl('p', {text: 'Some characters are invalid when used in file or folder names on certain operating systems.  They will therefore be converted to the following characters.'});
-
-        containerEl.createEl('p', {text: 'You can customise this mapping or selected from a preset.'});
-        
-        for(let k=0; k<plugin.settings.invalidChars.length; k++) {
-            new Setting(containerEl)
-            .setClass('gki_setting-mapping')
-            .setName(plugin.settings.invalidChars[k].char)
-            .addText((text) => {
-                text.setValue(plugin.settings.invalidChars[k].replacement);
-                text.inputEl.addEventListener('blur', async (e) => {
-                    const value = text.getValue();
-                    plugin.settings.invalidChars[k].replacement = value;
-                    text.setValue(value);
-                    await plugin.saveSettings();
-                });
-            })
-        }
+        containerEl.createEl('p', {text: 'Some characters don\'t work so well in file or folder names on certain operating systems. They will therefore be converted according to the following mapping settings.'});
 
         containerEl.createEl('h3', {text: 'Problem characters'});
-        containerEl.createEl('p', {text: 'Some characters are valid but will prevent Obsidian links to them working properly. They will therefore be converted to the following characters.'});
+        containerEl.createEl('p', {text: 'While these won\'t break the imports, they will create issues with links from other files—So are best avoided.'});
         
         for(let k=0; k<plugin.settings.problemChars.length; k++) {
             new Setting(containerEl)
@@ -332,6 +313,41 @@ export class CharMappingGroup {
                         await plugin.saveSettings();
                     });
                 })
+        }
+
+        containerEl.createEl('h3', {text: 'Invalid characters'});
+        containerEl.createEl('p', {text: 'These don\'t work at all on certain operating systems and can break your import or cause errors when transferring files to other operating systems.'});
+
+        const invalidMapDropdown = new Setting(containerEl)
+            // .setClass('gki_setting')
+            .setName('Preset')
+            .setDesc('Automatically adjust mapping below to prevent errors on the selected kinds of devices and operating systems.')
+            .addDropdown((dropdown) => {
+                dropdown.addOption(MappingPresets.all, 'Fix for all');
+                dropdown.addOption(MappingPresets.apple, "Apple");
+                dropdown.addOption(MappingPresets.android, "Android");
+                dropdown.addOption(MappingPresets.windows, "Windows");
+                dropdown.addOption(MappingPresets.linux, "Linux");
+                dropdown.setValue(MappingPresets.all);
+                dropdown.onChange(async (value) => {
+                    // plugin.settings.createdDate = value as CreatedDateTypes;
+                    await plugin.saveSettings();
+                });
+            })
+        
+        for(let k=0; k<plugin.settings.invalidChars.length; k++) {
+            new Setting(containerEl)
+            .setClass('gki_setting-mapping')
+            .setName(plugin.settings.invalidChars[k].char)
+            .addText((text) => {
+                text.setValue(plugin.settings.invalidChars[k].replacement);
+                text.inputEl.addEventListener('blur', async (e) => {
+                    const value = text.getValue();
+                    plugin.settings.invalidChars[k].replacement = value;
+                    text.setValue(value);
+                    await plugin.saveSettings();
+                });
+            })
         }
         
 

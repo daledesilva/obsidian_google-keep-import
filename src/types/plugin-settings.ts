@@ -6,6 +6,14 @@ export enum CreatedDateTypes {
 	import = 'Obsidian import date',
 };
 
+export enum MappingPresets {
+	all = 'all',
+	windows = 'windows',
+	apple = 'apple',
+	android = 'android',
+	linux = 'linux',
+};
+
 export interface CharMap {
 	char: string,
 	replacement: string,
@@ -34,6 +42,6 @@ export interface PluginSettings {
 		isArchived: string,
 		isTrashed: string,
 	},
-	invalidChars: Array<CharMap>,
 	problemChars: Array<CharMap>,
+	invalidChars: Array<CharMap>,
 }

@@ -7,6 +7,46 @@ import MastodonIcon from 'src/assets/mastodon';
 ///////////////////
 ///////////////////
 
+export const invalidChars_allPreset = [
+	{	char: '*',	replacement: '+' },
+	{	char: '"',	replacement: "'" },
+	{	char: '\\',	replacement: '-' },
+	{	char: '/',	replacement: '-' },
+	{	char: '<',	replacement: '(' },
+	{	char: '>',	replacement: ')' },
+	{	char: ':',	replacement: '_' },
+	{	char: '|',	replacement: '_' },
+	{	char: '?',	replacement: ''  },
+];
+
+
+export const invalidChars_appleAndroidPreset = [
+	{	char: '*',	replacement: '+' },
+	{	char: '\\',	replacement: '-' },
+	{	char: '/',	replacement: '-' },
+	{	char: ':',	replacement: '_' },
+	{	char: '|',	replacement: '_' },
+	{	char: '?',	replacement: ''  },
+];
+
+
+export const invalidChars_windowsPreset = [
+	{	char: '*',	replacement: '+' },
+	{	char: '"',	replacement: "'" },
+	{	char: '\\',	replacement: '-' },
+	{	char: '/',	replacement: '-' },
+	{	char: '<',	replacement: '(' },
+	{	char: '>',	replacement: ')' },
+	{	char: ':',	replacement: '_' },
+	{	char: '|',	replacement: '_' },
+	{	char: '?',	replacement: ''  },
+];
+
+
+export const invalidChars_linuxPreset = [
+	{	char: '/',	replacement: '-' },
+];
+
 
 /**
  * The default settings that a new install starts with
@@ -34,45 +74,6 @@ export const DEFAULT_SETTINGS: PluginSettings = {
 		isArchived: '#Keep/Archived',
 		isTrashed: '#Keep/Trashed',
 	},
-	// These characters aren't valid in the filepath or name on different operating systems.
-	invalidChars: [
-		{
-			char: '*',
-			replacement: '+'
-		},
-		{
-			char: '"',
-			replacement: "'"
-		},
-		{
-			char: '\\',
-			replacement: '-'
-		},
-		{
-			char: '/',
-			replacement: '-'
-		},
-		{
-			char: '<',
-			replacement: '('
-		},
-		{
-			char: '>',
-			replacement: ')'
-		},
-		{
-			char: ':',
-			replacement: '_'
-		},
-		{
-			char: '|',
-			replacement: '_'
-		},
-		{
-			char: '?',
-			replacement: ''
-		},
-	],
 	// These characters will work infilepath and name but will break linkability.
 	problemChars: [
 		{
@@ -95,8 +96,12 @@ export const DEFAULT_SETTINGS: PluginSettings = {
 			char: '|',
 			replacement: '_'
 		},
-	]
+	],
+	// These characters aren't valid in the filepath or name on different operating systems.
+	invalidChars: JSON.parse( JSON.stringify(invalidChars_allPreset) ),
 }
+
+
 
 
 /**
