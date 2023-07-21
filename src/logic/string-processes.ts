@@ -79,3 +79,13 @@ export function getFileExtension(filename: string): string {
 		return '';
 	}
 }
+
+/**
+ * Strips the file extension when passed a filename string.
+ */
+export function stripFileExtension(filename: string): string {
+	let split = filename.split('.');
+	split.pop();
+	let finalName = split.join("."); 
+	return finalName;
+}
