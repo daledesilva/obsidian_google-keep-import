@@ -23,6 +23,7 @@
 	},
 	"dependencies": {
 		"esbuild-plugin-copy": "^2.0.1",
-		"esbuild-sass-plugin": "^2.4.4"
+		"esbuild-sass-plugin": "^2.4.4",
+		"sanitize-filename": "^1.6.3"
 	}
 }

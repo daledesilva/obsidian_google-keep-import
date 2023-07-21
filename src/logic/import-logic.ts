@@ -1,7 +1,7 @@
 import { DataWriteOptions, Notice, Plugin, TAbstractFile, TFile, TFolder, Vault } from "obsidian";
 import GoogleKeepImportPlugin from "src/main";
 import { ImportProgressModal } from "src/modals/import-progress-modal/import-progress-modal";
-import { filenameSanitize, getFileExtension } from "./string-processes";
+import { getFileExtension } from "./string-processes";
 import { CreatedDateTypes, PluginSettings } from "src/types/plugin-settings";
 import { KeepJson, objectIsKeepJson } from "src/types/keep-data";
 import { IgnoreImportReason, ImportResult, LogStatus as LogStatus } from "src/types/results";
@@ -374,10 +374,9 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 			}
 
 
-
+			var sanitize = require("sanitize-filename");
+			const path = `${folder.path}/${sanitize(content.title || file.name)}`;	// TODO: Strip file extension from filename
 			
-			const path = `${folder.path}/${filenameSanitize(content.title || file.name)}`;	// TODO: Strip file extension from filename
-
 
 
 			// TODO: Refactor this as createNewMarkdownFile function
