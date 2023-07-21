@@ -11,7 +11,15 @@ export interface KeepAttachment {
 	mimetype: string;
 }
 
+export interface KeepAnnotation {
+	description: string;
+	source: string;
+	title: string;
+	url: URL;
+
+}
 export interface KeepJson {
+	annotations: KeepAnnotation[];
 	color: string;
 	createdTimestampUsec: number;
 	isArchived: boolean;

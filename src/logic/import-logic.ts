@@ -414,7 +414,35 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 			}
 				
 
+			try {
+				if (content.annotations) //wild guess
+				{
 
+					await vault.append(fileRef, `\n\n`);
+					await vault.append(fileRef, `| | |\n`);
+					await vault.append(fileRef, `|---|----|\n`);
+					for(let i=0; i<content.annotations.length; i++) {
+						//Might be better as front-matter, but for righ now...
+						let sDescription = content.annotations[i].description;
+						sDescription = sDescription.replace("\n","<br>");
+
+						await vault.append(fileRef, `${`|**Description**| ${sDescription}|`}\n`);	
+						await vault.append(fileRef, `${`|**Source**| ${content.annotations[i].source}|`}\n`);	
+						await vault.append(fileRef, `${`|**Title**| ${content.annotations[i].title}|` }\n`);	
+						await vault.append(fileRef, `${`|**URL**| ${content.annotations[i].url}|`}\n`);	
+						await vault.append(fileRef, `|<hr>|<hr>|\n`);
+					}
+				}
+			}
+			catch (error) {
+				result.logStatus = LogStatus.Error;
+				result.error = error;
+				result.details = 'Error adding Annotations file.'
+				return resolve(result);
+			}
+	
+			   
+			  
 			// TODO: Refactor this as appendTextContent
 			// Add in text content
 			try {
