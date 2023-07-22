@@ -1,5 +1,5 @@
 import { Notice, Plugin, addIcon } from 'obsidian';
-import { CreatedDateTypes, PluginSettings } from 'src/types/plugin-settings';
+import { CreatedDateTypes, MappingPresets, PluginSettings } from 'src/types/plugin-settings';
 import { runImportSequence } from './logic/import-logic';
 import { MySettingsTab } from './tabs/settings-tab/settings-tab';
 import MastodonIcon from 'src/assets/mastodon';
@@ -7,7 +7,7 @@ import MastodonIcon from 'src/assets/mastodon';
 ///////////////////
 ///////////////////
 
-export const invalidChars_allPreset = [
+export const invalidChars_allOrWindowsPreset = [
 	{	char: '*',	replacement: '+' },
 	{	char: '"',	replacement: "'" },
 	{	char: '\\',	replacement: '-' },
@@ -20,23 +20,10 @@ export const invalidChars_allPreset = [
 ];
 
 
-export const invalidChars_appleAndroidPreset = [
+export const invalidChars_appleOrAndroidPreset = [
 	{	char: '*',	replacement: '+' },
 	{	char: '\\',	replacement: '-' },
 	{	char: '/',	replacement: '-' },
-	{	char: ':',	replacement: '_' },
-	{	char: '|',	replacement: '_' },
-	{	char: '?',	replacement: ''  },
-];
-
-
-export const invalidChars_windowsPreset = [
-	{	char: '*',	replacement: '+' },
-	{	char: '"',	replacement: "'" },
-	{	char: '\\',	replacement: '-' },
-	{	char: '/',	replacement: '-' },
-	{	char: '<',	replacement: '(' },
-	{	char: '>',	replacement: ')' },
 	{	char: ':',	replacement: '_' },
 	{	char: '|',	replacement: '_' },
 	{	char: '?',	replacement: ''  },
@@ -98,7 +85,8 @@ export const DEFAULT_SETTINGS: PluginSettings = {
 		},
 	],
 	// These characters aren't valid in the filepath or name on different operating systems.
-	invalidChars: JSON.parse( JSON.stringify(invalidChars_allPreset) ),
+	invalidChars: JSON.parse( JSON.stringify(invalidChars_allOrWindowsPreset) ),
+	invalidCharFilter: MappingPresets.allOrWindows,
 }
 
 

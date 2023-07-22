@@ -1,4 +1,5 @@
 import { Setting } from "obsidian";
+import { applyMappingPreset, checkForPresetMatch } from "src/logic/import-logic";
 import { folderPathSanitize } from "src/logic/string-processes";
 import GoogleKeepImportPlugin from "src/main";
 import { ConfirmationModal } from "src/modals/confirmation-modal/confirmation-modal";
@@ -292,7 +293,7 @@ export class TagSettingsGroup {
  */
 export class CharMappingGroup {
     
-    constructor(containerEl: HTMLElement, plugin: GoogleKeepImportPlugin) {
+    constructor(containerEl: HTMLElement, plugin: GoogleKeepImportPlugin, onComplete: Function) {
         
         containerEl.createEl('h2', {text: 'Character Mapping'});
         containerEl.createEl('p', {text: 'Some characters don\'t work so well in file or folder names on certain operating systems. They will therefore be converted according to the following mapping settings.'});
@@ -320,18 +321,18 @@ export class CharMappingGroup {
 
         const invalidMapDropdown = new Setting(containerEl)
             // .setClass('gki_setting')
-            .setName('Preset')
-            .setDesc('Automatically adjust mapping below to prevent errors on the selected kinds of devices and operating systems.')
+            .setName('Operating Systems')
+            .setDesc('You can choose to limit the invalid characters you map to suit the specific operating system you\'d like your filenames to be compatible with. By default it\'s set to make your files compatible with all operating systems (And you should probably leave it like this).')
             .addDropdown((dropdown) => {
-                dropdown.addOption(MappingPresets.all, 'Fix for all');
-                dropdown.addOption(MappingPresets.apple, "Apple");
-                dropdown.addOption(MappingPresets.android, "Android");
-                dropdown.addOption(MappingPresets.windows, "Windows");
+                dropdown.addOption(MappingPresets.allOrWindows, 'All (Or Windows)');
+                dropdown.addOption(MappingPresets.appleOrAndroid, "Apple or Android");
                 dropdown.addOption(MappingPresets.linux, "Linux");
-                dropdown.setValue(MappingPresets.all);
+                dropdown.setValue(plugin.settings.invalidCharFilter);
                 dropdown.onChange(async (value) => {
-                    // plugin.settings.createdDate = value as CreatedDateTypes;
+                    applyMappingPreset(value as MappingPresets, plugin.settings);
+                    plugin.settings.invalidCharFilter = value as MappingPresets;
                     await plugin.saveSettings();
+                    onComplete();
                 });
             })
         

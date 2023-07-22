@@ -1,8 +1,8 @@
-import { DataWriteOptions, Notice, Plugin, TAbstractFile, TFile, TFolder, Vault } from "obsidian";
-import GoogleKeepImportPlugin from "src/main";
+import { DataWriteOptions, Notice, TFile, TFolder, Vault } from "obsidian";
+import GoogleKeepImportPlugin, { invalidChars_allOrWindowsPreset, invalidChars_appleOrAndroidPreset, invalidChars_linuxPreset} from "src/main";
 import { ImportProgressModal } from "src/modals/import-progress-modal/import-progress-modal";
 import { filenameSanitize, getFileExtension } from "./string-processes";
-import { CreatedDateTypes, PluginSettings } from "src/types/plugin-settings";
+import { CharMap, CreatedDateTypes, MappingPresets, PluginSettings } from "src/types/plugin-settings";
 import { KeepJson, objectIsKeepJson } from "src/types/keep-data";
 import { IgnoreImportReason, ImportResult, LogStatus as LogStatus } from "src/types/results";
 import { StartImportModal } from "src/modals/start-import-modal/start-import-modal";
@@ -502,4 +502,51 @@ async function importBinaryFile(vault: Vault, folder: TFolder, file: File) : Pro
 	}
     
     return Promise.resolve(result);
+}
+
+
+
+export function applyMappingPreset(presetType: MappingPresets, settings: PluginSettings) {
+	if(presetType === MappingPresets.appleOrAndroid) {
+		console.log('apple/android');
+		settings.invalidChars = JSON.parse( JSON.stringify(invalidChars_appleOrAndroidPreset) );
+		
+	} else if(presetType === MappingPresets.linux) {
+		console.log('linux');
+		settings.invalidChars = JSON.parse( JSON.stringify(invalidChars_linuxPreset) );
+		
+	} else {
+		console.log('all/Windows');
+		settings.invalidChars = JSON.parse( JSON.stringify(invalidChars_allOrWindowsPreset) );
+	}
+}
+
+
+
+export function getMatchingPreset(invalidChars: Array<CharMap>): string {
+	function arraysEqual(arr1: CharMap[], arr2: CharMap[]): boolean {
+		if (arr1.length !== arr2.length) return false;
+		for (let i = 0; i < arr1.length; i++) {
+			if (arr1[i].char !== arr2[i].char || arr1[i].replacement !== arr2[i].replacement) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	// Define your presets
+	const presets: Array<[string, CharMap[]]> = [
+		[MappingPresets.allOrWindows, invalidChars_allOrWindowsPreset],
+		[MappingPresets.appleOrAndroid, invalidChars_appleOrAndroidPreset],
+		[MappingPresets.linux, invalidChars_linuxPreset],
+	];
+
+	// Check for a matching preset
+	for (const [presetName, presetChars] of presets) {
+		if (arraysEqual(invalidChars, presetChars)) {
+			return presetName;
+		}
+	}
+	
+	return MappingPresets.allOrWindows;
 }

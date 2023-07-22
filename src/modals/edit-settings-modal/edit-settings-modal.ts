@@ -57,7 +57,7 @@ export class EditSettingsModal extends Modal {
 		new TagSettingsGroup(contentEl, this.plugin);
 		
 		contentEl.createEl('hr');
-		new CharMappingGroup(contentEl, this.plugin);
+		new CharMappingGroup(contentEl, this.plugin, () => this.onOpen());
 
 		contentEl.createEl('hr');
 		const modalActions = new Setting(contentEl);

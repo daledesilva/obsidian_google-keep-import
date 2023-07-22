@@ -7,10 +7,8 @@ export enum CreatedDateTypes {
 };
 
 export enum MappingPresets {
-	all = 'all',
-	windows = 'windows',
-	apple = 'apple',
-	android = 'android',
+	allOrWindows = 'all/windows',
+	appleOrAndroid = 'apple/android',
 	linux = 'linux',
 };
 
@@ -44,4 +42,5 @@ export interface PluginSettings {
 	},
 	problemChars: Array<CharMap>,
 	invalidChars: Array<CharMap>,
+	invalidCharFilter: MappingPresets,
 }
