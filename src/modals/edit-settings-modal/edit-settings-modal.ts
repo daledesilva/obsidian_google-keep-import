@@ -62,7 +62,7 @@ export class EditSettingsModal extends Modal {
 		contentEl.createEl('hr');
 		const modalActions = new Setting(contentEl);
 		new SupportButtonSet(modalActions);
-		addResetButton(modalActions, this.plugin, () => this.onOpen());	// TODO: Can this be refactored as new ResetButton(modalActions, this.plugin, () => this.onOpen())
+		addResetButton(modalActions, this.plugin, () => this.onOpen());
 		modalActions.addButton( (button) => {
 			button.setButtonText('Close');
 			button.setClass('gki_button');
