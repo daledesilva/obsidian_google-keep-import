@@ -332,6 +332,7 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 		reader.onerror = reject;
 		reader.onload = async (readerEvent) => {
 
+
 			// Bail if the file hasn't been interpreted properly
 			if(!readerEvent || !readerEvent.target) {
 				result.logStatus = LogStatus.Error;
@@ -339,6 +340,8 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 				return resolve(result);
 			}
 			
+
+			// Bail if the file has been read correctly but is malformed
 			let content: KeepJson | undefined;
 			try {
 				content = JSON.parse(readerEvent.target.result as string) as KeepJson;
@@ -350,14 +353,13 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 				return resolve(result);
 			}
 		
+
+			// Bail if the file has been read correctly but doesn't match the expected Keep format
 			if(!objectIsKeepJson(content)) {
 				result.logStatus = LogStatus.Error;
 				result.details = `JSON file doesn't match the expected Google Keep format.`;
 				return resolve(result);
 			}
-
-
-
 
 
 			// TODO: Refactor this as IsUserAcceptedType function
@@ -373,11 +375,9 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 				return resolve(result);
 			}
 
-
-
 			
-			const path = `${folder.path}/${filenameSanitize(content.title || file.name)}`;	// TODO: Strip file extension from filename
-
+			// TODO: Strip file extension from filename
+			const path = `${folder.path}/${filenameSanitize(content.title || file.name)}`;
 
 
 			// TODO: Refactor this as createNewMarkdownFile function
@@ -394,7 +394,6 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 			}
 		
 
-
 			// TODO: Refactor this as appendKeepTags function
 			// Add in tags to represent Keep properties
 			try {
@@ -409,7 +408,17 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 				result.details = 'Error adding tags to the new file.'
 				return resolve(result);
 			}
-				
+
+
+			// Add in tags to represent Keep properties
+			try {
+				appendKeepLabels(fileRef, content, settings, vault);
+			} catch (error) {
+				result.logStatus = LogStatus.Error;
+				result.error = error;
+				result.details = 'Error adding labels to the new file.'
+				return resolve(result);
+			}
 
 
 			// TODO: Refactor this as appendTextContent
@@ -487,8 +496,26 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 		}
 		
 	})
-		
+	
 }
+
+
+
+/**
+ * Adds labels found in the Google Keep file to the passed in markdown file.
+ */
+async function appendKeepLabels(fileRef: TFile, content: KeepJson, settings: PluginSettings, vault: Vault) {
+	if(!settings.addLabelTags) return;
+
+	let labels = "";
+	for(let i=0; i<content.labels.length; i++) {
+		if(i > 0) labels += ' ';
+		labels += settings.tagNames.labelPrepend + content.labels[i].name;
+	}
+	await vault.append(fileRef, labels);
+}
+
+
 
 /**
  * Recreates any binary file in the Obsidian vault.

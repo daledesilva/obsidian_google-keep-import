@@ -11,6 +11,10 @@ export interface KeepAttachment {
 	mimetype: string;
 }
 
+export interface KeepLabel {
+	name: string;
+}
+
 export interface KeepJson {
 	color: string;
 	createdTimestampUsec: number;
@@ -22,6 +26,7 @@ export interface KeepJson {
 	attachments?: Array<KeepAttachment>;
 	title: string;
 	userEditedTimestampUsec: number;
+	labels: Array<KeepLabel>;
 }
 
 /**
