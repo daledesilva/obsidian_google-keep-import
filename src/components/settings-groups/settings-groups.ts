@@ -1,5 +1,5 @@
 import { Setting } from "obsidian";
-import { applyMappingPreset, checkForPresetMatch } from "src/logic/import-logic";
+import { applyMappingPreset } from "src/logic/import-logic";
 import { folderPathSanitize } from "src/logic/string-processes";
 import GoogleKeepImportPlugin from "src/main";
 import { ConfirmationModal } from "src/modals/confirmation-modal/confirmation-modal";
@@ -25,8 +25,8 @@ export class BasicSettingsGroup {
             .addText((text) => {
                 text.setValue(plugin.settings.folderNames.notes);
                 text.inputEl.addEventListener('blur', async (e) => {
-                    const value = folderPathSanitize(text.getValue());
-                    plugin.settings.folderNames.notes = folderPathSanitize(value);
+                    const value = folderPathSanitize(text.getValue(), plugin.settings);
+                    plugin.settings.folderNames.notes = value;
                     text.setValue(value);
                     await plugin.saveSettings();
                 });
@@ -38,8 +38,8 @@ export class BasicSettingsGroup {
             .addText((text) => {
                 text.setValue(plugin.settings.folderNames.assets);
                 text.inputEl.addEventListener('blur', async (e) => {
-                    const value = folderPathSanitize(text.getValue());
-                    plugin.settings.folderNames.assets = folderPathSanitize(value);
+                    const value = folderPathSanitize(text.getValue(), plugin.settings);
+                    plugin.settings.folderNames.assets = folderPathSanitize(value, plugin.settings);
                     text.setValue(value);
                     await plugin.saveSettings();
                 });
@@ -51,8 +51,8 @@ export class BasicSettingsGroup {
             .addText((text) => {
                 text.setValue(plugin.settings.folderNames.unsupportedAssets);
                 text.inputEl.addEventListener('blur', async (e) => {
-                    const value = folderPathSanitize(text.getValue());
-                    plugin.settings.folderNames.unsupportedAssets = folderPathSanitize(value);
+                    const value = folderPathSanitize(text.getValue(), plugin.settings);
+                    plugin.settings.folderNames.unsupportedAssets = folderPathSanitize(value, plugin.settings);
                     text.setValue(value);
                     await plugin.saveSettings();
                 });

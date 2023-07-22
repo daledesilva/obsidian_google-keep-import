@@ -367,7 +367,7 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 
 
 			
-			const path = `${folder.path}/${filenameSanitize(content.title || file.name)}`;	// TODO: Strip file extension from filename
+			const path = `${folder.path}/${filenameSanitize(content.title || file.name, settings)}`;	// TODO: Strip file extension from filename
 
 
 
