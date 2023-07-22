@@ -159,24 +159,38 @@ export class FileImporter {
 				if(!assetFolder) assetFolder = await getOrCreateFolder(settings.folderNames.assets, vault);
 				result = await importBinaryFile(vault, assetFolder, file);
 
+			} else if(fileIsHtml(file) && settings.importUnsupported && settings.importHtml) {
+				// Import html file
+				if(!unsupportedFolder) unsupportedFolder = await getOrCreateFolder(settings.folderNames.unsupportedAssets, vault);
+				result = await importBinaryFile(vault, unsupportedFolder, file);
+				if(result.logStatus === LogStatus.Success) {
+					result.logStatus = LogStatus.Warning;
+					result.details = `<p>This file has been imported to '${settings.folderNames.unsupportedAssets}' because you've turned it on in the settings. However, HTML files may not be supported by Obsidian and thus may not be visible.</p><p>Also note that Google Takeout exports only include HTML files that are redundant to the included JSON note files. So if your importing a Takeout export you should leave HTML files turned off.</p>`;
+				}
+
+			} else if(fileIsHtml(file) && (!settings.importUnsupported || !settings.importHtml)) {
+				// Don't import htmls, but still log
+				result = {
+					keepFilename: file.name,
+					logStatus: LogStatus.Note,
+					details: `<p>HTML files in Google Takeout exports are redundant backups and this file has therefore been skipped. The note it relates too will have an equivalent JSON file that should have imported.</p><p>You can force HTML files to import in the settings but they may be unsupported by Obsidian.</p>`,
+				}
+
+			} else if(!fileIsHtml(file) && settings.importUnsupported) {
+				// Import as unsupported non-json file
+				if(!unsupportedFolder) unsupportedFolder = await getOrCreateFolder(settings.folderNames.unsupportedAssets, vault);
+				result = await importBinaryFile(vault, unsupportedFolder, file);
+				if(result.logStatus === LogStatus.Success) {
+					result.logStatus = LogStatus.Warning;
+					result.details = `This file type isn't a Google Keep JSON and isn't recognised by this plugin as Obsidian supported. It has been imported into '${settings.folderNames.unsupportedAssets}' as per your settings, but will only be visible in Obsidian if it's supported as is, if not, open that folder outside of Obsidian to convert or deleted the files. Any links to those files in notes will also need to be updated.`;
+				}
+
 			} else {
-				const fileIsHtmlAndValidImport = fileIsHtml(file) && settings.importUnsupported && settings.importHtml;
-				const fileIsOtherAndValidImport = !fileIsHtml(file) && settings.importUnsupported;
-				if(fileIsHtmlAndValidImport || fileIsOtherAndValidImport) {
-					// Import as unsupported binary file
-					if(!unsupportedFolder) unsupportedFolder = await getOrCreateFolder(settings.folderNames.unsupportedAssets, vault);
-					result = await importBinaryFile(vault, unsupportedFolder, file);
-					if(result.logStatus === LogStatus.Success) {
-						result.logStatus = LogStatus.Warning;
-						result.details = `This file type isn't supported by Obsidian. The file has been imported into '${settings.folderNames.unsupportedAssets}'. Open that folder outside of Obsidian to convert or deleted those files. Any links to those files in notes will also need to be updated.`;
-					}
-				} else {
-					// Don't import unsupported binary file, but still log
-					result = {
-						keepFilename: file.name,
-						logStatus: LogStatus.Note,
-						details: `This file type isn't supported by Obsidian and has been skipped. You can change this behaviour in the settings.`,
-					}
+				// Don't import unsupported non-json file, but still log
+				result = {
+					keepFilename: file.name,
+					logStatus: LogStatus.Note,
+					details: `This file type isn't supported by Obsidian and has been skipped. You can change this behaviour in the settings.`,
 				}
 			}
 
@@ -357,12 +371,12 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 			// Bail if the file has been read correctly but doesn't match the expected Keep format
 			if(!objectIsKeepJson(content)) {
 				result.logStatus = LogStatus.Error;
-				result.details = `JSON file doesn't match the expected Google Keep format.`;
+				result.details = `JSON file doesn't match the expected Google Keep format and therefore can't be imported.`;
 				return resolve(result);
 			}
 
 
-			// TODO: Refactor this as IsUserAcceptedType function
+			// TODO: Refactor this as IsFileTypeUserAccepted function
 			// Abort if user doesn't want this type of file
 			if(content.isArchived && !settings.importArchived) {
 				result.logStatus = LogStatus.Note;

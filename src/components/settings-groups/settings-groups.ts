@@ -122,7 +122,7 @@ export class InclusionSettingsGroup {
         let importHtmlToggle = new Setting(containerEl)
             .setClass('gki_setting')
             .setName('Import html files')
-            .setDesc('While HTML files are unsupported, they\'re also duplicates of supported notes in a Google Keep export. So you probably don\'t want these regardless.')
+            .setDesc('HTML files may be unsupported by Obsidian and therefore won\'t appear, and they\'re also duplicates of supported JSON notes in a Google Keep export. So you probably don\'t want these regardless.')
             .addToggle(toggle => {
                 toggle.setValue(plugin.settings.importHtml)
                 toggle.onChange(async (value) => {
