@@ -508,10 +508,11 @@ async function appendKeepLabels(fileRef: TFile, content: KeepJson, settings: Plu
 	if(!settings.addLabelTags) return;
 	if(!content.labels) return;
 
-	let labels = "";
+	let labels = '';
 	for(let i=0; i<content.labels.length; i++) {
+		const name = content.labels[i].name.split(' ').join('-');
 		if(i > 0) labels += ' ';
-		labels += settings.tagNames.labelPrepend + content.labels[i].name;
+		labels += settings.tagNames.labelPrepend + name;
 	}
 	await vault.append(fileRef, labels);
 }
