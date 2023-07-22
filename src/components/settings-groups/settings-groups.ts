@@ -148,6 +148,34 @@ export class TagSettingsGroup {
 
         new Setting(containerEl)
             .setClass('gki_setting')
+            .setName('Add label tags')
+            .setDesc('Add a tag to represent each label present in the Google Keep note.')
+            .addToggle(toggle => {
+                toggle.setValue(plugin.settings.addLabelTags)
+                toggle.onChange(async (value) => {
+                    plugin.settings.addLabelTags = value;
+                    await plugin.saveSettings();
+                    labelPrefixInput.setDisabled(!value);
+                });
+            })
+        let labelPrefixInput = new Setting(containerEl)
+            .setClass('gki_setting')
+            .setClass('gki_setting-child')
+            .setDesc('Text to prepend to each label tag:')
+            .addText((text) => {
+                text.setValue(plugin.settings.tagNames.labelPrepend);
+                text.inputEl.addEventListener('blur', async (e) => {
+                    const value = text.getValue();
+                    plugin.settings.tagNames.labelPrepend = value;
+                    text.setValue(value);
+                    await plugin.saveSettings();
+                });
+            })
+            .setDisabled(!plugin.settings.addColorTags)
+
+        
+        new Setting(containerEl)
+            .setClass('gki_setting')
             .setName('Add colour tags')
             .setDesc('Add a tag representing the color of the note in Google Keep.')
             .addToggle(toggle => {
