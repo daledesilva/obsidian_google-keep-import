@@ -506,6 +506,7 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
  */
 async function appendKeepLabels(fileRef: TFile, content: KeepJson, settings: PluginSettings, vault: Vault) {
 	if(!settings.addLabelTags) return;
+	if(!content.labels) return;
 
 	let labels = "";
 	for(let i=0; i<content.labels.length; i++) {
@@ -539,3 +540,4 @@ async function importBinaryFile(vault: Vault, folder: TFolder, file: File) : Pro
     
     return Promise.resolve(result);
 }
+
