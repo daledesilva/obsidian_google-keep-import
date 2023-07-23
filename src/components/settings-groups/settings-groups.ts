@@ -349,12 +349,12 @@ export class CharMappingGroup {
 
         const invalidMapDropdown = new Setting(containerEl)
             // .setClass('gki_setting')
-            .setName('Operating Systems')
+            .setName('File and folder name compatibility')
             .setDesc('You can choose to limit the invalid characters you map to suit the specific operating system you\'d like your filenames to be compatible with. By default it\'s set to make your files compatible with all operating systems (And you should probably leave it like this).')
             .addDropdown((dropdown) => {
-                dropdown.addOption(MappingPresets.allOrWindows, 'All (Or Windows)');
-                dropdown.addOption(MappingPresets.appleOrAndroid, "Apple or Android");
-                dropdown.addOption(MappingPresets.linux, "Linux");
+                dropdown.addOption(MappingPresets.allOrWindows, 'All Operating Systems');
+                dropdown.addOption(MappingPresets.appleOrAndroid, "Apple and Android only");
+                dropdown.addOption(MappingPresets.linux, "Linux only");
                 dropdown.setValue(plugin.settings.invalidCharFilter);
                 dropdown.onChange(async (value) => {
                     applyMappingPreset(value as MappingPresets, plugin.settings);

@@ -67,16 +67,21 @@ export async function runImportSequence(plugin: GoogleKeepImportPlugin) {
  */
 async function createNewEmptyMdFile(vault: Vault, path: string, options: DataWriteOptions, version: number = 1) : Promise<TFile> {
 	let fileRef: TFile;
+	let filePath;
+	
+	if(version == 1) {
+		filePath = `${path}.md`;
+	} else {
+		filePath = `${path} (${version}).md`;
+	}
 
-	try {
-		if(version == 1) {
-			fileRef = await vault.create(`${path}.md`, '', options);
-		} else {
-			fileRef = await vault.create(`${path} (${version}).md`, '', options);
-		}
+	if( await vault.adapter.exists(`${filePath}.md`) ) {
+		// File already exists, try appending a number (or higher number)
+		fileRef = await createNewEmptyMdFile(vault, path, options, version+1);
 
-	} catch(error) {
-;		fileRef = await createNewEmptyMdFile(vault, path, options, version+1);
+	} else {
+		// It doesn't already exists, so create it
+		fileRef = await vault.create(`${filePath}.md`, '', options);
 
 	}
 	
@@ -131,7 +136,6 @@ export class FileImporter {
 		const settings = this.plugin.settings;
 		this.activeImport = true;
 	
-		let noteFolder, assetFolder, unsupportedFolder;
 		this.totalImports = files.length;
 		this.successCount = 0;
 		this.failCount = 0;
@@ -146,23 +150,20 @@ export class FileImporter {
 	
 			if(fileIsJson(file)) {
 				// Assume is Google Keep note and attempt to import
-				if(!noteFolder) noteFolder = await getOrCreateFolder(settings.folderNames.notes, vault);
-				result = await importJson(vault, noteFolder, file, settings);
+				result = await importJson(vault, settings.folderNames.notes, file, settings);
 			
 			} else if(fileIsMarkdown(file)) {
 				// Import as is
-				if(!assetFolder) assetFolder = await getOrCreateFolder(settings.folderNames.assets, vault);
-				result = await importBinaryFile(vault, assetFolder, file);
+				result = await importBinaryFile(vault, settings.folderNames.notes, file);
 
 			} else if(fileIsBinaryAndSupportedByObsidian(file)) {
 				// Import as supported binary file
-				if(!assetFolder) assetFolder = await getOrCreateFolder(settings.folderNames.assets, vault);
-				result = await importBinaryFile(vault, assetFolder, file);
+				result = await importBinaryFile(vault, settings.folderNames.assets, file);
 
 			} else if(fileIsHtml(file) && settings.importUnsupported && settings.importHtml) {
 				// Import html file
-				if(!unsupportedFolder) unsupportedFolder = await getOrCreateFolder(settings.folderNames.unsupportedAssets, vault);
-				result = await importBinaryFile(vault, unsupportedFolder, file);
+				
+				result = await importBinaryFile(vault, settings.folderNames.unsupportedAssets, file);
 				if(result.logStatus === LogStatus.Success) {
 					result.logStatus = LogStatus.Warning;
 					result.details = `<p>This file has been imported to '${settings.folderNames.unsupportedAssets}' because you've turned it on in the settings. However, HTML files may not be supported by Obsidian and thus may not be visible.</p><p>Also note that Google Takeout exports only include HTML files that are redundant to the included JSON note files. So if your importing a Takeout export you should leave HTML files turned off.</p>`;
@@ -178,8 +179,7 @@ export class FileImporter {
 
 			} else if(!fileIsHtml(file) && settings.importUnsupported) {
 				// Import as unsupported non-json file
-				if(!unsupportedFolder) unsupportedFolder = await getOrCreateFolder(settings.folderNames.unsupportedAssets, vault);
-				result = await importBinaryFile(vault, unsupportedFolder, file);
+				result = await importBinaryFile(vault, settings.folderNames.unsupportedAssets, file);
 				if(result.logStatus === LogStatus.Success) {
 					result.logStatus = LogStatus.Warning;
 					result.details = `This file type isn't a Google Keep JSON and isn't recognised by this plugin as Obsidian supported. It has been imported into '${settings.folderNames.unsupportedAssets}' as per your settings, but will only be visible in Obsidian if it's supported as is, if not, open that folder outside of Obsidian to convert or deleted the files. Any links to those files in notes will also need to be updated.`;
@@ -217,7 +217,7 @@ export class FileImporter {
 			this.outputLog.push({
 				status: 'Error',
 				title: `${result.keepFilename}`,
-				desc: `${result.details} ${result.obsidianFilepath || ''} ${result.error ? '('+result.error+')' : ''}`,
+				desc: `${result.details} ${result.obsidianFilepath ? `<p><em>Intended name:</em> ${result.obsidianFilepath}` : ''} <p><em>${result.error || ''}</em></p>`,
 			})
 			
 		} else if(result.logStatus === LogStatus.Note) {
@@ -225,7 +225,7 @@ export class FileImporter {
 			this.outputLog.push({
 				status: 'Note',
 				title: `${result.keepFilename}`,
-				desc: `${result.details} ${result.error ? '('+result.error+')' : ''}`,
+				desc: `${result.details} <p><em>${result.error || ''}</em></p>`,
 			})
 
 		} else {
@@ -329,14 +329,26 @@ function fileIsHtml(file: File) {
 /**
  * Reads a Google Keep JSON file and creates a markdown note from it in the Obsidian vault.
  */
-async function importJson(vault: Vault, folder: TFolder, file: File, settings: PluginSettings) : Promise<ImportResult> {
+async function importJson(vault: Vault, folderPath: string, file: File, settings: PluginSettings) : Promise<ImportResult> {
+	let folder: TFolder;
 	const result: ImportResult = {
 		keepFilename: file.name,
 		logStatus: LogStatus.Success,
 	}
 
+
     // TODO: This composition is confusing - Attempt to simplify
-	return new Promise( (resolve, reject) => {
+	return new Promise( async (resolve, reject) => {
+
+		// Create folder
+		try {
+			folder = await getOrCreateFolder(folderPath, vault);
+		} catch(e) {
+			console.log(e);
+			result.logStatus = LogStatus.Error;
+			result.details = `<p>Please check the intended name doesn't include any characters not allowed by your operating system. This can happen if you've modified the character mapping options in this plugin's settings so that they don't match your operating system.</p>`;
+			return resolve(result);
+		}
 
 
 		// TODO: Refactor this as a parseKeepJson function that we wait for.
@@ -393,7 +405,6 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 			const path = `${folder.path}/${filenameSanitize(content.title || file.name, settings)}`;	// TODO: Strip file extension from filename
 
 
-
 			// TODO: Refactor this as createNewMarkdownFile function
 			// Create new file
 			result.obsidianFilepath = path;
@@ -403,7 +414,7 @@ async function importJson(vault: Vault, folder: TFolder, file: File, settings: P
 			} catch (error) {
 				result.logStatus = LogStatus.Error;
 				result.error = error;
-				result.details = `Error creating equivalent file in obsidian as ${path}`;
+				result.details = `<p>Please check the intended name doesn't include any characters not allowed by your operating system. This can happen if you've modified the character mapping options in this plugin's settings so that they don't match your operating system.</p>`;
 				return resolve(result);
 			}
 		
@@ -536,20 +547,34 @@ async function appendKeepLabels(fileRef: TFile, content: KeepJson, settings: Plu
 /**
  * Recreates any binary file in the Obsidian vault.
  */
-async function importBinaryFile(vault: Vault, folder: TFolder, file: File) : Promise<ImportResult> {
+async function importBinaryFile(vault: Vault, folderPath: string, file: File) : Promise<ImportResult> {
     let fileRef: TFile;
-	const path: string = `${folder.path}/${file.name}`;
+	let folder: TFolder;
+	let path: string;
 	const result: ImportResult = {
 		keepFilename: file.name,
 		logStatus: LogStatus.Success,
 	}
 	
+	// Create folder
+	try {
+		folder = await getOrCreateFolder(folderPath, vault);
+		path = `${folder.path}/${file.name}`;
+	} catch(e) {
+		console.log(e);
+		result.logStatus = LogStatus.Error;
+		result.details = `<p>Error creating folder '${folderPath}'.</p>
+		<p>Please check it doesn't include any characters not allowed by your operating system. This can happen if you've modified the character mapping options in the settings so that they don't match your operating system.</p>`;
+		return Promise.resolve(result);
+	}
+
+	// Create file
 	try {
 		fileRef = await vault.createBinary(path, await file.arrayBuffer());
 	} catch (error) {
 		result.logStatus = LogStatus.Error;
 		result.error = error;
-		result.details = 'Error creating file in obsidian.';
+		result.details = `Error creating file at '${path}'.`;
 		return Promise.resolve(result);
 	}
     
