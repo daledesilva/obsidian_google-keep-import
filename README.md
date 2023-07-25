@@ -36,7 +36,11 @@ The plugin can import any file it sees regardless of whether ut cam from Keep or
 The plugin provides a settings page that is also accessible during the import process. This allows you to tailor what gets imported and how dates, colours, tags, and more from the Keep files are treated in Obsidian.
 
 ### Settings:
-<image src="docs/media/settings.png" width="500px" alt="A screenshot of the plugin's settings. See below for a description."/>
+<image src="docs/media/settings_basics.jpg" width="500px" alt="A screenshot of the plugin's settings. See below for a description."/>
+<image src="docs/media/settings_inclusions.jpg" width="500px" alt="A screenshot of the plugin's settings. See below for a description."/>
+<image src="docs/media/settings_tags.jpg" width="500px" alt="A screenshot of the plugin's settings. See below for a description."/>
+<image src="docs/media/settings_problem-characters.jpg" width="500px" alt="A screenshot of the plugin's settings. See below for a description."/>
+<image src="docs/media/settings_invalid-characters.jpg" width="500px" alt="A screenshot of the plugin's settings. See below for a description."/>
 
 <details>
   <summary>Expand to read breakdown of settings</summary>
@@ -48,16 +52,25 @@ The plugin provides a settings page that is also accessible during the import pr
   - **Note creation date**: Defines which date should be used as the 'created on' date for each new Obsidian note; The date of Obsidian import, or the original Google Keep creation date.
   #### Inclusions
   Whether to import specific types of notes or ignore them.
-  - **Import archived notes**: 
-  - **Import trashed notes**: 
-  - **Import unsupported files**: 
+  - **Import archived notes**
+  - **Import trashed notes**
+  - **Import unsupported files**:
+    - **Import html files**:
+    Unsupported (and html files) aren't imported by default as they will usually be invisible in Obsidian. HTML files from Google Takeout exports are also duplicates of other files so they do not need to be imported.
   #### Tags
   Whether to apply tags to notes in Obsidian to represent these attributes of the original Google Keep notes.
+  - **Add label tags**
   - **Add colour tags**
   - **Add pinned tags**
   - **Add attachment tags**
   - **Add archived tags**
   - **Add trashed tags**
+  #### Character Mapping
+  Allows mapping any characters in titles to valid characters for use in your notes filenames. This is set to make files valid for all operating systems by default.
+  - **Problem characters**
+  These characters may not break the import, but the wil degrade functionality in certain places within Obsidian.
+  - **Invalid characters**
+  These characters in the titles of your imported notes can prevent import on certain operating systems.
 
 </details>
 
