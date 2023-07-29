@@ -11,6 +11,12 @@ export interface KeepAttachment {
 	mimetype: string;
 }
 
+export interface KeepSharee {
+	isOwner: boolean;
+	type: string;
+	email: string;
+}
+
 export interface KeepLabel {
 	name: string;
 }
@@ -24,6 +30,7 @@ export interface KeepJson {
 	textContent?: string;
 	listContent?: Array<KeepListItem>;
 	attachments?: Array<KeepAttachment>;
+	sharees?: Array<KeepSharee>;
 	title: string;
 	userEditedTimestampUsec: number;
 	labels: Array<KeepLabel>;

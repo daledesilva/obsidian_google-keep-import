@@ -89,10 +89,54 @@ export function folderPathSanitize(str: string, settings: PluginSettings) {
  * Returns the file extension when passed a filename string.
  */
 export function getFileExtension(filename: string): string {
-	let ext = filename.split('.').pop();
+	let fileAndExt = filename.split('.')
+	if(fileAndExt.length <= 1) return '';
+
+	let ext = fileAndExt.pop();
 	if(ext) {
 		return ext.toLowerCase();
 	} else {
 		return '';
 	}
+}
+
+/**
+ * Returns the filename without the extension.
+ * Supports being passed the full path and will return a full path
+ */
+export function removeExtension(path: string): string {
+	
+	// Split into folders along the path
+	let sections = path.split('/');
+	if(sections.length === 0) return path;
+
+	// Remove extension from filename section and add back in
+	let fileMeta = getNameAndExt(sections.pop() as string);
+	sections.push(fileMeta.name);
+
+	return sections.join('/');
+}
+
+/**
+ * Returns an object with name and ext properties.
+ * Doesn't accept a full path.
+ */
+export function getNameAndExt(filename: string): {name: string, ext: string} {
+	const indexOfLastPeriod = filename.lastIndexOf('.');
+	
+	// If there is no period, then the filename has no extension.
+	if (indexOfLastPeriod === -1) {
+		return {
+			name: filename,
+			ext: '',
+		}
+	}
+	
+	const name = filename.substring(0, indexOfLastPeriod);
+	const ext = filename.substring(indexOfLastPeriod + 1);
+	
+	return {
+		name,
+		ext,
+	};
 }

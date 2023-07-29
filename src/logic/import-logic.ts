@@ -1,7 +1,7 @@
 import { DataWriteOptions, Notice, TFile, TFolder, Vault } from "obsidian";
 import GoogleKeepImportPlugin, { invalidChars_allOrWindowsPreset, invalidChars_appleOrAndroidPreset, invalidChars_linuxPreset} from "src/main";
 import { ImportProgressModal } from "src/modals/import-progress-modal/import-progress-modal";
-import { filenameSanitize, getFileExtension } from "./string-processes";
+import { filenameSanitize, getFileExtension, removeExtension } from "./string-processes";
 import { CharMap, CreatedDateTypes, MappingPresets, PluginSettings } from "src/types/plugin-settings";
 import { KeepJson, objectIsKeepJson } from "src/types/keep-data";
 import { IgnoreImportReason, ImportResult, LogStatus as LogStatus } from "src/types/results";
@@ -64,24 +64,26 @@ export async function runImportSequence(plugin: GoogleKeepImportPlugin) {
 
 /**
  * Creates an empty markdown file and returns it. If the file exists already it creates a new one and appends a version number.
+ * Don't include file extension unless it should appear in the note's title.
+ * 
  */
-async function createNewEmptyMdFile(vault: Vault, path: string, options: DataWriteOptions, version: number = 1) : Promise<TFile> {
+async function createNewEmptyMdFile(vault: Vault, pathAndName: string, options: DataWriteOptions, version: number = 1) : Promise<TFile> {
 	let fileRef: TFile;
-	let filePath;
+	let pathAndVersionedName;
 	
 	if(version == 1) {
-		filePath = `${path}.md`;
+		pathAndVersionedName = pathAndName;
 	} else {
-		filePath = `${path} (${version}).md`;
+		pathAndVersionedName = `${pathAndName} (${version})`;
 	}
 
-	if( await vault.adapter.exists(`${filePath}.md`) ) {
+	if( await vault.adapter.exists(`${pathAndVersionedName}.md`) ) {
 		// File already exists, try appending a number (or higher number)
-		fileRef = await createNewEmptyMdFile(vault, path, options, version+1);
+		fileRef = await createNewEmptyMdFile(vault, pathAndName, options, version+1);
 
 	} else {
 		// It doesn't yet exist, so create it
-		fileRef = await vault.create(`${filePath}.md`, '', options);
+		fileRef = await vault.create(`${pathAndVersionedName}.md`, '', options);
 
 	}
 	
@@ -394,8 +396,8 @@ async function importJson(vault: Vault, folderPath: string, file: File, settings
 			}
 
 			
-			const path = `${folder.path}/${filenameSanitize(content.title || file.name, settings)}`;	// TODO: Strip file extension from filename
-
+			let path = `${folder.path}/${filenameSanitize(content.title || file.name, settings)}`;
+			
 
 			// TODO: Refactor this as createNewMarkdownFile function
 			// Create new file
